@@ -1,0 +1,19 @@
+﻿{
+    "key":  {
+                "H":  {
+                          "item":  "project_babylon_materials:reinforced_handle"
+                      },
+                "I":  {
+                          "item":  "project_babylon_materials:dragonsteel_ingot"
+                      }
+            },
+    "pattern":  [
+                    "  I",
+                    "II ",
+                    "HI "
+                ],
+    "result":  {
+                   "item":  "project_babylon_weapons:dragonsteel_greatsword"
+               },
+    "type":  "minecraft:crafting_shaped"
+}

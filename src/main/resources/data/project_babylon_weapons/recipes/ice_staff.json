@@ -1,0 +1,19 @@
+﻿{
+    "key":  {
+                "S":  {
+                          "item":  "project_babylon_materials:reinforced_shaft"
+                      },
+                "I":  {
+                          "item":  "project_babylon_materials:everfrost_ingot"
+                      }
+            },
+    "pattern":  [
+                    "  I",
+                    " S ",
+                    "I  "
+                ],
+    "result":  {
+                   "item":  "project_babylon_weapons:ice_staff"
+               },
+    "type":  "minecraft:crafting_shaped"
+}

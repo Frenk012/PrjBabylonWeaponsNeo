@@ -1,0 +1,142 @@
+package com.rave.projectbabylonweapons.item.battlescythe;
+
+import com.rave.projectbabylonweapons.item.renderer.NetheriteBattleScytheItemRenderer;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.*;
+
+import net.minecraft.world.level.Level;
+import software.bernie.geckolib.util.GeckoLibUtil;
+import software.bernie.geckolib.core.object.PlayState;
+import software.bernie.geckolib.core.animation.RawAnimation;
+import software.bernie.geckolib.core.animation.AnimationState;
+import software.bernie.geckolib.core.animation.AnimationController;
+import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.animatable.GeoItem;
+
+import net.minecraftforge.client.extensions.common.IClientItemExtensions;
+
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
+
+
+import java.util.List;
+import java.util.function.Consumer;
+
+
+public class NetheriteBattleScytheItem extends SwordItem implements GeoItem {
+    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
+    public String animationprocedure = "empty";
+
+    public static final int DURABILITY = 3136;
+    public static final int ATTACK_DAMAGE_MOD = 3;
+    public static final float ATTACK_SPEED_MOD = -3.0F;
+
+    public static final float IGNITE_PROC_CHANCE = 0.25F;
+    public static final int IGNITE_DURATION_SECONDS = 5;
+
+    public static final float BRIMSTONE_FLAMES_PROC_CHANCE = 0.25F;
+    public static final int BRIMSTONE_FLAMES_DURATION_TICKS = 20 * 5;
+
+    public static final float BRIMSTONE_FIRE_PROC_CHANCE = 0.25F;
+    public static final int BRIMSTONE_FIRE_DURATION_TICKS = 20 * 5;
+
+    public static final float BRIMSTONE_BLAST_PROC_CHANCE = 0.30F;
+    public static final float BRIMSTONE_BLAST_DAMAGE_MULTIPLIER = 0.30F;
+    public static final float BRIMSTONE_BLAST_RADIUS_BLOCKS = 2.5F;
+
+    public NetheriteBattleScytheItem() {
+        super(
+                Tiers.DIAMOND,
+                ATTACK_DAMAGE_MOD,
+                ATTACK_SPEED_MOD,
+                new Item.Properties()
+                        .durability(2600)
+                        .rarity(Rarity.COMMON)
+        );
+    }
+
+    @Override
+    public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged) {
+        return false;
+    }
+
+    @Override
+    public void initializeClient(Consumer<IClientItemExtensions> consumer) {
+        super.initializeClient(consumer);
+        consumer.accept(new IClientItemExtensions() {
+            private final BlockEntityWithoutLevelRenderer renderer = new NetheriteBattleScytheItemRenderer();
+
+            @Override
+            public BlockEntityWithoutLevelRenderer getCustomRenderer() {
+                return renderer;
+            }
+        });
+    }
+
+    private PlayState idlePredicate(AnimationState event) {
+        if (this.animationprocedure.equals("empty")) {
+            event.getController().setAnimation(RawAnimation.begin().thenLoop("animation.netherite_battlescythe.idle"));
+            return PlayState.CONTINUE;
+        }
+        return PlayState.STOP;
+    }
+
+    String prevAnim = "empty";
+
+    private PlayState procedurePredicate(AnimationState event) {
+        if (!this.animationprocedure.equals("empty") && event.getController().getAnimationState() == AnimationController.State.STOPPED || (!this.animationprocedure.equals(prevAnim) && !this.animationprocedure.equals("empty"))) {
+            if (!this.animationprocedure.equals(prevAnim))
+                event.getController().forceAnimationReset();
+            event.getController().setAnimation(RawAnimation.begin().thenPlay(this.animationprocedure));
+            if (event.getController().getAnimationState() == AnimationController.State.STOPPED) {
+                this.animationprocedure = "empty";
+                event.getController().forceAnimationReset();
+            }
+        } else if (this.animationprocedure.equals("empty")) {
+            prevAnim = "empty";
+            return PlayState.STOP;
+        }
+        prevAnim = this.animationprocedure;
+        return PlayState.CONTINUE;
+    }
+
+    @Override
+    public void registerControllers(AnimatableManager.ControllerRegistrar data) {
+        AnimationController procedureController = new AnimationController(this, "procedureController", 0, this::procedurePredicate);
+        data.add(procedureController);
+        AnimationController idleController = new AnimationController(this, "idleController", 0, this::idlePredicate);
+        data.add(idleController);
+    }
+
+    @Override
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return this.cache;
+    }
+
+    @Override
+    public int getEnchantmentValue() {
+        return 20;
+    }
+
+    @Override
+    public float getDestroySpeed(ItemStack par1ItemStack, BlockState par2Block) {
+        return 2.1F;
+    }
+
+    @Override
+    public void appendHoverText(ItemStack stack, Level level, List<Component> tooltip, TooltipFlag flag) {
+        super.appendHoverText(stack, level, tooltip, flag);
+
+        tooltip.add(Component.empty());
+        tooltip.add(Component.translatable("tooltip.project_babylon_weapons.passive.netherite.line1")
+                .withStyle(ChatFormatting.GOLD));
+        tooltip.add(Component.translatable("tooltip.project_babylon_weapons.passive.netherite.line2")
+                .withStyle(ChatFormatting.GRAY));
+        tooltip.add(Component.translatable("tooltip.project_babylon_weapons.passive.netherite.line3")
+                .withStyle(ChatFormatting.GRAY));
+    }
+}
+
+

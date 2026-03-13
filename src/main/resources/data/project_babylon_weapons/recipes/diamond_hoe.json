@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "## ",
+    " X ",
+    " X "
+  ],
+  "key": {
+    "#": {
+      "item": "project_babylon_materials:diamond_ingot"
+    },
+    "X": {
+      "item": "project_babylon_materials:handle"
+    }
+  },
+  "result": {
+    "item": "project_babylon_weapons:diamond_hoe"
+  }
+}

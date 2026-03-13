@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " ##",
+    " X#",
+    " X "
+  ],
+  "key": {
+    "#": {
+      "item": "minecraft:netherite_ingot"
+    },
+    "X": {
+      "item": "project_babylon_materials:reinforced_handle"
+    }
+  },
+  "result": {
+    "item": "project_babylon_weapons:netherite_axe_mirror"
+  }
+}

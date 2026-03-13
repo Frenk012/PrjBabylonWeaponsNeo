@@ -1,0 +1,22 @@
+﻿{
+    "key":  {
+                "S":  {
+                          "item":  "project_babylon_materials:reinforced_shaft"
+                      },
+                "I":  {
+                          "item":  "project_babylon_materials:dragonsteel_ingot"
+                      },
+                "B":  {
+                          "item":  "project_babylon_materials:dragonsteel_block"
+                      }
+            },
+    "pattern":  [
+                    "BIB",
+                    " S ",
+                    " S "
+                ],
+    "result":  {
+                   "item":  "project_babylon_weapons:dragonsteel_battlehammer"
+               },
+    "type":  "minecraft:crafting_shaped"
+}

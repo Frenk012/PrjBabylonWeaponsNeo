@@ -1,0 +1,19 @@
+﻿{
+    "key":  {
+                "S":  {
+                          "item":  "project_babylon_materials:shaft"
+                      },
+                "I":  {
+                          "item":  "project_babylon_materials:diamond_ingot"
+                      }
+            },
+    "pattern":  [
+                    "III",
+                    " S ",
+                    "S  "
+                ],
+    "result":  {
+                   "item":  "project_babylon_weapons:diamond_battlescythe"
+               },
+    "type":  "minecraft:crafting_shaped"
+}

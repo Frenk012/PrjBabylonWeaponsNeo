@@ -1,0 +1,19 @@
+﻿{
+    "key":  {
+                "H":  {
+                          "item":  "project_babylon_materials:reinforced_handle"
+                      },
+                "I":  {
+                          "item":  "project_babylon_materials:ethereal_ingot"
+                      }
+            },
+    "pattern":  [
+                    "  I",
+                    " I ",
+                    "HI "
+                ],
+    "result":  {
+                   "item":  "project_babylon_weapons:ethereal_tachi"
+               },
+    "type":  "minecraft:crafting_shaped"
+}

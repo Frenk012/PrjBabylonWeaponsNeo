@@ -1,0 +1,13 @@
+﻿{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " n ",
+    "In ",
+    " I "
+  ],
+  "key": {
+    "I": { "item": "minecraft:iron_ingot" },
+    "n": { "item": "minecraft:iron_nugget" }
+  },
+  "result": { "item": "project_babylon_weapons:iron_claws" }
+}

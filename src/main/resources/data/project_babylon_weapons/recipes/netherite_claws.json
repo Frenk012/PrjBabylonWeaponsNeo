@@ -1,0 +1,19 @@
+﻿{
+    "key":  {
+                "n":  {
+                          "item":  "project_babylon_materials:netherite_nugget"
+                      },
+                "I":  {
+                          "item":  "minecraft:netherite_ingot"
+                      }
+            },
+    "pattern":  [
+                    " n ",
+                    "In ",
+                    " I "
+                ],
+    "result":  {
+                   "item":  "project_babylon_weapons:netherite_claws"
+               },
+    "type":  "minecraft:crafting_shaped"
+}

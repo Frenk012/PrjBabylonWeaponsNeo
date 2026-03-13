@@ -1,0 +1,19 @@
+﻿{
+    "key":  {
+                "H":  {
+                          "item":  "project_babylon_materials:reinforced_handle"
+                      },
+                "I":  {
+                          "item":  "minecraft:netherite_ingot"
+                      }
+            },
+    "pattern":  [
+                    "   ",
+                    "  I",
+                    "HI "
+                ],
+    "result":  {
+                   "item":  "project_babylon_weapons:netherite_sickle"
+               },
+    "type":  "minecraft:crafting_shaped"
+}

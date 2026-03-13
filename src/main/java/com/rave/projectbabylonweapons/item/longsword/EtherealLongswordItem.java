@@ -1,0 +1,36 @@
+package com.rave.projectbabylonweapons.item.longsword;
+
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.SwordItem;
+import net.minecraft.world.item.Tiers;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
+
+import java.util.List;
+
+public class EtherealLongswordItem extends SwordItem {
+
+    public static final int DURABILITY = 3082;
+    public static final int ATTACK_DAMAGE_MOD = 3;
+    public static final float ATTACK_SPEED_MOD = -3.0F;
+
+
+    public static final float HOLY_DAMAGE_PERCENT = 0.75F;
+    public static final float PHYSICAL_DAMAGE_PERCENT = 0.25F;
+
+    public EtherealLongswordItem(Properties props) {
+        super(Tiers.WOOD, ATTACK_DAMAGE_MOD, ATTACK_SPEED_MOD, props.durability(DURABILITY));
+    }
+
+    @Override
+    public void appendHoverText(ItemStack stack, Level level, List<Component> tooltip, TooltipFlag flag) {
+        super.appendHoverText(stack, level, tooltip, flag);
+
+        tooltip.add(Component.empty());
+        tooltip.add(Component.translatable("tooltip.project_babylon_weapons.passive.ethereal.line1")
+                .withStyle(ChatFormatting.GRAY));
+    }
+}
+
