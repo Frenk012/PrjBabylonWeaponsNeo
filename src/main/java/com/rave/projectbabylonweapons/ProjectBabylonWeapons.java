@@ -3,6 +3,7 @@ package com.rave.projectbabylonweapons;
 import com.mojang.logging.LogUtils;
 
 import com.rave.projectbabylonweapons.gameasset.PBAnimations;
+import com.rave.projectbabylonweapons.config.PBConfig;
 import com.rave.projectbabylonweapons.init.CreativeTabRegistry;
 import com.rave.projectbabylonweapons.init.PBModBlocks;
 import com.rave.projectbabylonweapons.init.PBModEntities;
@@ -21,8 +22,10 @@ import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.ModLoadingContext;
 
 import net.minecraftforge.resource.PathPackResources;
 import org.slf4j.Logger;
@@ -40,6 +43,8 @@ public class ProjectBabylonWeapons {
     public ProjectBabylonWeapons() {
         IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
         IEventBus forgeBus = MinecraftForge.EVENT_BUS;
+
+        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, PBConfig.SPEC);
 
         modBus.addListener(this::commonSetup);
         modBus.addListener(this::addCreative);

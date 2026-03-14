@@ -1,15 +1,15 @@
 ﻿{
     "key":  {
                 "n":  {
-                          "item":  "project_babylon_materials:infused_gold_nugget"
+                          "item":  "project_babylon_materials:infused_golden_nugget"
                       },
                 "I":  {
-                          "item":  "project_babylon_materials:infused_gold_ingot"
+                          "item":  "project_babylon_materials:infused_golden_ingot"
                       }
             },
     "pattern":  [
                     " n ",
-                    "In ",
+                    "Inn",
                     " I "
                 ],
     "result":  {

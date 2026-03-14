@@ -1,0 +1,22 @@
+﻿{
+    "key":  {
+                "H":  {
+                          "item":  "project_babylon_materials:reinforced_handle"
+                      },
+                "I":  {
+                          "item":  "project_babylon_materials:everfrost_nugget"
+                      },
+                "n":  {
+                          "item":  "project_babylon_materials:everfrost_ingot"
+                      }
+            },
+    "pattern":  [
+                    "  I",
+                    "nI ",
+                    "Hn "
+                ],
+    "result":  {
+                   "item":  "project_babylon_weapons:ice_rapier"
+               },
+    "type":  "minecraft:crafting_shaped"
+}

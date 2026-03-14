@@ -1,8 +1,8 @@
 {
     "trail": {
     	"color": [205, 205, 225],
-    	"begin_pos": [0.0, 0.0, 1.0],
-    	"end_pos": [0.0, 0.0, -1.0],
+    	"begin_pos": [0.0, 0.0, 2.0],
+    	"end_pos": [0.0, 0.0, -2.0],
     	"lifetime": 6,
 		"interpolations": 12,
     	"texture_path": "project_babylon_weapons:textures/particle/weapon_trail/iron_trail.png",

@@ -1,0 +1,22 @@
+﻿{
+    "key":  {
+                "H":  {
+                          "item":  "project_babylon_materials:reinforced_handle"
+                      },
+                "I":  {
+                          "item":  "project_babylon_materials:ethereal_nugget"
+                      },
+                "n":  {
+                          "item":  "project_babylon_materials:ethereal_ingot"
+                      }
+            },
+    "pattern":  [
+                    "  I",
+                    "nI ",
+                    "Hn "
+                ],
+    "result":  {
+                   "item":  "project_babylon_weapons:ethereal_rapier"
+               },
+    "type":  "minecraft:crafting_shaped"
+}

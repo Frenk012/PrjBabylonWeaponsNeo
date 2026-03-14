@@ -1,8 +1,8 @@
 {
     "trail": {
     	"color": [205, 205, 225],
-    	"begin_pos": [0.0, 0.0, 1.4],
-    	"end_pos": [0.0, 0.0, -1.4],
+    	"begin_pos": [0.0, 0.0, 2.4],
+    	"end_pos": [0.0, 0.0, -2.4],
     	"lifetime": 6,
 		"interpolations": 12,
     	"texture_path": "project_babylon_weapons:textures/particle/weapon_trail/ice_trail.png",
