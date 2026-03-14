@@ -34,5 +34,5 @@
 
 - Redistribute ANY assets from this mod (located under `src/main/resources/assets`).
     - **Note:** You may replace all original assets with your own to redistribute your fork publicly.
-- Sell addons, mods, or other derivative works that use any Weapon Loadouts assets, including but not limited to animations,
+- Sell addons, mods, or other derivative works that use any Project Babylon assets, including but not limited to animations,
   textures, sounds, or models.
