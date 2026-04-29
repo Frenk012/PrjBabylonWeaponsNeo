@@ -1,7 +1,7 @@
 package com.rave.projectbabylonweapons.item.claws;
 
 import com.rave.projectbabylonweapons.init.PBModEffects;
-import net.minecraft.ChatFormatting;
+import com.rave.projectbabylonweapons.passive.golden.GoldenMagicPassive;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
@@ -20,7 +20,6 @@ public class GoldenClawsItem extends SwordItem {
     public static final int DURABILITY = 1312;
     public static final int ATTACK_DAMAGE_MOD = 3;
     public static final float ATTACK_SPEED_MOD = -3.0F;
-    public static final float BONUS_MAGIC_DAMAGE_PERCENT = 0.25F;
 
     public GoldenClawsItem(Properties props) {
         super(Tiers.WOOD, ATTACK_DAMAGE_MOD, ATTACK_SPEED_MOD, props.durability(DURABILITY));
@@ -39,10 +38,7 @@ public class GoldenClawsItem extends SwordItem {
     @Override
     public void appendHoverText(ItemStack stack, Level level, List<Component> tooltip, TooltipFlag flag) {
         super.appendHoverText(stack, level, tooltip, flag);
-
-        tooltip.add(Component.empty());
-        tooltip.add(Component.translatable("tooltip.project_babylon_weapons.passive.golden.line1")
-                .withStyle(ChatFormatting.GRAY));
+        GoldenMagicPassive.appendTooltip(tooltip);
     }
 }
 

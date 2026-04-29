@@ -17,6 +17,9 @@ public final class PBItemTags {
     public static final TagKey<Item> GOLDEN_TOOLS =
             ItemTags.create(new ResourceLocation(ProjectBabylonWeapons.MODID, "golden_tools"));
 
+    public static final TagKey<Item> DIAMOND_TOOLS =
+            ItemTags.create(new ResourceLocation(ProjectBabylonWeapons.MODID, "diamond_tools"));
+
     private PBItemTags() {
     }
 }

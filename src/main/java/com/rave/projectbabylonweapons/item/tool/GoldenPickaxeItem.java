@@ -1,7 +1,7 @@
 package com.rave.projectbabylonweapons.item.tool;
 
 import com.rave.projectbabylonweapons.item.material.PBToolTiers;
-import net.minecraft.ChatFormatting;
+import com.rave.projectbabylonweapons.passive.golden.GoldenMagicPassive;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.PickaxeItem;
@@ -19,9 +19,6 @@ public class GoldenPickaxeItem extends PickaxeItem {
     @Override
     public void appendHoverText(ItemStack stack, Level level, List<Component> tooltip, TooltipFlag flag) {
         super.appendHoverText(stack, level, tooltip, flag);
-
-        tooltip.add(Component.empty());
-        tooltip.add(Component.translatable("tooltip.project_babylon_weapons.passive.golden.line1")
-                .withStyle(ChatFormatting.GRAY));
+        GoldenMagicPassive.appendTooltip(tooltip);
     }
 }

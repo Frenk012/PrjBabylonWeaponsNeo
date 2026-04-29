@@ -1,5 +1,12 @@
 package com.rave.projectbabylonweapons.item.sickle;
 
+import java.util.List;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.chat.Component;
+import com.rave.projectbabylonweapons.passive.diamond.DiamondFangPassive;
+
 
 import net.minecraft.world.item.SwordItem;
 import net.minecraft.world.item.Tiers;
@@ -14,5 +21,10 @@ public class DiamondSickleItem extends SwordItem {
     public DiamondSickleItem(Properties props) {
         // ВАЖНО: без stacksTo(...). Только durability(...)
         super(Tiers.WOOD, ATTACK_DAMAGE_MOD, ATTACK_SPEED_MOD, props.durability(DURABILITY));
+    }
+    @Override
+    public void appendHoverText(ItemStack stack, Level level, List<Component> tooltip, TooltipFlag flag) {
+        super.appendHoverText(stack, level, tooltip, flag);
+        DiamondFangPassive.appendTooltip(tooltip);
     }
 }

@@ -2,7 +2,7 @@ package com.rave.projectbabylonweapons.item.greatsword;
 
 
 import com.rave.projectbabylonweapons.item.renderer.IceGreatswordItemRenderer;
-import net.minecraft.ChatFormatting;
+import com.rave.projectbabylonweapons.passive.ice.IceChillPassive;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.*;
 
@@ -32,19 +32,6 @@ public class IceGreatswordItem extends SwordItem implements GeoItem {
     public static final int DURABILITY = 2410;
     public static final int ATTACK_DAMAGE_MOD = 3;
     public static final float ATTACK_SPEED_MOD = -3.0F;
-    public static final float CHILL_I_PROC_CHANCE = 0.35F;
-    public static final float CHILL_II_PROC_CHANCE = 0.35F;
-    public static final float CHILL_III_PROC_CHANCE = 0.35F;
-    public static final float FROZEN_FROM_CHILL_III_PROC_CHANCE = 0.35F;
-
-    public static final int CHILL_I_DURATION_TICKS = 20 * 8;
-    public static final int CHILL_II_DURATION_TICKS = 20 * 8;
-    public static final int CHILL_III_DURATION_TICKS = 20 * 8;
-    public static final int FROZEN_DURATION_TICKS = 20 * 3;
-
-    public static final int CHILL_I_AMPLIFIER = 0;
-    public static final int CHILL_II_AMPLIFIER = 1;
-    public static final int CHILL_III_AMPLIFIER = 2;
 
 
     public IceGreatswordItem() {
@@ -129,13 +116,10 @@ public class IceGreatswordItem extends SwordItem implements GeoItem {
 
     @Override
     public void appendHoverText(ItemStack stack, Level level, List<Component> tooltip, TooltipFlag flag) {
-        super.appendHoverText(stack, level, tooltip, flag);
-
-        tooltip.add(Component.empty());
-        tooltip.add(Component.translatable("tooltip.project_babylon_weapons.passive.ice.line1")
-                .withStyle(ChatFormatting.GRAY));
-        tooltip.add(Component.translatable("tooltip.project_babylon_weapons.passive.ice.line2")
-                .withStyle(ChatFormatting.GRAY));
+        super.appendHoverText(stack, level, tooltip, flag);
+        IceChillPassive.appendTooltip(tooltip);
     }
 }
+
+
 

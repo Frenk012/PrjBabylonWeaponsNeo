@@ -1,4 +1,4 @@
-﻿{
+{
     "block.project_babylon_weapons.frozen_debuff_ice_block":  "Frozen Debuff Ice Block",
     "creativetab.projectbabylonweapons.weapons":  "Project Babylon Weapons",
     "effect.project_babylon_weapons.bleed_debuff":  "Bleeding",
@@ -150,11 +150,20 @@
     "subtitles.project_babylon_weapons.sounds.got_frozen":  "Ice cracks",
     "subtitles.project_babylon_weapons.sounds.chain_up":  "Chain tightening",
     "subtitles.project_babylon_weapons.sounds.chain_down":  "Chain released",
-    "tooltip.project_babylon_weapons.passive.ethereal.line1":  "75% of dealt damage is converted to §6Holy Damage.",
-    "tooltip.project_babylon_weapons.passive.golden.line1":  "Deals bonus §5Magic Damage §7on hit.",
-    "tooltip.project_babylon_weapons.passive.ice.line1":  "Builds up §bChilled §7on hit.",
-    "tooltip.project_babylon_weapons.passive.ice.line2":  "Maximum §bChilled §7can trigger §9Frozen.",
-    "tooltip.project_babylon_weapons.passive.netherite.line1":  "Ignites targets on hit.",
-    "tooltip.project_babylon_weapons.passive.netherite.line2":  "Burning targets can apply §6Brimstone Flames.",
-    "tooltip.project_babylon_weapons.passive.netherite.line3":  "Marked targets can trigger §cBrimstone Blast."
+    "tooltip.project_babylon_weapons.passive.hold_ctrl":  "Hold CTRL to see Weapon Passive.",
+    "tooltip.project_babylon_weapons.passive.weapon":  "Weapon Passive",
+    "tooltip.project_babylon_weapons.passive.description":  "Description",
+    "tooltip.project_babylon_weapons.passive.ice.name":  "Cold Touch",
+    "tooltip.project_babylon_weapons.passive.golden.name":  "Heavy Mind",
+    "tooltip.project_babylon_weapons.passive.ethereal.name":  "Blessing",
+    "tooltip.project_babylon_weapons.passive.netherite.name":  "Lava Core",
+    "tooltip.project_babylon_weapons.passive.ethereal.line1":  "Convert 75% of dealt damage into §6Holy Damage§r on hit.",
+    "tooltip.project_babylon_weapons.passive.golden.line1":  "Deal bonus §5Magic Damage§r on hit based on weapon damage.",
+    "tooltip.project_babylon_weapons.passive.ice.line1":  "Apply stackable §bCHILL§r on hit with a chance.",
+    "tooltip.project_babylon_weapons.passive.ice.line2":  "Maximum §bCHILL§r can trigger §9FROZEN§r on a target.",
+    "tooltip.project_babylon_weapons.passive.netherite.line1":  "Ignite targets on hit with a chance.",
+    "tooltip.project_babylon_weapons.passive.netherite.line2":  "Burning targets can apply §6Brimstone Flames§r with a chance.",
+    "tooltip.project_babylon_weapons.passive.diamond.name":  "Fang of the Wolf",
+    "tooltip.project_babylon_weapons.passive.diamond.line1":  "With 15% chance, weapon attacks ignore §6100% enemy defence§r.",
+    "tooltip.project_babylon_weapons.passive.netherite.line3":  "Marked targets can trigger \\u00A7cBrimstone Blast\\u00A7r around them."
 }

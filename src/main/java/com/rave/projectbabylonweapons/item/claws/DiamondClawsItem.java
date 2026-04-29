@@ -1,5 +1,11 @@
 package com.rave.projectbabylonweapons.item.claws;
 
+import java.util.List;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.network.chat.Component;
+import com.rave.projectbabylonweapons.passive.diamond.DiamondFangPassive;
+
 import com.rave.projectbabylonweapons.init.PBModEffects;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
@@ -28,5 +34,10 @@ public class DiamondClawsItem extends SwordItem {
             }
         }
         return super.hurtEnemy(stack, target, attacker);
+    }
+    @Override
+    public void appendHoverText(ItemStack stack, Level level, List<Component> tooltip, TooltipFlag flag) {
+        super.appendHoverText(stack, level, tooltip, flag);
+        DiamondFangPassive.appendTooltip(tooltip);
     }
 }
