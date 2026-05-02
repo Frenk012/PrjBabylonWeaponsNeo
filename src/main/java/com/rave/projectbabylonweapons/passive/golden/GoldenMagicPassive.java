@@ -1,6 +1,7 @@
 package com.rave.projectbabylonweapons.passive.golden;
 
 import com.rave.projectbabylonmaterials.ProjectBabylonMaterials;
+import com.rave.projectbabylonmaterials.combat.MagicArmorCalculationHelper;
 import com.rave.projectbabylonmaterials.tooltip.TooltipFrameStyle;
 import com.rave.projectbabylonweapons.ProjectBabylonWeapons;
 import com.rave.projectbabylonweapons.tooltip.WeaponPassiveTooltipData;
@@ -69,6 +70,11 @@ public final class GoldenMagicPassive {
             return;
         }
 
+        float adjustedBonusMagicDamage = MagicArmorCalculationHelper.applyAdjustedMagicDamage(target, bonusMagicDamage);
+        if (adjustedBonusMagicDamage <= 0.0F) {
+            return;
+        }
+
         DamageSource magicSource = new DamageSource(
                 attacker.level().registryAccess()
                         .registryOrThrow(Registries.DAMAGE_TYPE)
@@ -85,7 +91,7 @@ public final class GoldenMagicPassive {
             int originalInvulnerableTime = target.invulnerableTime;
             target.invulnerableTime = 0;
             try {
-                target.hurt(magicSource, bonusMagicDamage);
+                target.hurt(magicSource, adjustedBonusMagicDamage);
             } finally {
                 target.invulnerableTime = originalInvulnerableTime;
             }
