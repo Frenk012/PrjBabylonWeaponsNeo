@@ -2,6 +2,7 @@ package com.rave.projectbabylonweapons.world.entity.projectile;
 
 import javax.annotation.Nullable;
 
+import com.rave.projectbabylonmaterials.combat.PreserveOriginalOwnerOnReflect;
 import com.rave.projectbabylonweapons.init.PBModEffects;
 import com.rave.projectbabylonweapons.init.PBModEntities;
 import com.rave.projectbabylonweapons.init.PBWSounds;
@@ -15,6 +16,7 @@ import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
@@ -39,7 +41,7 @@ import yesman.epicfight.world.damagesource.EpicFightDamageSource;
 import yesman.epicfight.world.damagesource.EpicFightDamageSources;
 import yesman.epicfight.world.damagesource.EpicFightDamageTypeTags;
 
-public class SickleProjectileEntity extends ThrowableItemProjectile {
+public class SickleProjectileEntity extends ThrowableItemProjectile implements PreserveOriginalOwnerOnReflect {
     private static final EntityDataAccessor<ItemStack> DATA_ITEM_STACK =
             SynchedEntityData.defineId(SickleProjectileEntity.class, EntityDataSerializers.ITEM_STACK);
     private static final EntityDataAccessor<Boolean> DATA_TETHERED =
@@ -254,6 +256,12 @@ public class SickleProjectileEntity extends ThrowableItemProjectile {
 
         // Deal damage
         DamageSource baseSource = this.damageSources().thrown(this, owner);
+        if (target.isDamageSourceBlocked(baseSource)) {
+            this.level().playSound(null, target.getX(), target.getY(), target.getZ(), SoundEvents.SHIELD_BLOCK, SoundSource.PLAYERS, 1.0F, 0.9F + this.random.nextFloat() * 0.2F);
+            startReturning();
+            return;
+        }
+
         EpicFightDamageSource epicSource = EpicFightDamageSources.fromVanillaDamageSource(baseSource)
                 .addRuntimeTag(EpicFightDamageTypeTags.WEAPON_INNATE)
                 .setUsedItem(this.getItem());

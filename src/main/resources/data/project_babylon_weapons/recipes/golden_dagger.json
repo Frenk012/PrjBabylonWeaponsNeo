@@ -1,4 +1,11 @@
-﻿{
+{
+    "type":  "minecraft:crafting_shaped",
+    "category":  "equipment",
+    "pattern":  [
+                    "   ",
+                    " I ",
+                    "H  "
+                ],
     "key":  {
                 "H":  {
                           "item":  "project_babylon_materials:handle"
@@ -7,13 +14,7 @@
                           "item":  "project_babylon_materials:infused_golden_ingot"
                       }
             },
-    "pattern":  [
-                    "   ",
-                    " I ",
-                    "H  "
-                ],
     "result":  {
                    "item":  "project_babylon_weapons:golden_dagger"
-               },
-    "type":  "minecraft:crafting_shaped"
+               }
 }

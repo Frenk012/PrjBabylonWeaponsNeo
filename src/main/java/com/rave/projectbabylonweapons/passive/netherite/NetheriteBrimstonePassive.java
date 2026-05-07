@@ -34,8 +34,8 @@ public final class NetheriteBrimstonePassive {
     private static final ThreadLocal<Boolean> PROCESSING_BRIMSTONE_BLAST = ThreadLocal.withInitial(() -> false);
     private static final WeaponPassiveTooltipData TOOLTIP = new WeaponPassiveTooltipData(
             Component.translatable("tooltip.project_babylon_weapons.passive.netherite.name"),
-            ResourceLocation.fromNamespaceAndPath(ProjectBabylonMaterials.MODID, "textures/gui/tooltip/frame/material/dragonsteel_material_frame.png"),
-            ResourceLocation.fromNamespaceAndPath(ProjectBabylonMaterials.MODID, "textures/gui/tooltip/icon/material/dragonsteel_material_icon.png"),
+            ResourceLocation.fromNamespaceAndPath(ProjectBabylonMaterials.MODID, "textures/gui/tooltip/frame/material/netherite_material_frame.png"),
+            ResourceLocation.fromNamespaceAndPath(ProjectBabylonMaterials.MODID, "textures/gui/tooltip/icon/material/netherite_material_icon.png"),
             List.of(
                     Component.translatable("tooltip.project_babylon_weapons.passive.netherite.line1").withStyle(ChatFormatting.GRAY),
                     Component.translatable("tooltip.project_babylon_weapons.passive.netherite.line2").withStyle(ChatFormatting.GRAY),

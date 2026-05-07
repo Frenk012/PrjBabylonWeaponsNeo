@@ -1,4 +1,11 @@
-﻿{
+{
+    "type":  "minecraft:crafting_shaped",
+    "category":  "equipment",
+    "pattern":  [
+                    "   ",
+                    " I ",
+                    "H  "
+                ],
     "key":  {
                 "H":  {
                           "item":  "project_babylon_materials:reinforced_handle"
@@ -7,13 +14,7 @@
                           "item":  "minecraft:netherite_ingot"
                       }
             },
-    "pattern":  [
-                    "   ",
-                    " I ",
-                    "H  "
-                ],
     "result":  {
                    "item":  "project_babylon_weapons:netherite_dagger"
-               },
-    "type":  "minecraft:crafting_shaped"
+               }
 }

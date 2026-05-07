@@ -1,4 +1,11 @@
-﻿{
+{
+    "type":  "minecraft:crafting_shaped",
+    "category":  "equipment",
+    "pattern":  [
+                    "   ",
+                    "  I",
+                    "HI "
+                ],
     "key":  {
                 "H":  {
                           "item":  "project_babylon_materials:reinforced_handle"
@@ -7,13 +14,7 @@
                           "item":  "project_babylon_materials:ethereal_ingot"
                       }
             },
-    "pattern":  [
-                    "   ",
-                    "  I",
-                    "HI "
-                ],
     "result":  {
                    "item":  "project_babylon_weapons:ethereal_sickle"
-               },
-    "type":  "minecraft:crafting_shaped"
+               }
 }

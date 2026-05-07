@@ -1,4 +1,11 @@
-﻿{
+{
+    "type":  "minecraft:crafting_shaped",
+    "category":  "equipment",
+    "pattern":  [
+                    "BIB",
+                    " S ",
+                    " S "
+                ],
     "key":  {
                 "S":  {
                           "item":  "project_babylon_materials:reinforced_shaft"
@@ -10,13 +17,7 @@
                           "item":  "minecraft:netherite_block"
                       }
             },
-    "pattern":  [
-                    "BIB",
-                    " S ",
-                    " S "
-                ],
     "result":  {
                    "item":  "project_babylon_weapons:netherite_battlehammer"
-               },
-    "type":  "minecraft:crafting_shaped"
+               }
 }

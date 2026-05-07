@@ -1,4 +1,11 @@
-﻿{
+{
+    "type":  "minecraft:crafting_shaped",
+    "category":  "equipment",
+    "pattern":  [
+                    "I I",
+                    "ISI",
+                    " S "
+                ],
     "key":  {
                 "S":  {
                           "item":  "project_babylon_materials:reinforced_shaft"
@@ -7,13 +14,7 @@
                           "item":  "project_babylon_materials:everfrost_ingot"
                       }
             },
-    "pattern":  [
-                    "I I",
-                    "ISI",
-                    " S "
-                ],
     "result":  {
                    "item":  "project_babylon_weapons:ice_battleaxe"
-               },
-    "type":  "minecraft:crafting_shaped"
+               }
 }

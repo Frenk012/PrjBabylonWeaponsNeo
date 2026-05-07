@@ -1,4 +1,11 @@
-﻿{
+{
+    "type":  "minecraft:crafting_shaped",
+    "category":  "equipment",
+    "pattern":  [
+                    "   ",
+                    "  I",
+                    "HI "
+                ],
     "key":  {
                 "H":  {
                           "item":  "project_babylon_materials:handle"
@@ -7,13 +14,7 @@
                           "item":  "project_babylon_materials:diamond_ingot"
                       }
             },
-    "pattern":  [
-                    "   ",
-                    "  I",
-                    "HI "
-                ],
     "result":  {
                    "item":  "project_babylon_weapons:diamond_sickle"
-               },
-    "type":  "minecraft:crafting_shaped"
+               }
 }

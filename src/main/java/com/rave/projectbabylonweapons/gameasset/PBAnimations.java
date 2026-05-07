@@ -81,6 +81,8 @@ public class PBAnimations {
     public static AnimationManager.AnimationAccessor<AttackAnimation> THE_HARVEST;
     public static AnimationManager.AnimationAccessor<AttackAnimation> BEAST_ROAR;
 
+    public static AnimationManager.AnimationAccessor<AttackAnimation> REBIRTH;
+
 
     public static void buildAnimations(AnimationManager.AnimationBuilder builder) {
 
@@ -170,5 +172,8 @@ public class PBAnimations {
                 .addEvents(new AnimationEvent[]{AnimationEvent.InTimeEvent.create(1.0f, PBReusableEvents.BIG_GROUNDSLAM, AnimationEvent.Side.CLIENT).params(new Vec3f(0.0f, -0.24f, -2.0f))}));
         UPPERCUT = builder.nextAccessor("biped/skill/uppercut", (accessor) -> (DashAttackAnimation)(new DashAttackAnimation(0.12F, 0.1F, 0.4F, 0.6F, 2.0F, PBColliderPresets.APPERCUT_SKILL, ((HumanoidArmature)Armatures.BIPED.get()).toolR, accessor, Armatures.BIPED)).addProperty(AnimationProperty.AttackAnimationProperty.FIXED_MOVE_DISTANCE, true).addProperty(AnimationProperty.AttackAnimationProperty.BASIS_ATTACK_SPEED, 2.0F));
         TECTONIC = builder.nextAccessor("biped/skill/tectonic", (accessor) -> (AttackAnimation)(new AttackAnimation(0.12F, 0.1F, 0.8F, 1.5F, 1.1F, PBColliderPresets.TECTONIC_SKILL, ((HumanoidArmature)Armatures.BIPED.get()).toolR, accessor, Armatures.BIPED)).addProperty(AnimationProperty.AttackAnimationProperty.BASIS_ATTACK_SPEED, 2.0F).addEvents(new AnimationEvent[]{AnimationEvent.InTimeEvent.create(1.0f, PBReusableEvents.BIG_GROUNDSLAM, AnimationEvent.Side.CLIENT).params(new Vec3f(0.0f, -0.24f, -2.0f))}));
+
+
+        REBIRTH = builder.nextAccessor("biped/skill/rebirth", (accessor) ->  new AttackAnimation(0.25F,  0.26F,  0.29F,  0.6F, 4.7F, PBColliderPresets.BEAST_ROAR_FIRST, ((HumanoidArmature)Armatures.BIPED.get()).rootJoint, accessor, Armatures.BIPED).addProperty(AnimationProperty.AttackPhaseProperty.DAMAGE_MODIFIER, ValueModifier.multiplier(1.0F)).addProperty(AnimationProperty.ActionAnimationProperty.STOP_MOVEMENT, true).addProperty(AnimationProperty.ActionAnimationProperty.MOVE_VERTICAL, false).addProperty(AnimationProperty.AttackAnimationProperty.BASIS_ATTACK_SPEED, 1.7F).addEvents(new AnimationEvent[]{AnimationEvent.InTimeEvent.create(0.3f, PBReusableEvents.BIG_GROUNDSLAM, AnimationEvent.Side.CLIENT).params(new Vec3f(0.0f, -0.24f, -2.0f))}));
     }
 }

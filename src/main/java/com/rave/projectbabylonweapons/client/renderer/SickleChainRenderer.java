@@ -40,7 +40,7 @@ public class SickleChainRenderer extends EntityRenderer<SickleProjectileEntity> 
 
 
         ItemStack item = entity.getItem();
-        Minecraft.getInstance().getItemRenderer().renderStatic(item, ItemDisplayContext.GROUND, packedLight,
+        Minecraft.getInstance().getItemRenderer().renderStatic(item, ItemDisplayContext.THIRD_PERSON_RIGHT_HAND, packedLight,
                 OverlayTexture.NO_OVERLAY, poseStack, buffer, entity.level(), entity.getId());
 
         poseStack.popPose();

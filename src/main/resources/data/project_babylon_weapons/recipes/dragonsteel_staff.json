@@ -1,4 +1,11 @@
-﻿{
+{
+    "type":  "minecraft:crafting_shaped",
+    "category":  "equipment",
+    "pattern":  [
+                    "  I",
+                    " S ",
+                    "I  "
+                ],
     "key":  {
                 "S":  {
                           "item":  "project_babylon_materials:reinforced_shaft"
@@ -7,13 +14,7 @@
                           "item":  "project_babylon_materials:dragonsteel_ingot"
                       }
             },
-    "pattern":  [
-                    "  I",
-                    " S ",
-                    "I  "
-                ],
     "result":  {
                    "item":  "project_babylon_weapons:dragonsteel_staff"
-               },
-    "type":  "minecraft:crafting_shaped"
+               }
 }
