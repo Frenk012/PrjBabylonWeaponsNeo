@@ -162,6 +162,61 @@ public class PBWeaponCapabilityPresets {
 
         return builder;
     };
+
+    public static final Function<Item, CapabilityItem.Builder> PB_WAND = (item) -> {
+        WeaponCapability.Builder builder = WeaponCapability.builder()
+                .category(PBWeaponCategories.PB_WAND)
+                .styleProvider((playerpatch) -> CapabilityItem.Styles.TWO_HAND)
+                .collider(PBColliderPresets.SICKLE)
+                .canBePlacedOffhand(true)
+                .weaponCombinationPredicator((entitypatch) ->
+                        EpicFightCapabilities.getItemStackCapability(((LivingEntity) entitypatch.getOriginal()).getOffhandItem()).getWeaponCategory() == PBWeaponCategories.ARCLIGHT
+                );
+
+        if (item instanceof TieredItem tieredItem) {
+            if (tieredItem.getTier() == Tiers.WOOD) {
+                builder.hitSound(EpicFightSounds.BLUNT_HIT.get())
+                        .hitParticle(EpicFightParticles.HIT_BLUNT.get());
+            } else {
+                builder.hitSound(EpicFightSounds.BLADE_HIT.get())
+                        .hitParticle(EpicFightParticles.HIT_BLADE.get());
+            }
+        } else {
+            builder.hitSound(EpicFightSounds.BLADE_HIT.get())
+                    .hitParticle(EpicFightParticles.HIT_BLADE.get());
+        }
+
+        builder
+
+                .newStyleCombo(CapabilityItem.Styles.TWO_HAND, new AnimationManager.AnimationAccessor[]{
+                        PBAnimations.WAND_AUTO_1,
+                        PBAnimations.WAND_AUTO_2,
+                        PBAnimations.WAND_AUTO_3,
+                        PBAnimations.WAND_DASH,
+                        PBAnimations.WAND_AIRSlASH
+
+                })
+
+                .newStyleCombo(CapabilityItem.Styles.MOUNT, new AnimationManager.AnimationAccessor[]{
+                        Animations.SWORD_MOUNT_ATTACK
+                })
+
+                .innateSkill(CapabilityItem.Styles.TWO_HAND, (itemstack) -> PBSkills.THE_HARVEST)
+
+
+                .livingMotionModifier(CapabilityItem.Styles.TWO_HAND, LivingMotions.IDLE, PBAnimations.WAND_IDLE)
+                .livingMotionModifier(CapabilityItem.Styles.TWO_HAND, LivingMotions.KNEEL, PBAnimations.WAND_IDLE)
+                .livingMotionModifier(CapabilityItem.Styles.TWO_HAND, LivingMotions.WALK, PBAnimations.ARCLIGHT_WALK)
+                .livingMotionModifier(CapabilityItem.Styles.TWO_HAND, LivingMotions.CHASE, Animations.BIPED_WALK)
+                .livingMotionModifier(CapabilityItem.Styles.TWO_HAND, LivingMotions.RUN, PBAnimations.ARCLIGHT_RUN)
+                .livingMotionModifier(CapabilityItem.Styles.TWO_HAND, LivingMotions.SNEAK, PBAnimations.WAND_IDLE)
+                .livingMotionModifier(CapabilityItem.Styles.TWO_HAND, LivingMotions.SWIM, PBAnimations.WAND_IDLE)
+                .livingMotionModifier(CapabilityItem.Styles.TWO_HAND, LivingMotions.FLOAT, PBAnimations.WAND_IDLE)
+                .livingMotionModifier(CapabilityItem.Styles.TWO_HAND, LivingMotions.FALL, PBAnimations.WAND_IDLE);
+
+        return builder;
+    };
+
     @SubscribeEvent
     public static void registerWeaponPresets(WeaponCapabilityPresetRegistryEvent event) {
         event.getTypeEntry().put(
@@ -170,7 +225,10 @@ public class PBWeaponCapabilityPresets {
 
                 event.getTypeEntry().put(
                         ResourceLocation.fromNamespaceAndPath("project_babylon_weapons", "arclight"),
-                        ARCLIGHT
-        );
+                        ARCLIGHT);
+
+        event.getTypeEntry().put(
+                ResourceLocation.fromNamespaceAndPath("project_babylon_weapons", "pb_wand"),
+                PB_WAND);
     }
 }

@@ -1,9 +1,9 @@
-Copyright (c) 2025 One World Team
+Copyright (c) 2026 Singularity Team
 
 All rights reserved.
 
-The contents of `src/main/resources/assets` in the Project Babylon mod — 
-including but not limited to images, audio, video, fonts,
+The contents of `src/main/resources/assets` in the Project Babylon Mods — 
+including but not limited to images, audio, video, fonts, animations,
 models, textures, translations, sounds, shaders, particles, native
 libraries, and other media or game content — are the property of the
 copyright holder(s).

@@ -53,6 +53,7 @@ public class PBAnimations {
     public static AnimationManager.AnimationAccessor<StaticAnimation> HOLD_BATTLEHAMMER;
     public static AnimationManager.AnimationAccessor<DashAttackAnimation> BATTLEHAMMER_DASH;
 
+//ARCLIGHT
     public static AnimationManager.AnimationAccessor<StaticAnimation> ARCLIGHT_IDLE;
     public static AnimationManager.AnimationAccessor<StaticAnimation> ARCLIGHT_WALK;
     public static AnimationManager.AnimationAccessor<StaticAnimation> ARCLIGHT_RUN;
@@ -71,6 +72,16 @@ public class PBAnimations {
     public static AnimationManager.AnimationAccessor<AttackAnimation> ARCLIGHT_EX_AUTO_4;
     public static AnimationManager.AnimationAccessor<AttackAnimation> ARCLIGHT_EX_AUTO_4_NEW;
     public static AnimationManager.AnimationAccessor<AttackAnimation> ARCLIGHT_EX_AUTO_5;
+//WAND
+    public static AnimationManager.AnimationAccessor<StaticAnimation> WAND_IDLE;
+    public static AnimationManager.AnimationAccessor<MovementAnimation> WAND_WALK;
+    public static AnimationManager.AnimationAccessor<MovementAnimation> WAND_RUN;
+
+    public static AnimationManager.AnimationAccessor<AttackAnimation> WAND_AUTO_1;
+    public static AnimationManager.AnimationAccessor<AttackAnimation> WAND_AUTO_2;
+    public static AnimationManager.AnimationAccessor<AttackAnimation> WAND_AUTO_3;
+    public static AnimationManager.AnimationAccessor<AttackAnimation> WAND_AIRSlASH;
+    public static AnimationManager.AnimationAccessor<AttackAnimation> WAND_DASH;
 //SKILLS
     public static AnimationManager.AnimationAccessor<StaticAnimation> SICKLE_READY;
     public static AnimationManager.AnimationAccessor<ActionAnimation> SICKLE_THROW;
@@ -112,6 +123,7 @@ public class PBAnimations {
         BATTLEHAMMER_DASH = builder.nextAccessor("biped/combat/battlehammer_dash", (accessor) -> (DashAttackAnimation)(new DashAttackAnimation(0.1F, 0.1F, 0.25F, 0.6F, 1.25F, (Collider)null, ((HumanoidArmature)Armatures.BIPED.get()).toolR, accessor, Armatures.BIPED)).addProperty(AnimationProperty.AttackAnimationProperty.FIXED_MOVE_DISTANCE, true).addProperty(AnimationProperty.AttackAnimationProperty.BASIS_ATTACK_SPEED, 1.0F));
         HOLD_BATTLEHAMMER = builder.nextAccessor("biped/living/hold_battlehammer", (accessor) -> new StaticAnimation(true, accessor, Armatures.BIPED));
 
+//ARCLIGHT
         ARCLIGHT_IDLE = builder.nextAccessor("biped/living/arclight_idle", (accessor) -> new StaticAnimation(true, accessor, Armatures.BIPED));
         ARCLIGHT_WALK = builder.nextAccessor("biped/living/arclight_walk", (accessor) -> new StaticAnimation(true, accessor, Armatures.BIPED));
         ARCLIGHT_RUN = builder.nextAccessor("biped/living/arclight_run", (accessor) -> new StaticAnimation(true, accessor, Armatures.BIPED));
@@ -140,6 +152,15 @@ public class PBAnimations {
         ARCLIGHT_EX_AUTO_4 = builder.nextAccessor("biped/combat/arclight_ex_auto_4", (accessor) ->  new AttackAnimation(0.40F,  0.25F,  0.2F,  0.40F, 4.667F, (Collider)null, ((HumanoidArmature)Armatures.BIPED.get()).toolR, accessor, Armatures.BIPED).addProperty(AnimationProperty.AttackPhaseProperty.DAMAGE_MODIFIER, ValueModifier.multiplier(1.0F)).newTimePair(0.0F, 0.8F).addStateRemoveOld(EntityState.CAN_BASIC_ATTACK, false).addProperty(AnimationProperty.AttackAnimationProperty.BASIS_ATTACK_SPEED, 1.9F));
         ARCLIGHT_EX_AUTO_4_NEW = builder.nextAccessor("biped/combat/arclight_ex_auto_4_new", (accessor) ->  new AttackAnimation(0.40F,  0.25F,  0.2F,  0.40F, 4.667F, (Collider)null, ((HumanoidArmature)Armatures.BIPED.get()).toolR, accessor, Armatures.BIPED).addProperty(AnimationProperty.AttackPhaseProperty.DAMAGE_MODIFIER, ValueModifier.multiplier(1.0F)).newTimePair(0.0F, 0.8F).addStateRemoveOld(EntityState.CAN_BASIC_ATTACK, false).addProperty(AnimationProperty.AttackAnimationProperty.BASIS_ATTACK_SPEED, 1.9F));
         ARCLIGHT_EX_AUTO_5 = builder.nextAccessor("biped/combat/arclight_ex_auto_5", (accessor) ->  new AttackAnimation(0.25F,  0.25F,  0.1F,  0.4F, 7.667F, (Collider)null, ((HumanoidArmature)Armatures.BIPED.get()).toolR, accessor, Armatures.BIPED).addProperty(AnimationProperty.AttackPhaseProperty.DAMAGE_MODIFIER, ValueModifier.multiplier(1.0F)).newTimePair(0.0F, 0.75F).addStateRemoveOld(EntityState.CAN_BASIC_ATTACK, false).addProperty(AnimationProperty.AttackAnimationProperty.BASIS_ATTACK_SPEED, 1.9F));
+//WAND
+        WAND_IDLE = builder.nextAccessor("biped/living/wand_idle", (accessor) -> new StaticAnimation(true, accessor, Armatures.BIPED));
+
+        WAND_AUTO_1 = builder.nextAccessor("biped/combat/wand_auto_1", (accessor) ->  new AttackAnimation(0.15F,  0.15F,  0.1F,  0.4F, 2.0F, (Collider)null, ((HumanoidArmature)Armatures.BIPED.get()).toolR, accessor, Armatures.BIPED).addProperty(AnimationProperty.AttackPhaseProperty.DAMAGE_MODIFIER, ValueModifier.multiplier(1.0F)).newTimePair(0.0F, 2.0F).addStateRemoveOld(EntityState.CAN_BASIC_ATTACK, false).addProperty(AnimationProperty.AttackAnimationProperty.BASIS_ATTACK_SPEED, 1.0F));
+        WAND_AUTO_2 = builder.nextAccessor("biped/combat/wand_auto_2", (accessor) ->  new AttackAnimation(0.15F,  0.15F,  0.1F,  0.4F, 2.0F, (Collider)null, ((HumanoidArmature)Armatures.BIPED.get()).toolR, accessor, Armatures.BIPED).addProperty(AnimationProperty.AttackPhaseProperty.DAMAGE_MODIFIER, ValueModifier.multiplier(1.0F)).newTimePair(0.0F, 1.8F).addStateRemoveOld(EntityState.CAN_BASIC_ATTACK, false).addProperty(AnimationProperty.AttackAnimationProperty.BASIS_ATTACK_SPEED, 1.0F));
+        WAND_AUTO_3 = builder.nextAccessor("biped/combat/wand_auto_3", (accessor) ->  new AttackAnimation(0.15F,  0.15F,  0.1F,  0.4F, 2.0F, (Collider)null, ((HumanoidArmature)Armatures.BIPED.get()).toolR, accessor, Armatures.BIPED).addProperty(AnimationProperty.AttackPhaseProperty.DAMAGE_MODIFIER, ValueModifier.multiplier(1.0F)).newTimePair(0.0F, 2.0F).addStateRemoveOld(EntityState.CAN_BASIC_ATTACK, false).addProperty(AnimationProperty.AttackAnimationProperty.BASIS_ATTACK_SPEED, 1.0F));
+
+        WAND_DASH = builder.nextAccessor("biped/combat/wand_dash", (accessor) ->  new AttackAnimation(0.15F,  0.15F,  0.1F,  0.4F, 2.0F, (Collider)null, ((HumanoidArmature)Armatures.BIPED.get()).toolR, accessor, Armatures.BIPED).addProperty(AnimationProperty.AttackPhaseProperty.DAMAGE_MODIFIER, ValueModifier.multiplier(1.0F)).newTimePair(0.0F, 2.0F).addProperty(AnimationProperty.AttackAnimationProperty.FIXED_MOVE_DISTANCE, true).addStateRemoveOld(EntityState.CAN_BASIC_ATTACK, false).addProperty(AnimationProperty.AttackAnimationProperty.BASIS_ATTACK_SPEED, 1.0F));
+        WAND_AIRSlASH = builder.nextAccessor("biped/combat/wand_airslash", (accessor) ->  new AttackAnimation(0.25F,  0.28F,  0.1F,  0.9F, 1.7F, (Collider)null, ((HumanoidArmature)Armatures.BIPED.get()).toolR, accessor, Armatures.BIPED).addProperty(AnimationProperty.AttackPhaseProperty.DAMAGE_MODIFIER, ValueModifier.multiplier(1.0F)).newTimePair(0.0F, 0.75F).addStateRemoveOld(EntityState.CAN_BASIC_ATTACK, false).addProperty(AnimationProperty.AttackAnimationProperty.BASIS_ATTACK_SPEED, 1.0F).addEvents(new AnimationEvent[]{AnimationEvent.InTimeEvent.create(0.4f, PBReusableEvents.MEDIUM_GROUNDSLAM, AnimationEvent.Side.CLIENT).params(new Vec3f(0.0f, -0.24f, -2.0f))}));
 //SKILLS
         SICKLE_READY = builder.nextAccessor("biped/skill/sickle_ready", (accessor) -> new StaticAnimation(0.15F, false, accessor, Armatures.BIPED).addProperty(AnimationProperty.StaticAnimationProperty.PLAY_SPEED_MODIFIER, Animations.ReusableSources.CHARGING));
         SICKLE_THROW = builder.nextAccessor("biped/skill/sickle_throw", (accessor) -> new ActionAnimation(0.1F, accessor, Armatures.BIPED).addProperty(AnimationProperty.ActionAnimationProperty.STOP_MOVEMENT, true));
