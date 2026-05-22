@@ -13,7 +13,7 @@ public final class PBConfig {
         builder.push("recipes");
         ENABLE_VANILLA_WEAPONS_TOOLS_RECIPES = builder
                 .comment("Enable vanilla weapon and tool crafting recipes (not armor).")
-                .define("enable_vanilla_weapons_tools_recipes", true);
+                .define("enable_vanilla_weapons_tools_recipes", false);
         builder.pop();
 
         SPEC = builder.build();

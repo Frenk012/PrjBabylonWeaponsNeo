@@ -1,5 +1,6 @@
 package com.rave.projectbabylonweapons.passive.netherite;
 
+import com.google.gson.JsonObject;
 import com.rave.projectbabylonweapons.item.battleaxe.NetheriteBattleAxeItem;
 import com.rave.projectbabylonweapons.item.battlehammer.NetheriteBattleHammerItem;
 import com.rave.projectbabylonweapons.item.battlescythe.NetheriteBattleScytheItem;
@@ -12,7 +13,10 @@ import com.rave.projectbabylonweapons.item.sickle.NetheriteSickleItem;
 import com.rave.projectbabylonweapons.item.spear.NetheriteSpearItem;
 import com.rave.projectbabylonweapons.item.staff.NetheriteStaffItem;
 import com.rave.projectbabylonweapons.item.tachi.NetheriteTachiItem;
+import com.rave.projectbabylonweapons.passive.data.WeaponPassiveIds;
+import com.rave.projectbabylonweapons.passive.data.WeaponPassivePatchManager;
 import com.rave.projectbabylonweapons.util.PBItemTags;
+import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
@@ -37,6 +41,11 @@ public final class NetheriteBrimstoneBalance {
     public static Profile resolve(ItemStack stack) {
         if (stack.isEmpty()) {
             return null;
+        }
+
+        Profile override = WeaponPassivePatchManager.INSTANCE.resolveProfile(WeaponPassiveIds.NETHERITE_BRIMSTONE, stack, NetheriteBrimstoneBalance::parseProfile);
+        if (override != null) {
+            return override;
         }
 
         if (stack.is(PBItemTags.NETHERITE_TOOLS)) {
@@ -82,6 +91,19 @@ public final class NetheriteBrimstoneBalance {
         }
 
         return null;
+    }
+
+    private static Profile parseProfile(JsonObject json) {
+        return new Profile(
+                GsonHelper.getAsFloat(json, "ignite_proc_chance"),
+                GsonHelper.getAsFloat(json, "brimstone_flames_proc_chance"),
+                GsonHelper.getAsInt(json, "brimstone_flames_duration_ticks"),
+                GsonHelper.getAsFloat(json, "brimstone_fire_proc_chance"),
+                GsonHelper.getAsInt(json, "brimstone_fire_duration_ticks"),
+                GsonHelper.getAsFloat(json, "brimstone_blast_proc_chance"),
+                GsonHelper.getAsFloat(json, "brimstone_blast_damage_multiplier"),
+                GsonHelper.getAsFloat(json, "brimstone_blast_radius_blocks")
+        );
     }
 
     public record Profile(

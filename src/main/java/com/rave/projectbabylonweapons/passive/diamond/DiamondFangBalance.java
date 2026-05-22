@@ -1,5 +1,6 @@
 package com.rave.projectbabylonweapons.passive.diamond;
 
+import com.google.gson.JsonObject;
 import com.rave.projectbabylonweapons.item.battleaxe.DiamondBattleAxeItem;
 import com.rave.projectbabylonweapons.item.battlehammer.DiamondBattleHammerItem;
 import com.rave.projectbabylonweapons.item.battlescythe.DiamondBattleScytheItem;
@@ -12,7 +13,10 @@ import com.rave.projectbabylonweapons.item.sickle.DiamondSickleItem;
 import com.rave.projectbabylonweapons.item.spear.DiamondSpearItem;
 import com.rave.projectbabylonweapons.item.staff.DiamondStaffItem;
 import com.rave.projectbabylonweapons.item.tachi.DiamondTachiItem;
+import com.rave.projectbabylonweapons.passive.data.WeaponPassiveIds;
+import com.rave.projectbabylonweapons.passive.data.WeaponPassivePatchManager;
 import com.rave.projectbabylonweapons.util.PBItemTags;
+import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
@@ -26,6 +30,11 @@ public final class DiamondFangBalance {
     public static Profile resolve(ItemStack stack) {
         if (stack.isEmpty()) {
             return null;
+        }
+
+        Profile override = WeaponPassivePatchManager.INSTANCE.resolveProfile(WeaponPassiveIds.DIAMOND_FANG, stack, DiamondFangBalance::parseProfile);
+        if (override != null) {
+            return override;
         }
 
         if (stack.is(PBItemTags.DIAMOND_TOOLS)) {
@@ -49,6 +58,10 @@ public final class DiamondFangBalance {
         }
 
         return null;
+    }
+
+    private static Profile parseProfile(JsonObject json) {
+        return new Profile(GsonHelper.getAsFloat(json, "ignore_defense_proc_chance"));
     }
 
     public record Profile(float ignoreDefenseProcChance) {

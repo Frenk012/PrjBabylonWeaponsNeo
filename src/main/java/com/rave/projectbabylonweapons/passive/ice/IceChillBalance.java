@@ -1,5 +1,6 @@
 package com.rave.projectbabylonweapons.passive.ice;
 
+import com.google.gson.JsonObject;
 import com.rave.projectbabylonweapons.item.battleaxe.IceBattleAxeItem;
 import com.rave.projectbabylonweapons.item.battlehammer.IceBattleHammerItem;
 import com.rave.projectbabylonweapons.item.battlescythe.IceBattleScytheItem;
@@ -13,7 +14,10 @@ import com.rave.projectbabylonweapons.item.sickle.IceSickleItem;
 import com.rave.projectbabylonweapons.item.spear.IceSpearItem;
 import com.rave.projectbabylonweapons.item.staff.IceStaffItem;
 import com.rave.projectbabylonweapons.item.tachi.IceTachiItem;
+import com.rave.projectbabylonweapons.passive.data.WeaponPassiveIds;
+import com.rave.projectbabylonweapons.passive.data.WeaponPassivePatchManager;
 import com.rave.projectbabylonweapons.util.PBItemTags;
+import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
@@ -43,6 +47,11 @@ public final class IceChillBalance {
     public static Profile resolve(ItemStack stack) {
         if (stack.isEmpty()) {
             return null;
+        }
+
+        Profile override = WeaponPassivePatchManager.INSTANCE.resolveProfile(WeaponPassiveIds.ICE_CHILL, stack, IceChillBalance::parseProfile);
+        if (override != null) {
+            return override;
         }
 
         if (stack.is(PBItemTags.ICE_TOOLS)) {
@@ -92,6 +101,19 @@ public final class IceChillBalance {
         }
 
         return null;
+    }
+
+    private static Profile parseProfile(JsonObject json) {
+        return new Profile(
+                GsonHelper.getAsFloat(json, "chill_i_proc_chance"),
+                GsonHelper.getAsFloat(json, "chill_ii_proc_chance"),
+                GsonHelper.getAsFloat(json, "chill_iii_proc_chance"),
+                GsonHelper.getAsFloat(json, "frozen_from_chill_iii_proc_chance"),
+                GsonHelper.getAsInt(json, "chill_i_duration_ticks"),
+                GsonHelper.getAsInt(json, "chill_ii_duration_ticks"),
+                GsonHelper.getAsInt(json, "chill_iii_duration_ticks"),
+                GsonHelper.getAsInt(json, "frozen_duration_ticks")
+        );
     }
 
     public record Profile(

@@ -36,9 +36,12 @@ public class SickleChainRenderer extends EntityRenderer<SickleProjectileEntity> 
         renderChain(entity, poseStack, buffer, packedLight, partialTicks);
 
         poseStack.pushPose();
+
+
         poseStack.mulPose(Axis.YP.rotationDegrees(Mth.lerp(partialTicks, entity.yRotO, entity.getYRot()) - 90.0F));
-
-
+        poseStack.mulPose(Axis.ZP.rotationDegrees(Mth.lerp(partialTicks, entity.xRotO, entity.getXRot())));
+        poseStack.mulPose(Axis.ZP.rotationDegrees(90.0F));
+        poseStack.mulPose(Axis.YP.rotationDegrees(180.0F));
         ItemStack item = entity.getItem();
         Minecraft.getInstance().getItemRenderer().renderStatic(item, ItemDisplayContext.THIRD_PERSON_RIGHT_HAND, packedLight,
                 OverlayTexture.NO_OVERLAY, poseStack, buffer, entity.level(), entity.getId());
@@ -177,3 +180,4 @@ public class SickleChainRenderer extends EntityRenderer<SickleProjectileEntity> 
         return TextureAtlas.LOCATION_BLOCKS;
     }
 }
+

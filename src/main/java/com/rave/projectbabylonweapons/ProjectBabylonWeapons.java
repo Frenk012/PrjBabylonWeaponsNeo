@@ -1,32 +1,31 @@
 package com.rave.projectbabylonweapons;
 
 import com.mojang.logging.LogUtils;
-
-import com.rave.projectbabylonweapons.gameasset.PBAnimations;
 import com.rave.projectbabylonweapons.config.PBConfig;
+import com.rave.projectbabylonweapons.gameasset.PBAnimations;
+import com.rave.projectbabylonweapons.gameasset.PBSkills;
 import com.rave.projectbabylonweapons.init.CreativeTabRegistry;
 import com.rave.projectbabylonweapons.init.PBModBlocks;
 import com.rave.projectbabylonweapons.init.PBModEntities;
 import com.rave.projectbabylonweapons.init.PBModItems;
-import com.rave.projectbabylonweapons.gameasset.PBSkills;
 import com.rave.projectbabylonweapons.init.PBWSounds;
 import com.rave.projectbabylonweapons.network.PBNetworkManager;
-
+import com.rave.projectbabylonweapons.passive.data.WeaponPassivePatchManager;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackSource;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AddPackFindersEvent;
+import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModList;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fml.ModLoadingContext;
-
 import net.minecraftforge.resource.PathPackResources;
 import org.slf4j.Logger;
 
@@ -59,6 +58,7 @@ public class ProjectBabylonWeapons {
         PBWSounds.register(modBus);
         PBModEntities.ENTITIES.register(modBus);
 
+        forgeBus.addListener(this::addReloadListeners);
         forgeBus.register(this);
     }
 
@@ -74,6 +74,10 @@ public class ProjectBabylonWeapons {
     }
 
     private void addCreative(BuildCreativeModeTabContentsEvent event) {
+    }
+
+    private void addReloadListeners(AddReloadListenerEvent event) {
+        event.addListener(WeaponPassivePatchManager.INSTANCE);
     }
 
     public void addPackFindersEvent(AddPackFindersEvent event) {
