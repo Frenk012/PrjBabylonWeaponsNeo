@@ -8,6 +8,7 @@ import com.rave.projectbabylonweapons.init.CreativeTabRegistry;
 import com.rave.projectbabylonweapons.init.PBModBlocks;
 import com.rave.projectbabylonweapons.init.PBModEntities;
 import com.rave.projectbabylonweapons.init.PBModItems;
+import com.rave.projectbabylonweapons.init.PBModParticles;
 import com.rave.projectbabylonweapons.init.PBWSounds;
 import com.rave.projectbabylonweapons.network.PBNetworkManager;
 import com.rave.projectbabylonweapons.passive.data.WeaponPassivePatchManager;
@@ -54,6 +55,7 @@ public class ProjectBabylonWeapons {
         CreativeTabRegistry.TABS.register(modBus);
         PBModBlocks.register(modBus);
         PBModItems.ITEMS.register(modBus);
+        PBModParticles.PARTICLES.register(modBus);
         EFFECTS.register(modBus);
         PBWSounds.register(modBus);
         PBModEntities.ENTITIES.register(modBus);

@@ -12,6 +12,12 @@
                        "project_babylon_weapons:diamond_dagger",
                        "project_babylon_weapons:diamond_sickle",
                        "project_babylon_weapons:diamond_claws",
+                       "refm:diamond_rapier",
+                       "epicfight_dd:diamond_messer",
+                       "epicfight_dd:diamond_knife",
+                       "epicfight_dd:diamond_battlestaff",
+                       "epicfight_dd:diamond_halbert",
+                       "epicfight_dd:diamond_light_greatsword",
                        "project_babylon_weapons:diamond_tachi"
                    ],
     "visual":  {

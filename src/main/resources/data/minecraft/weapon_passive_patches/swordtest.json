@@ -1,6 +1,6 @@
 {
     "passive_id":  "project_babylon_weapons:netherite_brimstone",
-    "weapon_id":  "minecraft:iron_sword",
+    "weapon_id":  "minecraft:iron_swordd",
     "visual":  {
                    "frame_type":  "netherite",
                    "frame_texture":  "project_babylon_materials:textures/gui/tooltip/frame/material/netherite_material_frame.png",

@@ -192,6 +192,7 @@ public class PBWeaponCapabilityPresets {
                         PBAnimations.WAND_AUTO_1,
                         PBAnimations.WAND_AUTO_2,
                         PBAnimations.WAND_AUTO_3,
+                        PBAnimations.WAND_AUTO_4,
                         PBAnimations.WAND_DASH,
                         PBAnimations.WAND_AIRSlASH
 

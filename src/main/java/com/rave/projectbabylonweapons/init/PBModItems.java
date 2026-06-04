@@ -21,6 +21,10 @@ import com.rave.projectbabylonweapons.item.tachi.*;
 import com.rave.projectbabylonweapons.item.spear.*;
 import com.rave.projectbabylonweapons.item.staff.*;
 import com.rave.projectbabylonweapons.item.tool.*;
+import com.rave.projectbabylonweapons.item.wand.DiamondBattleWandItem;
+import com.rave.projectbabylonweapons.item.wand.GoldenBattleWandItem;
+import com.rave.projectbabylonweapons.item.wand.IceBattleWandItem;
+import com.rave.projectbabylonweapons.item.wand.IronBattleWandItem;
 import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.HoeItem;
 import net.minecraft.world.item.Item;
@@ -84,6 +88,9 @@ public class PBModItems {
     public static final RegistryObject<Item> IRON_TACHI =
             ITEMS.register("iron_tachi", () -> new IronTachiItem(new Item.Properties()));
 
+    public static final RegistryObject<Item> IRON_BATTLE_WAND =
+            ITEMS.register("iron_battle_wand", () -> new IronBattleWandItem());
+
 
     //GOLDEN
     public static final RegistryObject<Item> GOLDEN_PICKAXE =
@@ -134,6 +141,9 @@ public class PBModItems {
     public static final RegistryObject<Item> GOLDEN_TACHI =
             ITEMS.register("golden_tachi", () -> new GoldenTachiItem(new Item.Properties()));
 
+    public static final RegistryObject<Item> GOLDEN_BATTLE_WAND =
+            ITEMS.register("golden_battle_wand", () -> new GoldenBattleWandItem());
+
 
     //DIAMOND
     public static final RegistryObject<Item> DIAMOND_PICKAXE =
@@ -183,6 +193,9 @@ public class PBModItems {
 
     public static final RegistryObject<Item> DIAMOND_TACHI =
             ITEMS.register("diamond_tachi", () -> new DiamondTachiItem(new Item.Properties()));
+
+    public static final RegistryObject<Item> DIAMOND_BATTLE_WAND =
+            ITEMS.register("diamond_battle_wand", () -> new DiamondBattleWandItem());
 
 
 
@@ -287,6 +300,9 @@ public class PBModItems {
 
     public static final RegistryObject<Item> ICE_RAPIER =
             ITEMS.register("ice_rapier", () -> new IceRapierItem(new Item.Properties()));
+
+    public static final RegistryObject<Item> ICE_BATTLE_WAND =
+            ITEMS.register("ice_battle_wand", () -> new IceBattleWandItem());
 
 
 

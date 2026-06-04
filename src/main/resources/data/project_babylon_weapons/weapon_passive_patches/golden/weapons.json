@@ -12,6 +12,12 @@
                        "project_babylon_weapons:golden_dagger",
                        "project_babylon_weapons:golden_sickle",
                        "project_babylon_weapons:golden_claws",
+                       "refm:gold_rapier",
+                       "epicfight_dd:golden_messer",
+                       "epicfight_dd:golden_knife",
+                       "epicfight_dd:golden_battlestaff",
+                       "epicfight_dd:golden_halbert",
+                       "epicfight_dd:golden_light_greatsword",
                        "project_babylon_weapons:golden_tachi"
                    ],
     "visual":  {
