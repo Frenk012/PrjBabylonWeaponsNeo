@@ -15,7 +15,6 @@ import software.bernie.geckolib.core.object.PlayState;
 
 public class IceSpellProjectileEntity extends BasicSpellProjectileEntity {
     private static final RawAnimation ICE_LOOP_ANIMATION = RawAnimation.begin().thenLoop("animation.ice_spell_projectile.idle");
-    private static final float YAW_OFFSET = 90.0F;
     private static final int IMPACT_SNOWFLAKE_COUNT = 28;
     private static final int IMPACT_SNOW_DUST_COUNT = 16;
 
@@ -29,13 +28,6 @@ public class IceSpellProjectileEntity extends BasicSpellProjectileEntity {
 
     public IceSpellProjectileEntity(PlayMessages.SpawnEntity packet, Level level) {
         this(PBModEntities.ICE_SPELL_PROJECTILE.get(), level);
-    }
-
-    @Override
-    public void tick() {
-        super.tick();
-        this.setYRot(this.getYRot() + YAW_OFFSET);
-        this.yRotO += YAW_OFFSET;
     }
 
     @Override
@@ -93,7 +85,7 @@ public class IceSpellProjectileEntity extends BasicSpellProjectileEntity {
                 0.0D, 0.0D, 0.0D);
     }
 
-    private void spawnImpactParticles(Vec3 hitPos) {
+    protected void spawnImpactParticles(Vec3 hitPos) {
         if (!(this.level() instanceof ServerLevel serverLevel)) {
             return;
         }
@@ -110,3 +102,4 @@ public class IceSpellProjectileEntity extends BasicSpellProjectileEntity {
                 0.03D);
     }
 }
+

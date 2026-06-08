@@ -102,6 +102,7 @@ public class CreativeTabRegistry {
                         output.accept(PBModItems.NETHERITE_AXE.get());
                         output.accept(PBModItems.NETHERITE_PICKAXE.get());
                         output.accept(PBModItems.NETHERITE_HOE.get());
+                        output.accept(PBModItems.NETHERITE_BATTLE_WAND.get());
 
                         //ICE
                         output.accept(PBModItems.ICE_CLAWS.get());
@@ -158,6 +159,7 @@ public class CreativeTabRegistry {
                         output.accept(PBModItems.ETHEREAL_STAFF.get());
                         output.accept(PBModItems.ETHEREAL_TACHI.get());
                         output.accept(PBModItems.ETHEREAL_RAPIER.get());
+                        output.accept(PBModItems.ETHEREAL_BATTLE_WAND.get());
 
 
                         //DEMON

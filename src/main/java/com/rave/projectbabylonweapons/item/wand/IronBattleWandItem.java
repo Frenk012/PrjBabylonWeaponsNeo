@@ -100,6 +100,17 @@ public class IronBattleWandItem extends SwordItem implements GeoItem, MagicProje
     }
 
     @Override
+    public boolean shouldFireMagicProjectile(yesman.epicfight.api.animation.AnimationManager.AnimationAccessor<? extends yesman.epicfight.api.animation.types.AttackAnimation> animation,
+                                            yesman.epicfight.api.animation.types.AttackAnimation.Phase phase, int phaseOrder) {
+        return animation == PBAnimations.WAND_AUTO_1
+                || animation == PBAnimations.WAND_AUTO_2
+                || animation == PBAnimations.WAND_AUTO_3
+                || animation == PBAnimations.WAND_AUTO_4
+                || animation == PBAnimations.WAND_DASH
+                || animation == PBAnimations.WAND_AIRSlASH;
+    }
+
+    @Override
     public void fireMagicProjectiles(ServerPlayerPatch playerPatch, ItemStack weaponStack, AttackPhaseEndEvent event) {
         if (event.getAnimation() == PBAnimations.WAND_AUTO_3) {
             switch (event.getPhaseOrder()) {

@@ -57,12 +57,12 @@ public class IceBattleWandItem extends SwordItem implements GeoItem, MagicProjec
 
     @Override
     public ResourceKey<DamageType> getMagicDamageType() {
-        return ISSDamageTypes.EVOCATION_MAGIC;
+        return ISSDamageTypes.ICE_MAGIC;
     }
 
     @Override
     public Attribute getSchoolSpellPowerAttribute() {
-        return AttributeRegistry.EVOCATION_SPELL_POWER.get();
+        return AttributeRegistry.ICE_SPELL_POWER.get();
     }
 
     @Override
@@ -72,7 +72,7 @@ public class IceBattleWandItem extends SwordItem implements GeoItem, MagicProjec
 
     @Override
     public float getSchoolResistMultiplier(LivingEntity target) {
-        return Math.max(0.0F, 1.0F + (float) target.getAttributeValue(AttributeRegistry.EVOCATION_MAGIC_RESIST.get()));
+        return Math.max(0.0F, 1.0F + (float) target.getAttributeValue(AttributeRegistry.ICE_MAGIC_RESIST.get()));
     }
 
     @Override
@@ -100,6 +100,16 @@ public class IceBattleWandItem extends SwordItem implements GeoItem, MagicProjec
         return 80;
     }
 
+    @Override
+    public boolean shouldFireMagicProjectile(yesman.epicfight.api.animation.AnimationManager.AnimationAccessor<? extends yesman.epicfight.api.animation.types.AttackAnimation> animation,
+                                            yesman.epicfight.api.animation.types.AttackAnimation.Phase phase, int phaseOrder) {
+        return animation == PBAnimations.WAND_AUTO_1
+                || animation == PBAnimations.WAND_AUTO_2
+                || animation == PBAnimations.WAND_AUTO_3
+                || animation == PBAnimations.WAND_AUTO_4
+                || animation == PBAnimations.WAND_DASH
+                || animation == PBAnimations.WAND_AIRSlASH;
+    }
     @Override
     public void fireMagicProjectiles(ServerPlayerPatch playerPatch, ItemStack weaponStack, AttackPhaseEndEvent event) {
         if (event.getAnimation() == PBAnimations.WAND_AUTO_3) {

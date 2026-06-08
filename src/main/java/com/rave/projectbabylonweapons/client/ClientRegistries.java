@@ -4,7 +4,11 @@ import com.rave.projectbabylonweapons.ProjectBabylonWeapons;
 import com.rave.projectbabylonweapons.block.renderer.FrozenDebuffIceBlockTileRenderer;
 import com.rave.projectbabylonweapons.client.particle.BasicSpellProjectileTrailParticle;
 import com.rave.projectbabylonweapons.client.renderer.BasicSpellProjectileRenderer;
+import com.rave.projectbabylonweapons.client.renderer.FireSpellProjectileRenderer;
+import com.rave.projectbabylonweapons.client.renderer.GlacierIceSpikeRenderer;
 import com.rave.projectbabylonweapons.client.renderer.IceSpellProjectileRenderer;
+import com.rave.projectbabylonweapons.client.renderer.HolySpellProjectileRenderer;
+import com.rave.projectbabylonweapons.client.renderer.ManaBubbleProjectileRenderer;
 import com.rave.projectbabylonweapons.client.renderer.SickleChainRenderer;
 import com.rave.projectbabylonweapons.client.renderer.TectonicFallingBlockRenderer;
 import com.rave.projectbabylonweapons.init.PBModBlocks;
@@ -24,6 +28,10 @@ public class ClientRegistries {
         event.registerEntityRenderer(PBModEntities.SICKLE_PROJECTILE.get(), SickleChainRenderer::new);
         event.registerEntityRenderer(PBModEntities.BASIC_SPELL_PROJECTILE.get(), BasicSpellProjectileRenderer::new);
         event.registerEntityRenderer(PBModEntities.ICE_SPELL_PROJECTILE.get(), IceSpellProjectileRenderer::new);
+        event.registerEntityRenderer(PBModEntities.FIRE_SPELL_PROJECTILE.get(), FireSpellProjectileRenderer::new);
+        event.registerEntityRenderer(PBModEntities.HOLY_SPELL_PROJECTILE.get(), HolySpellProjectileRenderer::new);
+        event.registerEntityRenderer(PBModEntities.MANA_BUBBLE_PROJECTILE.get(), ManaBubbleProjectileRenderer::new);
+        event.registerEntityRenderer(PBModEntities.GLACIER_ICE_SPIKE.get(), GlacierIceSpikeRenderer::new);
         event.registerEntityRenderer(PBModEntities.TECTONIC_FALLING_BLOCK.get(), TectonicFallingBlockRenderer::new);
         event.registerBlockEntityRenderer(PBModBlocks.FROZEN_DEBUFF_ICE_BLOCK_ENTITY.get(), context -> new FrozenDebuffIceBlockTileRenderer());
     }
@@ -33,4 +41,3 @@ public class ClientRegistries {
         event.registerSpecial(PBModParticles.BASIC_SPELL_PROJECTILE_TRAIL.get(), new BasicSpellProjectileTrailParticle.Provider());
     }
 }
-

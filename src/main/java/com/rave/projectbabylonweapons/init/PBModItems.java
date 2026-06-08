@@ -21,10 +21,7 @@ import com.rave.projectbabylonweapons.item.tachi.*;
 import com.rave.projectbabylonweapons.item.spear.*;
 import com.rave.projectbabylonweapons.item.staff.*;
 import com.rave.projectbabylonweapons.item.tool.*;
-import com.rave.projectbabylonweapons.item.wand.DiamondBattleWandItem;
-import com.rave.projectbabylonweapons.item.wand.GoldenBattleWandItem;
-import com.rave.projectbabylonweapons.item.wand.IceBattleWandItem;
-import com.rave.projectbabylonweapons.item.wand.IronBattleWandItem;
+import com.rave.projectbabylonweapons.item.wand.*;
 import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.HoeItem;
 import net.minecraft.world.item.Item;
@@ -38,6 +35,9 @@ import net.minecraftforge.registries.RegistryObject;
 public class PBModItems {
     public static final DeferredRegister<Item> ITEMS =
             DeferredRegister.create(ForgeRegistries.ITEMS, ProjectBabylonWeapons.MODID);
+
+    public static final RegistryObject<Item> FIRE_SPELL_PROJECTILE =
+            ITEMS.register("fire_spell_projectile", () -> new Item(new Item.Properties()));
 
     //IRON
     public static final RegistryObject<Item> IRON_PICKAXE =
@@ -248,6 +248,9 @@ public class PBModItems {
     public static final RegistryObject<Item> NETHERITE_TACHI =
             ITEMS.register("netherite_tachi", () -> new NetheriteTachiItem(new Item.Properties()));
 
+    public static final RegistryObject<Item> NETHERITE_BATTLE_WAND =
+            ITEMS.register("netherite_battle_wand", () -> new NetheriteBattleWandItem());
+
 
     //ICE
     public static final RegistryObject<Item> ICE_PICKAXE =
@@ -388,6 +391,9 @@ public class PBModItems {
     public static final RegistryObject<Item> ETHEREAL_RAPIER =
             ITEMS.register("ethereal_rapier", () -> new EtherealRapierItem(new Item.Properties()));
 
+    public static final RegistryObject<Item> ETHEREAL_BATTLE_WAND =
+            ITEMS.register("ethereal_battle_wand", () -> new EtherealBattleWandItem());
+
 
     //DEMON
     public static final RegistryObject<Item> DEMON_BATTLEAXE =
@@ -409,3 +415,4 @@ public class PBModItems {
                     () -> new FrozenDebuffIceBlockDisplayItem(PBModBlocks.FROZEN_DEBUFF_ICE_BLOCK.get(), new Item.Properties()));
 
 }
+

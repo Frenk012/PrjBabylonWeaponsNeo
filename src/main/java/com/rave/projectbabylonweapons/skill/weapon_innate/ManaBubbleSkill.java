@@ -1,0 +1,266 @@
+package com.rave.projectbabylonweapons.skill.weapon_innate;
+
+import com.rave.projectbabylonweapons.gameasset.PBAnimations;
+import com.rave.projectbabylonweapons.handler.MagicMeleeWeaponHelper;
+import com.rave.projectbabylonweapons.handler.StaffMagicArmorHelper;
+import com.rave.projectbabylonweapons.item.MagicProjectileStaffWeapon;
+import com.rave.projectbabylonweapons.world.entity.projectile.BasicSpellProjectileEntity;
+import com.rave.projectbabylonweapons.world.entity.projectile.ManaBubbleProjectileEntity;
+import io.redspace.ironsspellbooks.registries.SoundRegistry;
+import io.redspace.ironsspellbooks.util.ParticleHelper;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.core.particles.DustParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import org.joml.Vector3f;
+import yesman.epicfight.client.input.EpicFightKeyMappings;
+import yesman.epicfight.skill.SkillBuilder;
+import yesman.epicfight.skill.SkillContainer;
+import yesman.epicfight.skill.weaponinnate.WeaponInnateSkill;
+import yesman.epicfight.world.capabilities.entitypatch.player.ServerPlayerPatch;
+import yesman.epicfight.world.entity.eventlistener.AnimationEndEvent;
+import yesman.epicfight.world.entity.eventlistener.PlayerEventListener.EventType;
+
+import java.util.UUID;
+
+public class ManaBubbleSkill extends WeaponInnateSkill {
+    private static final UUID CONTACT_UUID = UUID.fromString("efec2a91-5997-4ca1-9f2a-8ef9f1de7b93");
+    private static final UUID END_UUID = UUID.fromString("79f1297d-10f0-4e5a-bfdb-83d6d8adf4d9");
+    private static final float DAMAGE_MULTIPLIER = 3.0F;
+    private static final float SPEED_MULTIPLIER = 0.15F;
+    private static final float RENDER_SCALE = 7.0F;
+    private static final float DRAG_STRENGTH = 0.82F;
+    private static final int MIN_LIFETIME = 40;
+    private static final int OUTER_RING_COUNT = 18;
+    private static final int INNER_RING_COUNT = 12;
+    private static final double GROUND_RING_RADIUS = 1.25D;
+    private static final double TORSO_RING_RADIUS = 0.75D;
+    private static final double GROUND_RING_SPEED = 0.18D;
+    private static final double TORSO_RING_SPEED = 0.12D;
+    private static final double GROUND_RING_Y_OFFSET = 0.08D;
+    private static final double TORSO_RING_Y_MULTIPLIER = 0.62D;
+
+    public ManaBubbleSkill(SkillBuilder<? extends WeaponInnateSkill> builder) {
+        super(builder);
+    }
+
+    @Override
+    public void onInitiate(SkillContainer container) {
+        super.onInitiate(container);
+        container.getExecutor().getEventListener().addEventListener(
+                EventType.ATTACK_PHASE_END_EVENT,
+                CONTACT_UUID,
+                event -> {
+                    if (container.getExecutor().isLogicalClient()) {
+                        return;
+                    }
+
+                    if (event.getAnimation() != PBAnimations.MANA_BUBBLE) {
+                        return;
+                    }
+
+                    if (event.getPhaseOrder() != 0) {
+                        return;
+                    }
+
+                    ServerPlayerPatch playerPatch = event.getPlayerPatch();
+                    if (playerPatch == null) {
+                        return;
+                    }
+
+                    playerPatch.getOriginal().level().playSound(
+                            null,
+                            playerPatch.getOriginal().getX(),
+                            playerPatch.getOriginal().getY(),
+                            playerPatch.getOriginal().getZ(),
+                            SoundEvents.ILLUSIONER_CAST_SPELL,
+                            SoundSource.PLAYERS,
+                            1.0F,
+                            1.0F
+                    );
+                    spawnManaBubble(playerPatch, playerPatch.getOriginal().getMainHandItem());
+                    if (container.isActivated()) {
+                        container.deactivate();
+                    }
+                }
+        );
+        container.getExecutor().getEventListener().addEventListener(
+                EventType.ANIMATION_END_EVENT,
+                END_UUID,
+                event -> onAnimationEnd(container, event)
+        );
+    }
+
+    @Override
+    public void onRemoved(SkillContainer container) {
+        container.getExecutor().getEventListener().removeListener(EventType.ATTACK_PHASE_END_EVENT, CONTACT_UUID);
+        container.getExecutor().getEventListener().removeListener(EventType.ANIMATION_END_EVENT, END_UUID);
+        super.onRemoved(container);
+    }
+
+    @Override
+    public void executeOnServer(SkillContainer container, FriendlyByteBuf args) {
+        super.executeOnServer(container, args);
+        container.activate();
+        container.getExecutor().getOriginal().level().playSound(
+                null,
+                container.getExecutor().getOriginal().getX(),
+                container.getExecutor().getOriginal().getY(),
+                container.getExecutor().getOriginal().getZ(),
+                SoundRegistry.HEARTSTOP_CAST.get(),
+                SoundSource.PLAYERS,
+                1.0F,
+                1.0F
+        );
+        container.getServerExecutor().modifyLivingMotionByCurrentItem(false);
+        container.getExecutor().playAnimationSynchronized(PBAnimations.MANA_BUBBLE, 0.0F);
+    }
+
+    @Override
+    public void executeOnClient(SkillContainer container, FriendlyByteBuf args) {
+        super.executeOnClient(container, args);
+        container.activate();
+    }
+
+    @Override
+    public void cancelOnServer(SkillContainer container, FriendlyByteBuf args) {
+        container.deactivate();
+        super.cancelOnServer(container, args);
+    }
+
+    @Override
+    public void cancelOnClient(SkillContainer container, FriendlyByteBuf args) {
+        container.deactivate();
+        super.cancelOnClient(container, args);
+    }
+
+    @Override
+    public WeaponInnateSkill registerPropertiesToAnimation() {
+        if (!this.properties.isEmpty()) {
+            PBAnimations.MANA_BUBBLE.get().phases[0].addProperties(this.properties.get(0).entrySet());
+        }
+        return this;
+    }
+
+    private static void onAnimationEnd(SkillContainer container, AnimationEndEvent event) {
+        if (event.getAnimation() != PBAnimations.MANA_BUBBLE.get()) {
+            return;
+        }
+
+        if (container.isActivated()) {
+            container.deactivate();
+        }
+    }
+
+    private static void spawnManaBubble(ServerPlayerPatch playerPatch, ItemStack weaponStack) {
+        if (!(weaponStack.getItem() instanceof MagicProjectileStaffWeapon weapon)) {
+            return;
+        }
+
+        ManaBubbleProjectileEntity bubble = new ManaBubbleProjectileEntity(playerPatch.getOriginal().level());
+        BasicSpellProjectileEntity visualProjectile = weapon.createMagicProjectile(playerPatch.getOriginal().level());
+        ManaBubbleProjectileEntity.VisualPreset visualPreset = ManaBubbleProjectileEntity.VisualPreset.fromProjectile(visualProjectile);
+
+        bubble.configureBubble(
+                playerPatch.getOriginal(),
+                weaponStack,
+                weapon.getMagicDamageType(),
+                MagicMeleeWeaponHelper.calculateRawMagicDamage(
+                        playerPatch.getOriginal(),
+                        weaponStack,
+                        weapon,
+                        1.0F,
+                        DAMAGE_MULTIPLIER
+                ),
+                StaffMagicArmorHelper.resolveWeaponMagicArmorNegation(playerPatch.getOriginal(), weaponStack),
+                StaffMagicArmorHelper.resolveWeaponImpact(playerPatch.getOriginal(), weaponStack),
+                weapon.getMagicProjectileStunType(),
+                Math.max(MIN_LIFETIME, weapon.getMagicProjectileLifetime()),
+                weapon.getMagicProjectileTrailColor(),
+                visualPreset,
+                RENDER_SCALE,
+                DRAG_STRENGTH
+        );
+
+        Vec3 look = playerPatch.getOriginal().getLookAngle();
+        Vec3 forward = new Vec3(look.x, 0.0D, look.z);
+        if (forward.lengthSqr() < 1.0E-6D) {
+            forward = playerPatch.getOriginal().getForward();
+        } else {
+            forward = forward.normalize();
+        }
+
+        spawnContactParticles(playerPatch, visualPreset, weapon.getMagicProjectileTrailColor());
+
+        double spawnX = playerPatch.getOriginal().getX() + forward.x * weapon.getMagicProjectileSpawnForwardOffset();
+        double spawnY = playerPatch.getOriginal().getY() + playerPatch.getOriginal().getBbHeight() * 0.6D + weapon.getMagicProjectileSpawnVerticalOffset();
+        double spawnZ = playerPatch.getOriginal().getZ() + forward.z * weapon.getMagicProjectileSpawnForwardOffset();
+        bubble.setPos(spawnX, spawnY, spawnZ);
+        bubble.shoot(forward.x, 0.0D, forward.z, weapon.getMagicProjectileSpeed() * SPEED_MULTIPLIER, 0.0F);
+        playerPatch.getOriginal().level().addFreshEntity(bubble);
+    }
+
+    private static void spawnContactParticles(ServerPlayerPatch playerPatch, ManaBubbleProjectileEntity.VisualPreset visualPreset,
+                                              int trailColor) {
+        if (!(playerPatch.getOriginal().level() instanceof ServerLevel serverLevel)) {
+            return;
+        }
+
+        Vec3 origin = playerPatch.getOriginal().position();
+        double groundY = origin.y + GROUND_RING_Y_OFFSET;
+        double torsoY = origin.y + playerPatch.getOriginal().getBbHeight() * TORSO_RING_Y_MULTIPLIER;
+
+        spawnParticleRing(serverLevel, origin, groundY, OUTER_RING_COUNT, GROUND_RING_RADIUS, GROUND_RING_SPEED, visualPreset, trailColor, false);
+        spawnParticleRing(serverLevel, origin, torsoY, INNER_RING_COUNT, TORSO_RING_RADIUS, TORSO_RING_SPEED, visualPreset, trailColor, true);
+    }
+
+    private static void spawnParticleRing(ServerLevel level, Vec3 origin, double y, int count, double radius,
+                                          double outwardSpeed, ManaBubbleProjectileEntity.VisualPreset visualPreset,
+                                          int trailColor, boolean elevated) {
+        for (int i = 0; i < count; i++) {
+            double angle = (Math.PI * 2.0D * i) / count;
+            double cos = Math.cos(angle);
+            double sin = Math.sin(angle);
+            double spawnX = origin.x + cos * radius;
+            double spawnY = y + (elevated && (i & 1) == 0 ? 0.08D : 0.0D);
+            double spawnZ = origin.z + sin * radius;
+            double velocityX = cos * outwardSpeed;
+            double velocityZ = sin * outwardSpeed;
+
+            switch (visualPreset.particleTheme()) {
+                case ICE -> {
+                    level.sendParticles(ParticleHelper.SNOWFLAKE, spawnX, spawnY, spawnZ, 1, velocityX, 0.02D, velocityZ, 0.0D);
+                    level.sendParticles(ParticleHelper.SNOW_DUST, spawnX, spawnY, spawnZ, 1, velocityX * 0.75D, 0.01D, velocityZ * 0.75D, 0.0D);
+                }
+                case FIRE -> {
+                    level.sendParticles(ParticleTypes.FLAME, spawnX, spawnY, spawnZ, 1, velocityX, 0.02D, velocityZ, 0.0D);
+                    level.sendParticles(ParticleTypes.SMOKE, spawnX, spawnY, spawnZ, 1, velocityX * 0.7D, 0.01D, velocityZ * 0.7D, 0.0D);
+                }
+                case HOLY -> {
+                    level.sendParticles(ParticleTypes.END_ROD, spawnX, spawnY, spawnZ, 1, velocityX, 0.015D, velocityZ, 0.0D);
+                    level.sendParticles(ParticleTypes.END_ROD, spawnX, spawnY, spawnZ, 1, velocityX * 0.7D, 0.0D, velocityZ * 0.7D, 0.0D);
+                }
+                case BASIC -> {
+                    Vector3f color = new Vector3f(
+                            ((trailColor >> 16) & 0xFF) / 255.0F,
+                            ((trailColor >> 8) & 0xFF) / 255.0F,
+                            (trailColor & 0xFF) / 255.0F
+                    );
+                    level.sendParticles(new DustParticleOptions(color, elevated ? 0.9F : 1.1F), spawnX, spawnY, spawnZ, 1, velocityX, 0.0D, velocityZ, 0.0D);
+                }
+            }
+        }
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    public KeyMapping getKeyMapping() {
+        return EpicFightKeyMappings.WEAPON_INNATE_SKILL;
+    }
+}

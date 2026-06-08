@@ -15,6 +15,7 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.Entity;
@@ -44,6 +45,8 @@ public class BasicSpellProjectileEntity extends Projectile implements GeoEntity 
     private static final RawAnimation LOOP_ANIMATION = RawAnimation.begin().thenLoop("animation.basic_spell_projectile.idle");
     private static final float INERTIA = 0.99F;
     private static final int DEFAULT_TRAIL_COLOR = 0xB970FF;
+    private static final int IMPACT_DUST_LARGE_COUNT = 20;
+    private static final int IMPACT_DUST_SMALL_COUNT = 12;
     private static final String TAG_RAW_MAGIC_DAMAGE = "RawMagicDamage";
     private static final String TAG_MAGIC_ARMOR_NEGATION = "MagicArmorNegation";
     private static final String TAG_IMPACT = "Impact";
@@ -184,6 +187,9 @@ public class BasicSpellProjectileEntity extends Projectile implements GeoEntity 
 
     @Override
     protected void onHit(HitResult result) {
+        if (!this.level().isClientSide && result.getType() != HitResult.Type.MISS) {
+            this.spawnImpactParticles(result.getLocation());
+        }
         super.onHit(result);
         if (result.getType() != HitResult.Type.MISS && !this.level().isClientSide) {
             this.discard();
@@ -280,6 +286,24 @@ public class BasicSpellProjectileEntity extends Projectile implements GeoEntity 
 
         this.level().addParticle(new DustParticleOptions(color, 1.0F), center.x + spiralOffset.x, center.y + spiralOffset.y, center.z + spiralOffset.z, 0.0D, 0.0D, 0.0D);
         this.level().addParticle(new DustParticleOptions(color, 0.75F), center.x + oppositeOffset.x, center.y + oppositeOffset.y, center.z + oppositeOffset.z, 0.0D, 0.0D, 0.0D);
+    }
+
+    protected void spawnImpactParticles(Vec3 hitPos) {
+        if (!(this.level() instanceof ServerLevel serverLevel)) {
+            return;
+        }
+
+        Vector3f color = new Vector3f(this.getTrailRed(), this.getTrailGreen(), this.getTrailBlue());
+        serverLevel.sendParticles(new DustParticleOptions(color, 1.25F),
+                hitPos.x, hitPos.y, hitPos.z,
+                IMPACT_DUST_LARGE_COUNT,
+                0.35D, 0.35D, 0.35D,
+                0.05D);
+        serverLevel.sendParticles(new DustParticleOptions(color, 0.85F),
+                hitPos.x, hitPos.y, hitPos.z,
+                IMPACT_DUST_SMALL_COUNT,
+                0.2D, 0.2D, 0.2D,
+                0.02D);
     }
 
     private ResourceKey<DamageType> resolveMagicDamageType() {
