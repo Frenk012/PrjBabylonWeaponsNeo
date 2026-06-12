@@ -1,0 +1,27 @@
+package com.rave.projectbabylonweapons.client.renderer;
+
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
+import com.rave.projectbabylonweapons.client.model.EnderSpellProjectileEntityModel;
+import com.rave.projectbabylonweapons.world.entity.projectile.EnderSpellProjectileEntity;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.util.Mth;
+import software.bernie.geckolib.renderer.GeoEntityRenderer;
+
+public class EnderSpellProjectileRenderer extends GeoEntityRenderer<EnderSpellProjectileEntity> {
+    public EnderSpellProjectileRenderer(EntityRendererProvider.Context context) {
+        super(context, new EnderSpellProjectileEntityModel());
+        this.shadowRadius = 0.0F;
+    }
+
+    @Override
+    public void render(EnderSpellProjectileEntity entity, float entityYaw, float partialTick, PoseStack poseStack,
+                       MultiBufferSource bufferSource, int packedLight) {
+        poseStack.pushPose();
+        poseStack.mulPose(Axis.YP.rotationDegrees(Mth.lerp(partialTick, entity.yRotO, entity.getYRot()) - 90.0F));
+        poseStack.mulPose(Axis.ZP.rotationDegrees(Mth.lerp(partialTick, entity.xRotO, entity.getXRot())));
+        super.render(entity, entityYaw, partialTick, poseStack, bufferSource, packedLight);
+        poseStack.popPose();
+    }
+}

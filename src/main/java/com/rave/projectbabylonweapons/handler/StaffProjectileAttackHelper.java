@@ -1,6 +1,7 @@
 package com.rave.projectbabylonweapons.handler;
 
 import com.rave.projectbabylonweapons.item.MagicProjectileStaffWeapon;
+import com.rave.projectbabylonweapons.skill.weapon_innate.DragonDescendSkill;
 import com.rave.projectbabylonweapons.world.entity.projectile.BasicSpellProjectileEntity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
@@ -66,6 +67,7 @@ public final class StaffProjectileAttackHelper {
                 weapon.getMagicProjectileLifetime(),
                 weapon.getMagicProjectileTrailColor()
         );
+        projectile.setPiercing(DragonDescendSkill.isDragonDescendActive(attacker));
         projectile.setPos(spawnPos.x, spawnPos.y, spawnPos.z);
         projectile.shoot(shootDirection.x, shootDirection.y, shootDirection.z, weapon.getMagicProjectileSpeed(), weapon.getMagicProjectileInaccuracy());
 
@@ -81,4 +83,3 @@ public final class StaffProjectileAttackHelper {
         return flat.normalize();
     }
 }
-

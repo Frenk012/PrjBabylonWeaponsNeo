@@ -2,8 +2,11 @@ package com.rave.projectbabylonweapons.init;
 
 import com.rave.projectbabylonweapons.ProjectBabylonWeapons;
 import com.rave.projectbabylonweapons.world.entity.effect.GlacierIceSpikeEntity;
+import com.rave.projectbabylonweapons.world.entity.effect.HolyMagicalSealEntity;
 import com.rave.projectbabylonweapons.world.entity.effect.TectonicFallingBlockEntity;
 import com.rave.projectbabylonweapons.world.entity.projectile.BasicSpellProjectileEntity;
+import com.rave.projectbabylonweapons.world.entity.projectile.DragonDescendProjectileEntity;
+import com.rave.projectbabylonweapons.world.entity.projectile.EnderSpellProjectileEntity;
 import com.rave.projectbabylonweapons.world.entity.projectile.FireSpellProjectileEntity;
 import com.rave.projectbabylonweapons.world.entity.projectile.HolySpellProjectileEntity;
 import com.rave.projectbabylonweapons.world.entity.projectile.IceSpellProjectileEntity;
@@ -51,7 +54,6 @@ public class PBModEntities {
                             .updateInterval(1)
                             .build("fire_spell_projectile"));
 
-
     public static final RegistryObject<EntityType<HolySpellProjectileEntity>> HOLY_SPELL_PROJECTILE =
             ENTITIES.register("holy_spell_projectile", () ->
                     EntityType.Builder.<HolySpellProjectileEntity>of(HolySpellProjectileEntity::new, MobCategory.MISC)
@@ -59,6 +61,15 @@ public class PBModEntities {
                             .clientTrackingRange(64)
                             .updateInterval(1)
                             .build("holy_spell_projectile"));
+
+    public static final RegistryObject<EntityType<EnderSpellProjectileEntity>> ENDER_SPELL_PROJECTILE =
+            ENTITIES.register("ender_spell_projectile", () ->
+                    EntityType.Builder.<EnderSpellProjectileEntity>of(EnderSpellProjectileEntity::new, MobCategory.MISC)
+                            .sized(1.0f, 1.0f)
+                            .clientTrackingRange(64)
+                            .updateInterval(1)
+                            .build("ender_spell_projectile"));
+
     public static final RegistryObject<EntityType<ManaBubbleProjectileEntity>> MANA_BUBBLE_PROJECTILE =
             ENTITIES.register("mana_bubble_projectile", () ->
                     EntityType.Builder.<ManaBubbleProjectileEntity>of(ManaBubbleProjectileEntity::new, MobCategory.MISC)
@@ -67,6 +78,14 @@ public class PBModEntities {
                             .updateInterval(1)
                             .build("mana_bubble_projectile"));
 
+    public static final RegistryObject<EntityType<DragonDescendProjectileEntity>> DRAGON_DESCEND_PROJECTILE =
+            ENTITIES.register("dragon_descend_projectile", () ->
+                    EntityType.Builder.<DragonDescendProjectileEntity>of(DragonDescendProjectileEntity::new, MobCategory.MISC)
+                            .sized(2.0f, 2.0f)
+                            .clientTrackingRange(64)
+                            .updateInterval(1)
+                            .build("dragon_descend_projectile"));
+
     public static final RegistryObject<EntityType<GlacierIceSpikeEntity>> GLACIER_ICE_SPIKE =
             ENTITIES.register("glacier_ice_spike", () ->
                     EntityType.Builder.<GlacierIceSpikeEntity>of(GlacierIceSpikeEntity::new, MobCategory.MISC)
@@ -74,6 +93,14 @@ public class PBModEntities {
                             .clientTrackingRange(64)
                             .updateInterval(1)
                             .build("glacier_ice_spike"));
+
+    public static final RegistryObject<EntityType<HolyMagicalSealEntity>> HOLY_MAGICAL_SEAL =
+            ENTITIES.register("holy_magical_seal", () ->
+                    EntityType.Builder.<HolyMagicalSealEntity>of(HolyMagicalSealEntity::new, MobCategory.MISC)
+                            .sized(3.0f, 0.2f)
+                            .clientTrackingRange(64)
+                            .updateInterval(1)
+                            .build("holy_magical_seal"));
 
     public static final RegistryObject<EntityType<TectonicFallingBlockEntity>> TECTONIC_FALLING_BLOCK =
             ENTITIES.register("tectonic_falling_block", () ->

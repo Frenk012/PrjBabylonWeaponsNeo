@@ -4,10 +4,13 @@ import com.rave.projectbabylonweapons.ProjectBabylonWeapons;
 import com.rave.projectbabylonweapons.block.renderer.FrozenDebuffIceBlockTileRenderer;
 import com.rave.projectbabylonweapons.client.particle.BasicSpellProjectileTrailParticle;
 import com.rave.projectbabylonweapons.client.renderer.BasicSpellProjectileRenderer;
+import com.rave.projectbabylonweapons.client.renderer.DragonDescendProjectileRenderer;
+import com.rave.projectbabylonweapons.client.renderer.EnderSpellProjectileRenderer;
 import com.rave.projectbabylonweapons.client.renderer.FireSpellProjectileRenderer;
 import com.rave.projectbabylonweapons.client.renderer.GlacierIceSpikeRenderer;
-import com.rave.projectbabylonweapons.client.renderer.IceSpellProjectileRenderer;
+import com.rave.projectbabylonweapons.client.renderer.HolyMagicalSealRenderer;
 import com.rave.projectbabylonweapons.client.renderer.HolySpellProjectileRenderer;
+import com.rave.projectbabylonweapons.client.renderer.IceSpellProjectileRenderer;
 import com.rave.projectbabylonweapons.client.renderer.ManaBubbleProjectileRenderer;
 import com.rave.projectbabylonweapons.client.renderer.SickleChainRenderer;
 import com.rave.projectbabylonweapons.client.renderer.TectonicFallingBlockRenderer;
@@ -30,8 +33,11 @@ public class ClientRegistries {
         event.registerEntityRenderer(PBModEntities.ICE_SPELL_PROJECTILE.get(), IceSpellProjectileRenderer::new);
         event.registerEntityRenderer(PBModEntities.FIRE_SPELL_PROJECTILE.get(), FireSpellProjectileRenderer::new);
         event.registerEntityRenderer(PBModEntities.HOLY_SPELL_PROJECTILE.get(), HolySpellProjectileRenderer::new);
+        event.registerEntityRenderer(PBModEntities.ENDER_SPELL_PROJECTILE.get(), EnderSpellProjectileRenderer::new);
         event.registerEntityRenderer(PBModEntities.MANA_BUBBLE_PROJECTILE.get(), ManaBubbleProjectileRenderer::new);
+        event.registerEntityRenderer(PBModEntities.DRAGON_DESCEND_PROJECTILE.get(), DragonDescendProjectileRenderer::new);
         event.registerEntityRenderer(PBModEntities.GLACIER_ICE_SPIKE.get(), GlacierIceSpikeRenderer::new);
+        event.registerEntityRenderer(PBModEntities.HOLY_MAGICAL_SEAL.get(), HolyMagicalSealRenderer::new);
         event.registerEntityRenderer(PBModEntities.TECTONIC_FALLING_BLOCK.get(), TectonicFallingBlockRenderer::new);
         event.registerBlockEntityRenderer(PBModBlocks.FROZEN_DEBUFF_ICE_BLOCK_ENTITY.get(), context -> new FrozenDebuffIceBlockTileRenderer());
     }

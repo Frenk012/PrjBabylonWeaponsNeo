@@ -349,6 +349,9 @@ public class PBModItems {
     public static final RegistryObject<Item> DRAGONSTEEL_RAPIER =
             ITEMS.register("dragonsteel_rapier", () -> new DragonsteelRapierItem(new Item.Properties()));
 
+    public static final RegistryObject<Item> DRAGONSTEEL_BATTLE_WAND =
+            ITEMS.register("dragonsteel_battle_wand", () -> new DragonsteelBattleWandItem());
+
 
 
     //ETHEREAL
@@ -415,4 +418,5 @@ public class PBModItems {
                     () -> new FrozenDebuffIceBlockDisplayItem(PBModBlocks.FROZEN_DEBUFF_ICE_BLOCK.get(), new Item.Properties()));
 
 }
+
 

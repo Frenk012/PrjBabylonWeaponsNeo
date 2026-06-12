@@ -55,6 +55,7 @@ public class BasicSpellProjectileEntity extends Projectile implements GeoEntity 
     private static final String TAG_LIFETIME = "Lifetime";
     private static final String TAG_SOURCE_WEAPON = "SourceWeapon";
     private static final String TAG_TRAIL_COLOR = "TrailColor";
+    private static final String TAG_PIERCING = "Piercing";
     private static final EntityDataAccessor<Integer> DATA_TRAIL_COLOR = SynchedEntityData.defineId(BasicSpellProjectileEntity.class, EntityDataSerializers.INT);
 
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
@@ -67,6 +68,7 @@ public class BasicSpellProjectileEntity extends Projectile implements GeoEntity 
     private int maxLifetime = 200;
     private ItemStack sourceWeapon = ItemStack.EMPTY;
     private boolean trailSpawnedClient;
+    private boolean piercing;
 
     public BasicSpellProjectileEntity(EntityType<? extends BasicSpellProjectileEntity> type, Level level) {
         super(type, level);
@@ -93,6 +95,14 @@ public class BasicSpellProjectileEntity extends Projectile implements GeoEntity 
         this.stunTypeName = stunType != null ? stunType.name() : "";
         this.maxLifetime = Math.max(1, maxLifetime);
         this.setTrailColor(trailColor);
+    }
+
+    public void setPiercing(boolean piercing) {
+        this.piercing = piercing;
+    }
+
+    public boolean isPiercing() {
+        return this.piercing;
     }
 
     @Override
@@ -172,7 +182,7 @@ public class BasicSpellProjectileEntity extends Projectile implements GeoEntity 
             }
         }
 
-        if (!this.level().isClientSide) {
+        if (!this.level().isClientSide && !this.piercing) {
             this.discard();
         }
     }
@@ -191,7 +201,10 @@ public class BasicSpellProjectileEntity extends Projectile implements GeoEntity 
             this.spawnImpactParticles(result.getLocation());
         }
         super.onHit(result);
-        if (result.getType() != HitResult.Type.MISS && !this.level().isClientSide) {
+        if (!this.level().isClientSide && result.getType() == HitResult.Type.BLOCK) {
+            this.discard();
+        }
+        if (!this.level().isClientSide && result.getType() == HitResult.Type.ENTITY && !this.piercing) {
             this.discard();
         }
     }
@@ -206,6 +219,7 @@ public class BasicSpellProjectileEntity extends Projectile implements GeoEntity 
         tag.putString(TAG_STUN_TYPE, this.stunTypeName);
         tag.putInt(TAG_LIFETIME, this.maxLifetime);
         tag.putInt(TAG_TRAIL_COLOR, this.getTrailColor());
+        tag.putBoolean(TAG_PIERCING, this.piercing);
         if (!this.sourceWeapon.isEmpty()) {
             tag.put(TAG_SOURCE_WEAPON, this.sourceWeapon.save(new CompoundTag()));
         }
@@ -220,6 +234,7 @@ public class BasicSpellProjectileEntity extends Projectile implements GeoEntity 
         this.magicDamageTypeId = tag.getString(TAG_DAMAGE_TYPE);
         this.stunTypeName = tag.getString(TAG_STUN_TYPE);
         this.maxLifetime = Math.max(1, tag.getInt(TAG_LIFETIME));
+        this.piercing = tag.getBoolean(TAG_PIERCING);
         if (tag.contains(TAG_TRAIL_COLOR)) {
             this.setTrailColor(tag.getInt(TAG_TRAIL_COLOR));
         }

@@ -552,3 +552,4 @@ public class ManaBubbleProjectileEntity extends Projectile implements GeoEntity 
         return this.cache;
     }
 }
+

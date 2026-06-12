@@ -202,7 +202,7 @@ public class PBWeaponCapabilityPresets {
                         Animations.SWORD_MOUNT_ATTACK
                 })
 
-                .innateSkill(CapabilityItem.Styles.TWO_HAND, (itemstack) -> PBSkills.MANA_BUBBLE)
+                .innateSkill(CapabilityItem.Styles.TWO_HAND, (itemstack) -> PBSkills.DRAGON_DESCEND)
 
 
                 .livingMotionModifier(CapabilityItem.Styles.TWO_HAND, LivingMotions.IDLE, PBAnimations.WAND_IDLE)

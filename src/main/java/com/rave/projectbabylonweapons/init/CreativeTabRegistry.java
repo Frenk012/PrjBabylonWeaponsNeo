@@ -142,6 +142,7 @@ public class CreativeTabRegistry {
                         output.accept(PBModItems.DRAGONSTEEL_STAFF.get());
                         output.accept(PBModItems.DRAGONSTEEL_TACHI.get());
                         output.accept(PBModItems.DRAGONSTEEL_RAPIER.get());
+                        output.accept(PBModItems.DRAGONSTEEL_BATTLE_WAND.get());
 
 
                         //ETHEREAL

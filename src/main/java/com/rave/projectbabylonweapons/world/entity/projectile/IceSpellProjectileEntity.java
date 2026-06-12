@@ -1,5 +1,6 @@
 package com.rave.projectbabylonweapons.world.entity.projectile;
 
+import com.rave.projectbabylonweapons.client.PhotonWeaponEffectHelper;
 import com.rave.projectbabylonweapons.init.PBModEntities;
 import io.redspace.ironsspellbooks.util.ParticleHelper;
 import net.minecraft.server.level.ServerLevel;
@@ -32,6 +33,9 @@ public class IceSpellProjectileEntity extends BasicSpellProjectileEntity {
 
     @Override
     protected void onHit(HitResult result) {
+        if (this.level().isClientSide && result.getType() != HitResult.Type.MISS) {
+            PhotonWeaponEffectHelper.spawnIceProjectileImpact(this, result.getLocation());
+        }
         if (!this.level().isClientSide && result.getType() != HitResult.Type.MISS) {
             this.spawnImpactParticles(result.getLocation());
         }
@@ -48,41 +52,7 @@ public class IceSpellProjectileEntity extends BasicSpellProjectileEntity {
 
     @Override
     protected void spawnClientParticles() {
-        Vec3 movement = this.getDeltaMovement();
-        if (movement.lengthSqr() < 1.0E-5D) {
-            return;
-        }
-
-        Vec3 normalized = movement.normalize();
-        Vec3 center = this.position().subtract(normalized.scale(0.35D));
-        Vec3 right = new Vec3(-normalized.z, 0.0D, normalized.x);
-        if (right.lengthSqr() < 1.0E-6D) {
-            right = new Vec3(1.0D, 0.0D, 0.0D);
-        } else {
-            right = right.normalize();
-        }
-
-        Vec3 up = normalized.cross(right);
-        if (up.lengthSqr() < 1.0E-6D) {
-            up = new Vec3(0.0D, 1.0D, 0.0D);
-        } else {
-            up = up.normalize();
-        }
-
-        float angle = this.tickCount * 0.6F;
-        Vec3 spiralOffset = right.scale(Math.cos(angle) * 0.12D).add(up.scale(Math.sin(angle) * 0.12D));
-        Vec3 oppositeOffset = spiralOffset.scale(-1.0D);
-
-        this.level().addParticle(ParticleHelper.SNOWFLAKE,
-                center.x + spiralOffset.x,
-                center.y + spiralOffset.y,
-                center.z + spiralOffset.z,
-                0.0D, 0.005D, 0.0D);
-        this.level().addParticle(ParticleHelper.SNOW_DUST,
-                center.x + oppositeOffset.x,
-                center.y + oppositeOffset.y,
-                center.z + oppositeOffset.z,
-                0.0D, 0.0D, 0.0D);
+        PhotonWeaponEffectHelper.spawnIceProjectileFlight(this, this.getDeltaMovement());
     }
 
     protected void spawnImpactParticles(Vec3 hitPos) {
@@ -102,4 +72,3 @@ public class IceSpellProjectileEntity extends BasicSpellProjectileEntity {
                 0.03D);
     }
 }
-

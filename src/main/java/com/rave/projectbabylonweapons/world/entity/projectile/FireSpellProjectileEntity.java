@@ -1,10 +1,12 @@
 package com.rave.projectbabylonweapons.world.entity.projectile;
 
+import com.rave.projectbabylonweapons.client.PhotonWeaponEffectHelper;
 import com.rave.projectbabylonweapons.init.PBModEntities;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.network.PlayMessages;
 import software.bernie.geckolib.core.animation.AnimatableManager;
@@ -39,41 +41,15 @@ public class FireSpellProjectileEntity extends BasicSpellProjectileEntity {
 
     @Override
     protected void spawnClientParticles() {
-        Vec3 movement = this.getDeltaMovement();
-        if (movement.lengthSqr() < 1.0E-5D) {
-            return;
+        PhotonWeaponEffectHelper.spawnFireProjectileFlight(this, this.getDeltaMovement());
+    }
+
+    @Override
+    protected void onHit(HitResult result) {
+        if (this.level().isClientSide && result.getType() != HitResult.Type.MISS) {
+            PhotonWeaponEffectHelper.spawnFireProjectileImpact(this, result.getLocation());
         }
-
-        Vec3 normalized = movement.normalize();
-        Vec3 center = this.position().subtract(normalized.scale(0.35D));
-        Vec3 right = new Vec3(-normalized.z, 0.0D, normalized.x);
-        if (right.lengthSqr() < 1.0E-6D) {
-            right = new Vec3(1.0D, 0.0D, 0.0D);
-        } else {
-            right = right.normalize();
-        }
-
-        Vec3 up = normalized.cross(right);
-        if (up.lengthSqr() < 1.0E-6D) {
-            up = new Vec3(0.0D, 1.0D, 0.0D);
-        } else {
-            up = up.normalize();
-        }
-
-        float angle = this.tickCount * 0.6F;
-        Vec3 flameOffset = right.scale(Math.cos(angle) * 0.14D).add(up.scale(Math.sin(angle) * 0.14D));
-        Vec3 smokeOffset = flameOffset.scale(-0.75D);
-
-        this.level().addParticle(ParticleTypes.FLAME,
-                center.x + flameOffset.x,
-                center.y + flameOffset.y,
-                center.z + flameOffset.z,
-                0.0D, 0.01D, 0.0D);
-        this.level().addParticle(ParticleTypes.SMOKE,
-                center.x + smokeOffset.x,
-                center.y + smokeOffset.y,
-                center.z + smokeOffset.z,
-                0.0D, 0.0D, 0.0D);
+        super.onHit(result);
     }
 
     @Override

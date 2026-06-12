@@ -1,9 +1,9 @@
 package com.rave.projectbabylonweapons.network;
 
 import com.rave.projectbabylonweapons.ProjectBabylonWeapons;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.PacketDistributor;
@@ -58,6 +58,15 @@ public class PBNetworkManager {
                 SPSickleActiveSync::encode,
                 SPSickleActiveSync::new,
                 SPSickleActiveSync::handle,
+                java.util.Optional.of(NetworkDirection.PLAY_TO_CLIENT)
+        );
+
+        CHANNEL.registerMessage(
+                id++,
+                SPPlayWeaponVisualEffect.class,
+                SPPlayWeaponVisualEffect::encode,
+                SPPlayWeaponVisualEffect::new,
+                SPPlayWeaponVisualEffect::handle,
                 java.util.Optional.of(NetworkDirection.PLAY_TO_CLIENT)
         );
     }

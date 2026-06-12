@@ -1,10 +1,12 @@
 package com.rave.projectbabylonweapons.world.entity.projectile;
 
+import com.rave.projectbabylonweapons.client.PhotonWeaponEffectHelper;
 import com.rave.projectbabylonweapons.init.PBModEntities;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.network.PlayMessages;
 import software.bernie.geckolib.core.animation.AnimatableManager;
@@ -38,41 +40,15 @@ public class HolySpellProjectileEntity extends BasicSpellProjectileEntity {
 
     @Override
     protected void spawnClientParticles() {
-        Vec3 movement = this.getDeltaMovement();
-        if (movement.lengthSqr() < 1.0E-5D) {
-            return;
+        PhotonWeaponEffectHelper.spawnHolyProjectileFlight(this, this.getDeltaMovement());
+    }
+
+    @Override
+    protected void onHit(HitResult result) {
+        if (this.level().isClientSide && result.getType() != HitResult.Type.MISS) {
+            PhotonWeaponEffectHelper.spawnHolyProjectileImpact(this, result.getLocation());
         }
-
-        Vec3 normalized = movement.normalize();
-        Vec3 center = this.position().subtract(normalized.scale(0.3D));
-        Vec3 right = new Vec3(-normalized.z, 0.0D, normalized.x);
-        if (right.lengthSqr() < 1.0E-6D) {
-            right = new Vec3(1.0D, 0.0D, 0.0D);
-        } else {
-            right = right.normalize();
-        }
-
-        Vec3 up = normalized.cross(right);
-        if (up.lengthSqr() < 1.0E-6D) {
-            up = new Vec3(0.0D, 1.0D, 0.0D);
-        } else {
-            up = up.normalize();
-        }
-
-        float angle = this.tickCount * 0.45F;
-        Vec3 spiralOffset = right.scale(Math.cos(angle) * 0.1D).add(up.scale(Math.sin(angle) * 0.1D));
-        Vec3 oppositeOffset = spiralOffset.scale(-1.0D);
-
-        this.level().addParticle(ParticleTypes.END_ROD,
-                center.x + spiralOffset.x,
-                center.y + spiralOffset.y,
-                center.z + spiralOffset.z,
-                0.0D, 0.0D, 0.0D);
-        this.level().addParticle(ParticleTypes.END_ROD,
-                center.x + oppositeOffset.x,
-                center.y + oppositeOffset.y,
-                center.z + oppositeOffset.z,
-                0.0D, 0.0D, 0.0D);
+        super.onHit(result);
     }
 
     @Override
