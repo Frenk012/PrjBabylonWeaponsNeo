@@ -31,6 +31,61 @@ public final class WeaponVisualEffectClientHelper {
 
         if (WeaponVisualEffectHelper.DRAGON_DESCEND_CAST_STOP.equals(effectId)) {
             PhotonWeaponEffectHelper.stopDragonDescendCast(entity);
+            return;
+        }
+
+        if (WeaponVisualEffectHelper.GLACIER_CAST_START.equals(effectId)) {
+            PhotonWeaponEffectHelper.startGlacierCast(entity);
+            return;
+        }
+
+        if (WeaponVisualEffectHelper.GLACIER_CAST_STOP.equals(effectId)) {
+            PhotonWeaponEffectHelper.stopGlacierCast(entity);
+            return;
+        }
+
+        if (WeaponVisualEffectHelper.GLACIER_CONTACT_WAVE.equals(effectId)) {
+            PhotonWeaponEffectHelper.spawnGlacierContactWave(entity);
+            return;
+        }
+
+        if (WeaponVisualEffectHelper.BLESSING_CAST_START.equals(effectId)) {
+            PhotonWeaponEffectHelper.startBlessingCast(entity);
+            return;
+        }
+
+        if (WeaponVisualEffectHelper.BLESSING_CAST_BURST.equals(effectId)) {
+            PhotonWeaponEffectHelper.burstBlessingCast(entity);
+            return;
+        }
+
+        if (WeaponVisualEffectHelper.BLESSING_CAST_STOP.equals(effectId)) {
+            PhotonWeaponEffectHelper.stopBlessingCast(entity);
+            return;
+        }
+
+        if (WeaponVisualEffectHelper.BLESSING_HEAL_PULSE.equals(effectId)) {
+            PhotonWeaponEffectHelper.spawnBlessingHealPulse(entity);
+            return;
+        }
+
+        if (WeaponVisualEffectHelper.BLESSING_ABSORPTION_PULSE.equals(effectId)) {
+            PhotonWeaponEffectHelper.spawnBlessingAbsorptionPulse(entity);
+            return;
+        }
+
+        if (WeaponVisualEffectHelper.FIRE_STORM_CAST_START.equals(effectId)) {
+            PhotonWeaponEffectHelper.startFireStormCast(entity);
+            return;
+        }
+
+        if (WeaponVisualEffectHelper.FIRE_STORM_CAST_BURST.equals(effectId)) {
+            PhotonWeaponEffectHelper.burstFireStormCast(entity);
+            return;
+        }
+
+        if (WeaponVisualEffectHelper.FIRE_STORM_CAST_STOP.equals(effectId)) {
+            PhotonWeaponEffectHelper.stopFireStormCast(entity);
         }
     }
 }

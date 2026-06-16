@@ -1,6 +1,7 @@
 package com.rave.projectbabylonweapons.world.entity.effect;
 
 import com.rave.projectbabylonweapons.ProjectBabylonWeapons;
+import com.rave.projectbabylonweapons.handler.WeaponVisualEffectHelper;
 import com.rave.projectbabylonweapons.init.PBModEntities;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
@@ -11,9 +12,9 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.network.NetworkHooks;
 import net.minecraftforge.network.PlayMessages;
@@ -32,9 +33,10 @@ public class HolyMagicalSealEntity extends Entity implements GeoEntity {
             .thenPlay("spawn_animation")
             .thenLoop("loop_animation");
     private static final RawAnimation DESPAWN_ANIMATION = RawAnimation.begin().thenPlay("despawn_animation");
-    private static final int ACTIVE_DURATION_TICKS = 16 * 20;
+    private static final int DEFAULT_ACTIVE_DURATION_TICKS = 16 * 20;
     private static final int DESPAWN_DURATION_TICKS = 3 * 20;
     private static final int HEAL_INTERVAL_TICKS = 2 * 20;
+    private static final int ABSORPTION_INTERVAL_TICKS = 8 * 20;
     private static final int ABSORPTION_DURATION_TICKS = 8 * 20;
     private static final float HEAL_PERCENT = 0.05F;
     private static final float ABSORPTION_PERCENT = 0.35F;
@@ -43,6 +45,7 @@ public class HolyMagicalSealEntity extends Entity implements GeoEntity {
     private static final String TAG_CASTER_UUID = "CasterUuid";
     private static final String TAG_EXPIRES_AT = "ExpiresAt";
     private static final String TAG_NEXT_HEAL_AT = "NextHealAt";
+    private static final String TAG_NEXT_ABSORPTION_AT = "NextAbsorptionAt";
     private static final String TAG_ABSORPTION_EXPIRES_AT = "AbsorptionExpiresAt";
     private static final String TAG_GRANTED_ABSORPTION = "GrantedAbsorption";
     private static final String TAG_DESPAWNING = "Despawning";
@@ -53,6 +56,7 @@ public class HolyMagicalSealEntity extends Entity implements GeoEntity {
     private UUID casterUuid;
     private long expiresAt;
     private long nextHealAt;
+    private long nextAbsorptionAt;
     private long absorptionExpiresAt;
     private float grantedAbsorption;
 
@@ -70,15 +74,22 @@ public class HolyMagicalSealEntity extends Entity implements GeoEntity {
     }
 
     public void configure(ServerPlayer caster, ServerPlayer target) {
+        this.configure(caster, target, DEFAULT_ACTIVE_DURATION_TICKS);
+    }
+
+    public void configure(ServerPlayer caster, ServerPlayer target, int activeDurationTicks) {
         this.casterUuid = caster.getUUID();
         this.targetUuid = target.getUUID();
         long gameTime = caster.level().getGameTime();
-        this.expiresAt = gameTime + ACTIVE_DURATION_TICKS;
+        int boundedDuration = Mth.clamp(activeDurationTicks, 1, 20 * 60 * 10);
+        this.expiresAt = gameTime + boundedDuration;
         this.nextHealAt = gameTime;
+        this.nextAbsorptionAt = gameTime;
         this.absorptionExpiresAt = -1L;
         this.grantedAbsorption = 0.0F;
         this.setDespawning(false);
-        this.followTarget(target);
+        this.setPos(target.getX(), target.getY() + Y_OFFSET, target.getZ());
+        this.startRiding(target, true);
     }
 
     public boolean tracks(ServerPlayer target) {
@@ -133,12 +144,17 @@ public class HolyMagicalSealEntity extends Entity implements GeoEntity {
 
         if (target == null || !target.isAlive() || target.isRemoved()) {
             this.beginDespawn(gameTime, null);
+        } else if (this.getVehicle() != target || !this.isPassenger()) {
+            this.beginDespawn(gameTime, target);
         } else {
-            this.followTarget(target);
             if (!this.isDespawning()) {
                 if (gameTime >= this.nextHealAt) {
-                    this.pulseTarget(target, gameTime);
+                    this.healTarget(target);
                     this.nextHealAt = gameTime + HEAL_INTERVAL_TICKS;
+                }
+                if (gameTime >= this.nextAbsorptionAt) {
+                    this.pulseAbsorption(target, gameTime);
+                    this.nextAbsorptionAt = gameTime + ABSORPTION_INTERVAL_TICKS;
                 }
                 if (gameTime >= this.expiresAt) {
                     this.beginDespawn(gameTime, target);
@@ -158,7 +174,6 @@ public class HolyMagicalSealEntity extends Entity implements GeoEntity {
             this.discard();
         }
     }
-
     private void pulseTarget(ServerPlayer target, long gameTime) {
         float maxHealth = target.getMaxHealth();
         if (maxHealth <= 0.0F) {
@@ -166,11 +181,38 @@ public class HolyMagicalSealEntity extends Entity implements GeoEntity {
         }
 
         if (target.getHealth() < maxHealth) {
+            float healthBefore = target.getHealth();
             target.heal(maxHealth * HEAL_PERCENT);
+            if (target.getHealth() > healthBefore) {
+                WeaponVisualEffectHelper.playBlessingHealPulse(target);
+            }
             return;
         }
 
         this.applyAbsorption(target, gameTime, maxHealth * ABSORPTION_PERCENT);
+    }
+
+    private void healTarget(ServerPlayer target) {
+        float maxHealth = target.getMaxHealth();
+        if (maxHealth <= 0.0F || target.getHealth() >= maxHealth) {
+            return;
+        }
+
+        float healthBefore = target.getHealth();
+        target.heal(maxHealth * HEAL_PERCENT);
+        if (target.getHealth() > healthBefore) {
+            WeaponVisualEffectHelper.playBlessingHealPulse(target);
+        }
+    }
+
+    private void pulseAbsorption(ServerPlayer target, long gameTime) {
+        float maxHealth = target.getMaxHealth();
+        if (maxHealth <= 0.0F || target.getHealth() < maxHealth) {
+            return;
+        }
+
+        this.applyAbsorption(target, gameTime, maxHealth * ABSORPTION_PERCENT);
+        WeaponVisualEffectHelper.playBlessingAbsorptionPulse(target);
     }
 
     private void applyAbsorption(ServerPlayer target, long gameTime, float desiredAbsorption) {
@@ -207,12 +249,6 @@ public class HolyMagicalSealEntity extends Entity implements GeoEntity {
         }
     }
 
-    private void followTarget(LivingEntity target) {
-        this.setPos(target.getX(), target.getY() + Y_OFFSET, target.getZ());
-        this.setYRot(target.getYRot());
-        this.yRotO = this.getYRot();
-    }
-
     private ServerPlayer resolveTarget(ServerLevel level) {
         Entity entity = this.targetUuid == null ? null : level.getEntity(this.targetUuid);
         return entity instanceof ServerPlayer player ? player : null;
@@ -233,6 +269,7 @@ public class HolyMagicalSealEntity extends Entity implements GeoEntity {
         }
         this.expiresAt = tag.getLong(TAG_EXPIRES_AT);
         this.nextHealAt = tag.getLong(TAG_NEXT_HEAL_AT);
+        this.nextAbsorptionAt = tag.getLong(TAG_NEXT_ABSORPTION_AT);
         this.absorptionExpiresAt = tag.getLong(TAG_ABSORPTION_EXPIRES_AT);
         this.grantedAbsorption = tag.getFloat(TAG_GRANTED_ABSORPTION);
         this.setDespawning(tag.getBoolean(TAG_DESPAWNING));
@@ -248,6 +285,7 @@ public class HolyMagicalSealEntity extends Entity implements GeoEntity {
         }
         tag.putLong(TAG_EXPIRES_AT, this.expiresAt);
         tag.putLong(TAG_NEXT_HEAL_AT, this.nextHealAt);
+        tag.putLong(TAG_NEXT_ABSORPTION_AT, this.nextAbsorptionAt);
         tag.putLong(TAG_ABSORPTION_EXPIRES_AT, this.absorptionExpiresAt);
         tag.putFloat(TAG_GRANTED_ABSORPTION, this.grantedAbsorption);
         tag.putBoolean(TAG_DESPAWNING, this.isDespawning());
@@ -282,3 +320,12 @@ public class HolyMagicalSealEntity extends Entity implements GeoEntity {
         return this.cache;
     }
 }
+
+
+
+
+
+
+
+
+

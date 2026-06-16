@@ -2,6 +2,11 @@ package com.rave.projectbabylonweapons.item;
 
 import com.rave.projectbabylonweapons.handler.StaffProjectileAttackHelper;
 import com.rave.projectbabylonweapons.world.entity.projectile.BasicSpellProjectileEntity;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import yesman.epicfight.api.animation.AnimationManager.AnimationAccessor;
@@ -45,6 +50,42 @@ public interface MagicProjectileStaffWeapon extends MagicMeleeWeapon {
         return StunType.SHORT;
     }
 
+    default SoundEvent getMagicProjectileCastSound() {
+        return null;
+    }
+
+    default float getMagicProjectileCastSoundVolume() {
+        return 0.6F;
+    }
+
+    default float getMagicProjectileCastSoundPitch() {
+        return 1.0F;
+    }
+
+    default void playMagicProjectileCastSound(LivingEntity attacker) {
+        SoundEvent sound = this.getMagicProjectileCastSound();
+        if (sound == null) {
+            return;
+        }
+
+        attacker.level().playSound(
+                null,
+                attacker.getX(),
+                attacker.getY(),
+                attacker.getZ(),
+                sound,
+                SoundSource.PLAYERS,
+                this.getMagicProjectileCastSoundVolume(),
+                this.getMagicProjectileCastSoundPitch()
+        );
+    }
+
+    static SoundEvent getIronsSpellbooksSound(String path) {
+        return BuiltInRegistries.SOUND_EVENT.getOptional(
+                ResourceLocation.fromNamespaceAndPath("irons_spellbooks", path)
+        ).orElse(null);
+    }
+
     default boolean shouldFireMagicProjectile(AnimationAccessor<? extends AttackAnimation> animation, AttackAnimation.Phase phase, int phaseOrder) {
         return phase != null;
     }
@@ -53,4 +94,5 @@ public interface MagicProjectileStaffWeapon extends MagicMeleeWeapon {
         StaffProjectileAttackHelper.spawnProjectile(playerPatch, weaponStack, this);
     }
 }
+
 

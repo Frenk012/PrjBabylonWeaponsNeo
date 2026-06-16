@@ -11,6 +11,21 @@
       "project_babylon_weapons:fire_blast"
     ]
   },
+  "fire_storm_start": {
+    "subtitle": "subtitles.project_babylon_weapons.fire_storm_start",
+    "sounds": [
+      "project_babylon_weapons:fire_storm_start"
+    ]
+  },
+  "fire_tornado": {
+    "subtitle": "subtitles.project_babylon_weapons.fire_tornado",
+    "sounds": [
+      {
+        "name": "project_babylon_weapons:fire_tornado",
+        "stream": true
+      }
+    ]
+  },
   "sounds/rumbling_ground": {
     "subtitle": "subtitles.project_babylon_weapons.sounds.rumbling_ground",
     "sounds": [
@@ -27,6 +42,12 @@
     "subtitle": "subtitles.project_babylon_weapons.sounds.chain_down",
     "sounds": [
       "project_babylon_weapons:chain_down"
+    ]
+  },
+  "sounds/blizzard": {
+    "subtitle": "subtitles.project_babylon_weapons.sounds.blizzard",
+    "sounds": [
+      "project_babylon_weapons:blizzard"
     ]
   }
 }

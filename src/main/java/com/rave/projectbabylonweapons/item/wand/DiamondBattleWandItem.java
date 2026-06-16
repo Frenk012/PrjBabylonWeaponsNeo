@@ -5,11 +5,13 @@ import com.rave.projectbabylonweapons.handler.StaffProjectilePatternHelper;
 import com.rave.projectbabylonweapons.item.MagicProjectileStaffWeapon;
 import com.rave.projectbabylonweapons.item.renderer.DiamondBattleWandItemRenderer;
 import com.rave.projectbabylonweapons.world.entity.projectile.BasicSpellProjectileEntity;
+import com.rave.projectbabylonweapons.world.entity.projectile.DiamondSpellProjectileEntity;
 import io.redspace.ironsspellbooks.api.registry.AttributeRegistry;
 import io.redspace.ironsspellbooks.damage.ISSDamageTypes;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -81,7 +83,7 @@ public class DiamondBattleWandItem extends SwordItem implements GeoItem, MagicPr
 
     @Override
     public BasicSpellProjectileEntity createMagicProjectile(Level level) {
-        return new BasicSpellProjectileEntity(level);
+        return new DiamondSpellProjectileEntity(level);
     }
 
     @Override
@@ -91,9 +93,14 @@ public class DiamondBattleWandItem extends SwordItem implements GeoItem, MagicPr
 
     @Override
     public int getMagicProjectileTrailColor() {
-        return 0xA95BFF;
+        return 0x7FE3FF;
     }
 
+
+    @Override
+    public SoundEvent getMagicProjectileCastSound() {
+        return MagicProjectileStaffWeapon.getIronsSpellbooksSound("cast.generic.evocation");
+    }
     @Override
     public int getMagicProjectileLifetime() {
         return 80;
@@ -192,4 +199,8 @@ public class DiamondBattleWandItem extends SwordItem implements GeoItem, MagicPr
         return 2.1F;
     }
 }
+
+
+
+
 

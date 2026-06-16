@@ -8,6 +8,17 @@ public final class WeaponVisualEffectHelper {
     public static final String DRAGON_DESCEND_CAST_START = "dragon_descend_cast_start";
     public static final String DRAGON_DESCEND_CAST_BURST = "dragon_descend_cast_burst";
     public static final String DRAGON_DESCEND_CAST_STOP = "dragon_descend_cast_stop";
+    public static final String GLACIER_CAST_START = "glacier_cast_start";
+    public static final String GLACIER_CAST_STOP = "glacier_cast_stop";
+    public static final String GLACIER_CONTACT_WAVE = "glacier_contact_wave";
+    public static final String BLESSING_CAST_START = "blessing_cast_start";
+    public static final String BLESSING_CAST_BURST = "blessing_cast_burst";
+    public static final String BLESSING_CAST_STOP = "blessing_cast_stop";
+    public static final String BLESSING_HEAL_PULSE = "blessing_heal_pulse";
+    public static final String BLESSING_ABSORPTION_PULSE = "blessing_absorption_pulse";
+    public static final String FIRE_STORM_CAST_START = "fire_storm_cast_start";
+    public static final String FIRE_STORM_CAST_BURST = "fire_storm_cast_burst";
+    public static final String FIRE_STORM_CAST_STOP = "fire_storm_cast_stop";
 
     private WeaponVisualEffectHelper() {
     }
@@ -22,6 +33,50 @@ public final class WeaponVisualEffectHelper {
 
     public static void stopDragonDescendCast(Entity entity) {
         play(entity, DRAGON_DESCEND_CAST_STOP);
+    }
+
+    public static void startGlacierCast(Entity entity) {
+        play(entity, GLACIER_CAST_START);
+    }
+
+    public static void stopGlacierCast(Entity entity) {
+        play(entity, GLACIER_CAST_STOP);
+    }
+
+    public static void playGlacierContactWave(Entity entity) {
+        play(entity, GLACIER_CONTACT_WAVE);
+    }
+
+    public static void startBlessingCast(Entity entity) {
+        play(entity, BLESSING_CAST_START);
+    }
+
+    public static void burstBlessingCast(Entity entity) {
+        play(entity, BLESSING_CAST_BURST);
+    }
+
+    public static void stopBlessingCast(Entity entity) {
+        play(entity, BLESSING_CAST_STOP);
+    }
+
+    public static void playBlessingHealPulse(Entity entity) {
+        play(entity, BLESSING_HEAL_PULSE);
+    }
+
+    public static void playBlessingAbsorptionPulse(Entity entity) {
+        play(entity, BLESSING_ABSORPTION_PULSE);
+    }
+
+    public static void startFireStormCast(Entity entity) {
+        play(entity, FIRE_STORM_CAST_START);
+    }
+
+    public static void burstFireStormCast(Entity entity) {
+        play(entity, FIRE_STORM_CAST_BURST);
+    }
+
+    public static void stopFireStormCast(Entity entity) {
+        play(entity, FIRE_STORM_CAST_STOP);
     }
 
     private static void play(Entity entity, String effectId) {

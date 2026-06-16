@@ -36,9 +36,6 @@ public class IceSpellProjectileEntity extends BasicSpellProjectileEntity {
         if (this.level().isClientSide && result.getType() != HitResult.Type.MISS) {
             PhotonWeaponEffectHelper.spawnIceProjectileImpact(this, result.getLocation());
         }
-        if (!this.level().isClientSide && result.getType() != HitResult.Type.MISS) {
-            this.spawnImpactParticles(result.getLocation());
-        }
         super.onHit(result);
     }
 
@@ -72,3 +69,4 @@ public class IceSpellProjectileEntity extends BasicSpellProjectileEntity {
                 0.03D);
     }
 }
+

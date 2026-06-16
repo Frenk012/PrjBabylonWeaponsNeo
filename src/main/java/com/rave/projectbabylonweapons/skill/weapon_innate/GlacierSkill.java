@@ -1,14 +1,17 @@
 package com.rave.projectbabylonweapons.skill.weapon_innate;
 
 import com.rave.projectbabylonweapons.gameasset.PBAnimations;
+import com.rave.projectbabylonweapons.handler.WeaponVisualEffectHelper;
 import com.rave.projectbabylonweapons.handler.MagicMeleeWeaponHelper;
 import com.rave.projectbabylonweapons.handler.StaffMagicArmorHelper;
 import com.rave.projectbabylonweapons.init.PBModEffects;
+import com.rave.projectbabylonweapons.init.PBWSounds;
 import com.rave.projectbabylonweapons.world.entity.effect.GlacierIceSpikeEntity;
 import io.redspace.ironsspellbooks.registries.MobEffectRegistry;
 import io.redspace.ironsspellbooks.util.ParticleHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffect;
@@ -42,7 +45,9 @@ import java.util.UUID;
 
 @net.minecraftforge.fml.common.Mod.EventBusSubscriber(modid = com.rave.projectbabylonweapons.ProjectBabylonWeapons.MODID, bus = net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus.FORGE)
 public class GlacierSkill extends SimpleWeaponInnateSkill {
+    private static final UUID GLACIER_BEGIN_UUID = UUID.fromString("58f71a4a-e0d5-444f-b8b5-c86e8427a2bf");
     private static final UUID GLACIER_CONTACT_UUID = UUID.fromString("bb8934f5-b652-44a1-a8ef-1e7d9e5a1f24");
+    private static final UUID GLACIER_END_UUID = UUID.fromString("d0cf0e8d-9cb7-46c4-a1eb-5fd8386eb588");
     private static final int CHILL_DURATION_TICKS = 15 * 20;
     private static final int FROZEN_DURATION_TICKS = 4 * 20;
     private static final int OUTER_SPIKE_COUNT = 10;
@@ -71,6 +76,7 @@ public class GlacierSkill extends SimpleWeaponInnateSkill {
 
     private record RingSpec(int spikeCount, double frontRadius, double backRadius, double sideRadius, double minDistance,
                             int waitStart, int waitStep, float backScale, float frontScale) {
+
     }
 
     private record PendingSpikeBurst(long triggerGameTime, Vec3 spikePos, GlacierIceSpikeEntity spikeEntity) {
@@ -114,6 +120,24 @@ public class GlacierSkill extends SimpleWeaponInnateSkill {
         super.onInitiate(container);
 
         container.getExecutor().getEventListener().addEventListener(
+                EventType.ANIMATION_BEGIN_EVENT,
+                GLACIER_BEGIN_UUID,
+                event -> {
+                    if (container.getExecutor().isLogicalClient()) {
+                        return;
+                    }
+
+                    if (event.getAnimation() != PBAnimations.GLACIER.get()) {
+                        return;
+                    }
+
+                    LivingEntity caster = container.getExecutor().getOriginal();
+                    WeaponVisualEffectHelper.startGlacierCast(caster);
+                    caster.level().playSound(null, caster.getX(), caster.getY(), caster.getZ(), PBWSounds.BLIZZARD.get(), SoundSource.PLAYERS, 1.25F, 1.0F);
+                }
+        );
+
+        container.getExecutor().getEventListener().addEventListener(
                 EventType.ATTACK_PHASE_END_EVENT,
                 GLACIER_CONTACT_UUID,
                 event -> {
@@ -134,17 +158,33 @@ public class GlacierSkill extends SimpleWeaponInnateSkill {
                         return;
                     }
 
+                    WeaponVisualEffectHelper.stopGlacierCast(playerPatch.getOriginal());
+                    WeaponVisualEffectHelper.playGlacierContactWave(playerPatch.getOriginal());
                     spawnGlacier(playerPatch, playerPatch.getOriginal().getMainHandItem());
+                }
+        );
+
+        container.getExecutor().getEventListener().addEventListener(
+                EventType.ANIMATION_END_EVENT,
+                GLACIER_END_UUID,
+                event -> {
+                    if (event.getAnimation() != PBAnimations.GLACIER.get()) {
+                        return;
+                    }
+
+                    WeaponVisualEffectHelper.stopGlacierCast(container.getExecutor().getOriginal());
                 }
         );
     }
 
     @Override
     public void onRemoved(SkillContainer container) {
+        container.getExecutor().getEventListener().removeListener(EventType.ANIMATION_BEGIN_EVENT, GLACIER_BEGIN_UUID);
         container.getExecutor().getEventListener().removeListener(EventType.ATTACK_PHASE_END_EVENT, GLACIER_CONTACT_UUID);
+        container.getExecutor().getEventListener().removeListener(EventType.ANIMATION_END_EVENT, GLACIER_END_UUID);
+        WeaponVisualEffectHelper.stopGlacierCast(container.getExecutor().getOriginal());
         super.onRemoved(container);
     }
-
     @SubscribeEvent
     public static void onServerTick(TickEvent.ServerTickEvent event) {
         if (event.phase != TickEvent.Phase.END || ACTIVE_CASTS.isEmpty()) {
@@ -410,3 +450,12 @@ public class GlacierSkill extends SimpleWeaponInnateSkill {
         return null;
     }
 }
+
+
+
+
+
+
+
+
+

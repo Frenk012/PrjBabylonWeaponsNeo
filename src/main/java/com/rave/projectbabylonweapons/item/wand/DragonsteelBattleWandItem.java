@@ -11,6 +11,7 @@ import io.redspace.ironsspellbooks.damage.ISSDamageTypes;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -95,6 +96,11 @@ public class DragonsteelBattleWandItem extends SwordItem implements GeoItem, Mag
         return 0x7B4DFF;
     }
 
+
+    @Override
+    public SoundEvent getMagicProjectileCastSound() {
+        return MagicProjectileStaffWeapon.getIronsSpellbooksSound("cast.generic.ender");
+    }
     @Override
     public int getMagicProjectileLifetime() {
         return 80;
@@ -214,3 +220,4 @@ public class DragonsteelBattleWandItem extends SwordItem implements GeoItem, Mag
         return 2.1F;
     }
 }
+

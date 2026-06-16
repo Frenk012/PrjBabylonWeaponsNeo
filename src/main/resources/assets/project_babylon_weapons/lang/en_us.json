@@ -1,4 +1,4 @@
-{
+﻿{
     "block.project_babylon_weapons.frozen_debuff_ice_block":  "Frozen Debuff Ice Block",
     "creativetab.projectbabylonweapons.weapons":  "Project Babylon Weapons",
     "effect.project_babylon_weapons.bleed_debuff":  "Bleeding",
@@ -168,8 +168,30 @@
     "tooltip.project_babylon_weapons.passive.netherite.line2":  "Burning targets can apply В§6Brimstone FlamesВ§r with a chance.",
     "tooltip.project_babylon_weapons.passive.diamond.name":  "Fang of the Wolf",
     "tooltip.project_babylon_weapons.passive.diamond.line1":  "With 15% chance, weapon attacks ignore В§6100% enemy defenceВ§r.",
-    "tooltip.project_babylon_weapons.passive.netherite.line3":  "Marked targets can trigger В§6Brimstone BlastВ§r around them."
-    ,"item.project_babylon_weapons.iron_battle_wand":  "Iron Battle Wand",
-    "attribute.project_babylon_weapons.magic_damage":  "Magic Damage"
+    "tooltip.project_babylon_weapons.passive.netherite.line3":  "Marked targets can trigger В§6Brimstone BlastВ§r around them.",
+    "item.project_babylon_weapons.iron_battle_wand":  "Iron Battle Wand",
+    "item.project_babylon_weapons.golden_battle_wand":  "Golden Battle Wand",
+    "item.project_babylon_weapons.diamond_battle_wand":  "Diamond Battle Wand",
+    "item.project_babylon_weapons.netherite_battle_wand":  "Netherite Battle Wand",
+    "item.project_babylon_weapons.ice_battle_wand":  "Ice Battle Wand",
+    "item.project_babylon_weapons.ethereal_battle_wand":  "Ethereal Battle Wand",
+    "item.project_babylon_weapons.dragonsteel_battle_wand":  "Dragonsteel Battle Wand",
+    "attribute.project_babylon_weapons.magic_damage":  "Magic Damage",
+    "tooltip.project_babylon_weapons.passive.wand_diamond.name":  "Ricochet",
+    "tooltip.project_babylon_weapons.passive.wand_diamond.line1":  "Projectiles have a 50% chance to ricochet off surfaces up to 2 times.",
+    "tooltip.project_babylon_weapons.passive.wand_golden.name":  "Blood Pact",
+    "tooltip.project_babylon_weapons.passive.wand_golden.line1":  "Each attack reduces max health by 2% for 8 seconds, stacking up to 20%.",
+    "tooltip.project_babylon_weapons.passive.wand_golden.line2":  "Gain +2% damage and +2% attack speed per stack.",
+    "tooltip.project_babylon_weapons.passive.wand_netherite.name":  "Ashen Wake",
+    "tooltip.project_babylon_weapons.passive.wand_netherite.line1":  "Each hit deals 50% damage in an area around the target.",
+    "tooltip.project_babylon_weapons.passive.wand_netherite.line2":  "Affected enemies have a 25% chance to ignite for 5 seconds.",
+    "tooltip.project_babylon_weapons.passive.wand_ethereal.name":  "Sanctuary",
+    "tooltip.project_babylon_weapons.passive.wand_ethereal.line1":  "On hit, has a 15% chance to cleanse 1 negative effect from the nearest ally within 15 blocks.",
+    "tooltip.project_babylon_weapons.passive.wand_ethereal.line2":  "The cleansed ally is healed for 10% of their max health.",
+    "tooltip.project_babylon_weapons.passive.wand_ice.name":  "Frost Touch",
+    "tooltip.project_babylon_weapons.passive.wand_ice.line1":  "Hits can stack CHILL on the target.",
+    "tooltip.project_babylon_weapons.passive.wand_ice.line2":  "At maximum CHILL, hits can trigger FROZEN in a small area.",
+    "tooltip.project_babylon_weapons.passive.wand_dragonsteel.name":  "Dragonlord",
+    "tooltip.project_babylon_weapons.passive.wand_dragonsteel.line1":  "Each attack fires 2 side mini-projectiles that deal 50% damage."
 }
 

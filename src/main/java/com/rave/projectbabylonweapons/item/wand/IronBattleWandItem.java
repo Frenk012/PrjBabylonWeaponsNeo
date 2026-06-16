@@ -10,6 +10,7 @@ import io.redspace.ironsspellbooks.damage.ISSDamageTypes;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -92,6 +93,12 @@ public class IronBattleWandItem extends SwordItem implements GeoItem, MagicProje
     @Override
     public int getMagicProjectileTrailColor() {
         return 0xA95BFF;
+    }
+
+
+    @Override
+    public SoundEvent getMagicProjectileCastSound() {
+        return MagicProjectileStaffWeapon.getIronsSpellbooksSound("cast.generic.evocation");
     }
 
     @Override
@@ -213,4 +220,7 @@ public class IronBattleWandItem extends SwordItem implements GeoItem, MagicProje
         return 2.1F;
     }
 }
+
+
+
 

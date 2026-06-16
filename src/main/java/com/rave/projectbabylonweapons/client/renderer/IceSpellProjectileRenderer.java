@@ -22,6 +22,8 @@ public class IceSpellProjectileRenderer extends GeoEntityRenderer<IceSpellProjec
         poseStack.mulPose(Axis.YP.rotationDegrees(Mth.lerp(partialTick, entity.yRotO, entity.getYRot()) - 90.0F));
         poseStack.mulPose(Axis.ZP.rotationDegrees(Mth.lerp(partialTick, entity.xRotO, entity.getXRot())));
         poseStack.mulPose(Axis.YP.rotationDegrees(90.0F));
+        float renderScale = entity.getVisualScale();
+        poseStack.scale(renderScale, renderScale, renderScale);
         super.render(entity, entityYaw, partialTick, poseStack, bufferSource, packedLight);
         poseStack.popPose();
     }

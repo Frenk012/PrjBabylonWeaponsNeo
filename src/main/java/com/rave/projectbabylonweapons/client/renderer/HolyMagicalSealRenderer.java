@@ -1,12 +1,12 @@
 package com.rave.projectbabylonweapons.client.renderer;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
 import com.rave.projectbabylonweapons.client.model.HolyMagicalSealEntityModel;
 import com.rave.projectbabylonweapons.world.entity.effect.HolyMagicalSealEntity;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import software.bernie.geckolib.renderer.GeoEntityRenderer;
@@ -24,25 +24,18 @@ public class HolyMagicalSealRenderer extends GeoEntityRenderer<HolyMagicalSealEn
     @Override
     public void render(HolyMagicalSealEntity entity, float entityYaw, float partialTick, PoseStack poseStack,
                        MultiBufferSource bufferSource, int packedLight) {
-        SealRenderState renderState = this.computeRenderState(entity, partialTick);
-        float renderYaw = renderState != null ? renderState.targetYaw() : Mth.rotLerp(partialTick, entity.yRotO, entity.getYRot());
+        Vec3 offset = this.computeRenderOffset(entity, partialTick);
 
         poseStack.pushPose();
-        if (renderState != null) {
-            poseStack.translate(renderState.offset().x, renderState.offset().y, renderState.offset().z);
+        if (offset != null) {
+            poseStack.translate(offset.x, offset.y, offset.z);
         }
-        poseStack.mulPose(Axis.YP.rotationDegrees(-renderYaw));
-        super.render(entity, renderYaw, partialTick, poseStack, bufferSource, packedLight);
+        super.render(entity, 0.0F, partialTick, poseStack, bufferSource, packedLight);
         poseStack.popPose();
     }
 
-    private SealRenderState computeRenderState(HolyMagicalSealEntity entity, float partialTick) {
-        UUID targetUuid = entity.getTargetUuid();
-        if (targetUuid == null) {
-            return null;
-        }
-
-        Player target = entity.level().getPlayerByUUID(targetUuid);
+    private Vec3 computeRenderOffset(HolyMagicalSealEntity entity, float partialTick) {
+        Player target = this.resolveTrackedPlayer(entity);
         if (target == null) {
             return null;
         }
@@ -54,12 +47,16 @@ public class HolyMagicalSealRenderer extends GeoEntityRenderer<HolyMagicalSealEn
         double currentX = Mth.lerp(partialTick, entity.xo, entity.getX());
         double currentY = Mth.lerp(partialTick, entity.yo, entity.getY());
         double currentZ = Mth.lerp(partialTick, entity.zo, entity.getZ());
-
-        Vec3 offset = new Vec3(targetX - currentX, targetY - currentY, targetZ - currentZ);
-        float targetYaw = Mth.rotLerp(partialTick, target.yRotO, target.getYRot());
-        return new SealRenderState(offset, targetYaw);
+        return new Vec3(targetX - currentX, targetY - currentY, targetZ - currentZ);
     }
 
-    private record SealRenderState(Vec3 offset, float targetYaw) {
+    private Player resolveTrackedPlayer(HolyMagicalSealEntity entity) {
+        Entity vehicle = entity.getVehicle();
+        if (vehicle instanceof Player player) {
+            return player;
+        }
+
+        UUID targetUuid = entity.getTargetUuid();
+        return targetUuid == null ? null : entity.level().getPlayerByUUID(targetUuid);
     }
 }

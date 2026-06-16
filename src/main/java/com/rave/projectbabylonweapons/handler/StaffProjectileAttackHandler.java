@@ -77,6 +77,7 @@ public final class StaffProjectileAttackHandler {
             return;
         }
 
+        BattleWandPassiveHooks.onAttackPhaseEnd(event.getPlayerPatch(), player.getMainHandItem());
         weapon.fireMagicProjectiles(event.getPlayerPatch(), player.getMainHandItem(), event);
     }
 }

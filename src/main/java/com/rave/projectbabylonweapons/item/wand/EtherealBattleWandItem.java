@@ -10,6 +10,7 @@ import io.redspace.ironsspellbooks.api.registry.AttributeRegistry;
 import io.redspace.ironsspellbooks.damage.ISSDamageTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -83,6 +84,17 @@ public class EtherealBattleWandItem extends SwordItem implements MagicProjectile
         return 0xF6D77A;
     }
 
+
+    @Override
+    public SoundEvent getMagicProjectileCastSound() {
+        return MagicProjectileStaffWeapon.getIronsSpellbooksSound("spell.guiding_bolt.cast");
+    }
+
+    @Override
+    public float getMagicProjectileCastSoundVolume() {
+        return 0.35F;
+    }
+
     @Override
     public int getMagicProjectileLifetime() {
         return 80;
@@ -142,7 +154,7 @@ public class EtherealBattleWandItem extends SwordItem implements MagicProjectile
     @Override
     public void appendHoverText(ItemStack stack, Level level, List<Component> tooltip, TooltipFlag flag) {
         super.appendHoverText(stack, level, tooltip, flag);
-        EtherealHolyPassive.appendTooltip(tooltip);
+
     }
 
     @Override
@@ -155,3 +167,8 @@ public class EtherealBattleWandItem extends SwordItem implements MagicProjectile
         return 2.1F;
     }
 }
+
+
+
+
+

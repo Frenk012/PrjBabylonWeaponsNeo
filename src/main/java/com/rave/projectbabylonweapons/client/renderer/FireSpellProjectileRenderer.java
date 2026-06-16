@@ -21,6 +21,8 @@ public class FireSpellProjectileRenderer extends GeoEntityRenderer<FireSpellProj
         poseStack.pushPose();
         poseStack.mulPose(Axis.YP.rotationDegrees(Mth.lerp(partialTick, entity.yRotO, entity.getYRot()) - 90.0F));
         poseStack.mulPose(Axis.ZP.rotationDegrees(Mth.lerp(partialTick, entity.xRotO, entity.getXRot())));
+        float renderScale = entity.getVisualScale();
+        poseStack.scale(renderScale, renderScale, renderScale);
         super.render(entity, entityYaw, partialTick, poseStack, bufferSource, packedLight);
         poseStack.popPose();
     }

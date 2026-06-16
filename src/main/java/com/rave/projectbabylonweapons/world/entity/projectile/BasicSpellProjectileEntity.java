@@ -1,5 +1,6 @@
 package com.rave.projectbabylonweapons.world.entity.projectile;
 
+import com.rave.projectbabylonweapons.handler.BattleWandPassiveHooks;
 import com.rave.projectbabylonweapons.handler.MagicMeleeWeaponHelper;
 import com.rave.projectbabylonweapons.handler.StaffMagicArmorHelper;
 import com.rave.projectbabylonweapons.init.PBModEntities;
@@ -56,7 +57,10 @@ public class BasicSpellProjectileEntity extends Projectile implements GeoEntity 
     private static final String TAG_SOURCE_WEAPON = "SourceWeapon";
     private static final String TAG_TRAIL_COLOR = "TrailColor";
     private static final String TAG_PIERCING = "Piercing";
+    private static final String TAG_REMAINING_RICOCHETS = "RemainingRicochets";
+    private static final String TAG_VISUAL_SCALE = "VisualScale";
     private static final EntityDataAccessor<Integer> DATA_TRAIL_COLOR = SynchedEntityData.defineId(BasicSpellProjectileEntity.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Float> DATA_VISUAL_SCALE = SynchedEntityData.defineId(BasicSpellProjectileEntity.class, EntityDataSerializers.FLOAT);
 
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
@@ -69,6 +73,7 @@ public class BasicSpellProjectileEntity extends Projectile implements GeoEntity 
     private ItemStack sourceWeapon = ItemStack.EMPTY;
     private boolean trailSpawnedClient;
     private boolean piercing;
+    private int remainingRicochets;
 
     public BasicSpellProjectileEntity(EntityType<? extends BasicSpellProjectileEntity> type, Level level) {
         super(type, level);
@@ -97,12 +102,52 @@ public class BasicSpellProjectileEntity extends Projectile implements GeoEntity 
         this.setTrailColor(trailColor);
     }
 
+    public ItemStack getSourceWeapon() {
+        return this.sourceWeapon.copy();
+    }
+
+    public float getRawMagicDamage() {
+        return this.rawMagicDamage;
+    }
+
+    public float getMagicArmorNegationValue() {
+        return this.magicArmorNegation;
+    }
+
+    public float getImpactValue() {
+        return this.impact;
+    }
+
+    public ResourceKey<DamageType> getMagicDamageTypeKey() {
+        return this.resolveMagicDamageType();
+    }
+
+    public StunType getProjectileStunType() {
+        return this.resolveStunType();
+    }
+
+    public float getVisualScale() {
+        return this.entityData.get(DATA_VISUAL_SCALE);
+    }
+
+    public void setVisualScale(float visualScale) {
+        this.entityData.set(DATA_VISUAL_SCALE, Math.max(0.1F, visualScale));
+    }
+
     public void setPiercing(boolean piercing) {
         this.piercing = piercing;
     }
 
     public boolean isPiercing() {
         return this.piercing;
+    }
+
+    public int getRemainingRicochets() {
+        return this.remainingRicochets;
+    }
+
+    public void setRemainingRicochets(int remainingRicochets) {
+        this.remainingRicochets = Math.max(0, remainingRicochets);
     }
 
     @Override
@@ -113,6 +158,7 @@ public class BasicSpellProjectileEntity extends Projectile implements GeoEntity 
     @Override
     protected void defineSynchedData() {
         this.entityData.define(DATA_TRAIL_COLOR, DEFAULT_TRAIL_COLOR);
+        this.entityData.define(DATA_VISUAL_SCALE, 1.0F);
     }
 
     @Override
@@ -179,6 +225,8 @@ public class BasicSpellProjectileEntity extends Projectile implements GeoEntity 
                 } finally {
                     target.invulnerableTime = originalInvulnerableTime;
                 }
+
+                BattleWandPassiveHooks.onProjectileHitEntity(this, target, owner, adjustedMagicDamage, magicDamageSource);
             }
         }
 
@@ -190,16 +238,15 @@ public class BasicSpellProjectileEntity extends Projectile implements GeoEntity 
     @Override
     protected void onHitBlock(BlockHitResult result) {
         super.onHitBlock(result);
-        if (!this.level().isClientSide) {
-            this.discard();
-        }
     }
 
     @Override
     protected void onHit(HitResult result) {
-        if (!this.level().isClientSide && result.getType() != HitResult.Type.MISS) {
-            this.spawnImpactParticles(result.getLocation());
+        if (!this.level().isClientSide && result.getType() == HitResult.Type.BLOCK
+                && BattleWandPassiveHooks.tryHandleBlockHit(this, (BlockHitResult) result)) {
+            return;
         }
+
         super.onHit(result);
         if (!this.level().isClientSide && result.getType() == HitResult.Type.BLOCK) {
             this.discard();
@@ -220,6 +267,8 @@ public class BasicSpellProjectileEntity extends Projectile implements GeoEntity 
         tag.putInt(TAG_LIFETIME, this.maxLifetime);
         tag.putInt(TAG_TRAIL_COLOR, this.getTrailColor());
         tag.putBoolean(TAG_PIERCING, this.piercing);
+        tag.putInt(TAG_REMAINING_RICOCHETS, this.remainingRicochets);
+        tag.putFloat(TAG_VISUAL_SCALE, this.getVisualScale());
         if (!this.sourceWeapon.isEmpty()) {
             tag.put(TAG_SOURCE_WEAPON, this.sourceWeapon.save(new CompoundTag()));
         }
@@ -235,6 +284,10 @@ public class BasicSpellProjectileEntity extends Projectile implements GeoEntity 
         this.stunTypeName = tag.getString(TAG_STUN_TYPE);
         this.maxLifetime = Math.max(1, tag.getInt(TAG_LIFETIME));
         this.piercing = tag.getBoolean(TAG_PIERCING);
+        this.remainingRicochets = tag.getInt(TAG_REMAINING_RICOCHETS);
+        if (tag.contains(TAG_VISUAL_SCALE)) {
+            this.setVisualScale(tag.getFloat(TAG_VISUAL_SCALE));
+        }
         if (tag.contains(TAG_TRAIL_COLOR)) {
             this.setTrailColor(tag.getInt(TAG_TRAIL_COLOR));
         }
@@ -353,3 +406,4 @@ public class BasicSpellProjectileEntity extends Projectile implements GeoEntity 
         return this.cache;
     }
 }
+

@@ -15,13 +15,31 @@ public final class StaffProjectileAttackHelper {
     public static void spawnProjectile(ServerPlayerPatch playerPatch, ItemStack weaponStack, MagicProjectileStaffWeapon weapon) {
         LivingEntity attacker = playerPatch.getOriginal();
         Vec3 forward = horizontalForward(attacker);
-        spawnProjectile(playerPatch, weaponStack, weapon, forward, weapon.getMagicProjectileSpawnForwardOffset(), 0.0D,
-                weapon.getMagicProjectileSpawnVerticalOffset(), weapon.getProjectileMagicDamageMultiplier());
+        spawnProjectileInternal(playerPatch, weaponStack, weapon, forward, weapon.getMagicProjectileSpawnForwardOffset(), 0.0D,
+                weapon.getMagicProjectileSpawnVerticalOffset(), weapon.getProjectileMagicDamageMultiplier(), true, 1.0F);
     }
 
     public static void spawnProjectile(ServerPlayerPatch playerPatch, ItemStack weaponStack, MagicProjectileStaffWeapon weapon,
                                        Vec3 direction, double forwardOffset, double sideOffset, double verticalOffset,
                                        float damageMultiplier) {
+        spawnProjectileInternal(playerPatch, weaponStack, weapon, direction, forwardOffset, sideOffset, verticalOffset, damageMultiplier, true, 1.0F);
+    }
+
+    public static void spawnProjectileWithoutPassives(ServerPlayerPatch playerPatch, ItemStack weaponStack, MagicProjectileStaffWeapon weapon,
+                                                      Vec3 direction, double forwardOffset, double sideOffset, double verticalOffset,
+                                                      float damageMultiplier) {
+        spawnProjectileWithoutPassives(playerPatch, weaponStack, weapon, direction, forwardOffset, sideOffset, verticalOffset, damageMultiplier, 1.0F);
+    }
+
+    public static void spawnProjectileWithoutPassives(ServerPlayerPatch playerPatch, ItemStack weaponStack, MagicProjectileStaffWeapon weapon,
+                                                      Vec3 direction, double forwardOffset, double sideOffset, double verticalOffset,
+                                                      float damageMultiplier, float renderScale) {
+        spawnProjectileInternal(playerPatch, weaponStack, weapon, direction, forwardOffset, sideOffset, verticalOffset, damageMultiplier, false, renderScale);
+    }
+
+    private static void spawnProjectileInternal(ServerPlayerPatch playerPatch, ItemStack weaponStack, MagicProjectileStaffWeapon weapon,
+                                                Vec3 direction, double forwardOffset, double sideOffset, double verticalOffset,
+                                                float damageMultiplier, boolean allowPassiveEffects, float renderScale) {
         LivingEntity attacker = playerPatch.getOriginal();
         BasicSpellProjectileEntity projectile = weapon.createMagicProjectile(attacker.level());
         if (projectile == null) {
@@ -35,7 +53,9 @@ public final class StaffProjectileAttackHelper {
         } else {
             shootDirection = shootDirection.normalize();
         }
-        float rawMagicDamage = MagicMeleeWeaponHelper.calculateRawMagicDamage(attacker, weaponStack, weapon, 1.0F, damageMultiplier);
+
+        float adjustedDamageMultiplier = BattleWandPassiveHooks.adjustProjectileDamageMultiplier(attacker, weaponStack, damageMultiplier);
+        float rawMagicDamage = MagicMeleeWeaponHelper.calculateRawMagicDamage(attacker, weaponStack, weapon, 1.0F, adjustedDamageMultiplier);
         if (rawMagicDamage <= 0.0F) {
             return;
         }
@@ -67,11 +87,15 @@ public final class StaffProjectileAttackHelper {
                 weapon.getMagicProjectileLifetime(),
                 weapon.getMagicProjectileTrailColor()
         );
+        BattleWandPassiveHooks.configureProjectile(projectile, allowPassiveEffects);
+        projectile.setVisualScale(renderScale);
         projectile.setPiercing(DragonDescendSkill.isDragonDescendActive(attacker));
         projectile.setPos(spawnPos.x, spawnPos.y, spawnPos.z);
+        weapon.playMagicProjectileCastSound(attacker);
         projectile.shoot(shootDirection.x, shootDirection.y, shootDirection.z, weapon.getMagicProjectileSpeed(), weapon.getMagicProjectileInaccuracy());
 
         attacker.level().addFreshEntity(projectile);
+        BattleWandPassiveHooks.afterProjectileSpawn(playerPatch, weaponStack, weapon, shootDirection, forwardOffset, verticalOffset, damageMultiplier, allowPassiveEffects);
     }
 
     private static Vec3 horizontalForward(LivingEntity attacker) {

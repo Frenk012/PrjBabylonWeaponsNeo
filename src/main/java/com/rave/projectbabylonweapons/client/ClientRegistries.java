@@ -4,9 +4,13 @@ import com.rave.projectbabylonweapons.ProjectBabylonWeapons;
 import com.rave.projectbabylonweapons.block.renderer.FrozenDebuffIceBlockTileRenderer;
 import com.rave.projectbabylonweapons.client.particle.BasicSpellProjectileTrailParticle;
 import com.rave.projectbabylonweapons.client.renderer.BasicSpellProjectileRenderer;
+import com.rave.projectbabylonweapons.client.renderer.DiamondSpellProjectileRenderer;
 import com.rave.projectbabylonweapons.client.renderer.DragonDescendProjectileRenderer;
+import com.rave.projectbabylonweapons.client.renderer.GoldenSpellProjectileRenderer;
 import com.rave.projectbabylonweapons.client.renderer.EnderSpellProjectileRenderer;
+import com.rave.projectbabylonweapons.client.renderer.FireMagicalSealRenderer;
 import com.rave.projectbabylonweapons.client.renderer.FireSpellProjectileRenderer;
+import com.rave.projectbabylonweapons.client.renderer.FireStormEntityRenderer;
 import com.rave.projectbabylonweapons.client.renderer.GlacierIceSpikeRenderer;
 import com.rave.projectbabylonweapons.client.renderer.HolyMagicalSealRenderer;
 import com.rave.projectbabylonweapons.client.renderer.HolySpellProjectileRenderer;
@@ -30,6 +34,8 @@ public class ClientRegistries {
     public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(PBModEntities.SICKLE_PROJECTILE.get(), SickleChainRenderer::new);
         event.registerEntityRenderer(PBModEntities.BASIC_SPELL_PROJECTILE.get(), BasicSpellProjectileRenderer::new);
+        event.registerEntityRenderer(PBModEntities.GOLDEN_SPELL_PROJECTILE.get(), GoldenSpellProjectileRenderer::new);
+        event.registerEntityRenderer(PBModEntities.DIAMOND_SPELL_PROJECTILE.get(), DiamondSpellProjectileRenderer::new);
         event.registerEntityRenderer(PBModEntities.ICE_SPELL_PROJECTILE.get(), IceSpellProjectileRenderer::new);
         event.registerEntityRenderer(PBModEntities.FIRE_SPELL_PROJECTILE.get(), FireSpellProjectileRenderer::new);
         event.registerEntityRenderer(PBModEntities.HOLY_SPELL_PROJECTILE.get(), HolySpellProjectileRenderer::new);
@@ -38,6 +44,8 @@ public class ClientRegistries {
         event.registerEntityRenderer(PBModEntities.DRAGON_DESCEND_PROJECTILE.get(), DragonDescendProjectileRenderer::new);
         event.registerEntityRenderer(PBModEntities.GLACIER_ICE_SPIKE.get(), GlacierIceSpikeRenderer::new);
         event.registerEntityRenderer(PBModEntities.HOLY_MAGICAL_SEAL.get(), HolyMagicalSealRenderer::new);
+        event.registerEntityRenderer(PBModEntities.FIRE_MAGICAL_SEAL.get(), FireMagicalSealRenderer::new);
+        event.registerEntityRenderer(PBModEntities.FIRE_STORM.get(), FireStormEntityRenderer::new);
         event.registerEntityRenderer(PBModEntities.TECTONIC_FALLING_BLOCK.get(), TectonicFallingBlockRenderer::new);
         event.registerBlockEntityRenderer(PBModBlocks.FROZEN_DEBUFF_ICE_BLOCK_ENTITY.get(), context -> new FrozenDebuffIceBlockTileRenderer());
     }

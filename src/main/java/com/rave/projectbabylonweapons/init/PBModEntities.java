@@ -1,13 +1,17 @@
 package com.rave.projectbabylonweapons.init;
 
 import com.rave.projectbabylonweapons.ProjectBabylonWeapons;
+import com.rave.projectbabylonweapons.world.entity.effect.FireMagicalSealEntity;
+import com.rave.projectbabylonweapons.world.entity.effect.FireStormEntity;
 import com.rave.projectbabylonweapons.world.entity.effect.GlacierIceSpikeEntity;
 import com.rave.projectbabylonweapons.world.entity.effect.HolyMagicalSealEntity;
 import com.rave.projectbabylonweapons.world.entity.effect.TectonicFallingBlockEntity;
 import com.rave.projectbabylonweapons.world.entity.projectile.BasicSpellProjectileEntity;
+import com.rave.projectbabylonweapons.world.entity.projectile.DiamondSpellProjectileEntity;
 import com.rave.projectbabylonweapons.world.entity.projectile.DragonDescendProjectileEntity;
 import com.rave.projectbabylonweapons.world.entity.projectile.EnderSpellProjectileEntity;
 import com.rave.projectbabylonweapons.world.entity.projectile.FireSpellProjectileEntity;
+import com.rave.projectbabylonweapons.world.entity.projectile.GoldenSpellProjectileEntity;
 import com.rave.projectbabylonweapons.world.entity.projectile.HolySpellProjectileEntity;
 import com.rave.projectbabylonweapons.world.entity.projectile.IceSpellProjectileEntity;
 import com.rave.projectbabylonweapons.world.entity.projectile.ManaBubbleProjectileEntity;
@@ -38,6 +42,21 @@ public class PBModEntities {
                             .updateInterval(1)
                             .build("basic_spell_projectile"));
 
+    public static final RegistryObject<EntityType<GoldenSpellProjectileEntity>> GOLDEN_SPELL_PROJECTILE =
+            ENTITIES.register("golden_spell_projectile", () ->
+                    EntityType.Builder.<GoldenSpellProjectileEntity>of(GoldenSpellProjectileEntity::new, MobCategory.MISC)
+                            .sized(1.0f, 1.0f)
+                            .clientTrackingRange(64)
+                            .updateInterval(1)
+                            .build("golden_spell_projectile"));
+
+    public static final RegistryObject<EntityType<DiamondSpellProjectileEntity>> DIAMOND_SPELL_PROJECTILE =
+            ENTITIES.register("diamond_spell_projectile", () ->
+                    EntityType.Builder.<DiamondSpellProjectileEntity>of(DiamondSpellProjectileEntity::new, MobCategory.MISC)
+                            .sized(1.0f, 1.0f)
+                            .clientTrackingRange(64)
+                            .updateInterval(1)
+                            .build("diamond_spell_projectile"));
     public static final RegistryObject<EntityType<IceSpellProjectileEntity>> ICE_SPELL_PROJECTILE =
             ENTITIES.register("ice_spell_projectile", () ->
                     EntityType.Builder.<IceSpellProjectileEntity>of(IceSpellProjectileEntity::new, MobCategory.MISC)
@@ -101,6 +120,22 @@ public class PBModEntities {
                             .clientTrackingRange(64)
                             .updateInterval(1)
                             .build("holy_magical_seal"));
+
+    public static final RegistryObject<EntityType<FireMagicalSealEntity>> FIRE_MAGICAL_SEAL =
+            ENTITIES.register("fire_magical_seal", () ->
+                    EntityType.Builder.<FireMagicalSealEntity>of(FireMagicalSealEntity::new, MobCategory.MISC)
+                            .sized(3.0f, 0.2f)
+                            .clientTrackingRange(64)
+                            .updateInterval(1)
+                            .build("fire_magical_seal"));
+
+    public static final RegistryObject<EntityType<FireStormEntity>> FIRE_STORM =
+            ENTITIES.register("fire_storm", () ->
+                    EntityType.Builder.<FireStormEntity>of(FireStormEntity::new, MobCategory.MISC)
+                            .sized(3.0f, 4.0f)
+                            .clientTrackingRange(64)
+                            .updateInterval(1)
+                            .build("fire_storm"));
 
     public static final RegistryObject<EntityType<TectonicFallingBlockEntity>> TECTONIC_FALLING_BLOCK =
             ENTITIES.register("tectonic_falling_block", () ->
