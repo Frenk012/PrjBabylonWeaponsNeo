@@ -2,7 +2,7 @@ package com.rave.projectbabylonweapons.skill.weapon_innate;
 
 import com.rave.projectbabylonweapons.ProjectBabylonWeapons;
 import com.rave.projectbabylonweapons.gameasset.PBAnimations;
-import com.rave.projectbabylonweapons.init.PBModEffects;
+import com.rave.projectbabylonmaterials.init.PBMEffects;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -125,7 +125,7 @@ public class UppercutSkill extends SimpleWeaponInnateSkill {
         target.hurtMarked = true;
 
         target.addEffect(new MobEffectInstance(
-                PBModEffects.FEAR_DEBUFF.get(),
+                PBMEffects.FEAR_DEBUFF.get(),
                 FEAR_DURATION_TICKS,
                 0,
                 false,
@@ -140,3 +140,4 @@ public class UppercutSkill extends SimpleWeaponInnateSkill {
         super.onRemoved(container);
     }
 }
+

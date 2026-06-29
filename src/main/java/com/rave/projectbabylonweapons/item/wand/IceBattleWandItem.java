@@ -41,9 +41,9 @@ public class IceBattleWandItem extends SwordItem implements GeoItem, MagicProjec
     public String animationprocedure = "empty";
 
     public static final int DURABILITY = 756;
-    public static final int ATTACK_DAMAGE_MOD = 2;
+    public static final int ATTACK_DAMAGE_MOD = 1;
     public static final float ATTACK_SPEED_MOD = -3.0F;
-    private static final float BASE_MAGIC_DAMAGE = 1.0F + ATTACK_DAMAGE_MOD;
+    private static final float BASE_MAGIC_DAMAGE = 2.3F;
 
     public IceBattleWandItem() {
         super(
@@ -219,5 +219,7 @@ public class IceBattleWandItem extends SwordItem implements GeoItem, MagicProjec
         return 2.1F;
     }
 }
+
+
 
 

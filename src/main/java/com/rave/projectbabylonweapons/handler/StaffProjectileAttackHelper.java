@@ -1,5 +1,7 @@
 package com.rave.projectbabylonweapons.handler;
 
+import com.rave.projectbabylonweapons.ProjectBabylonWeapons;
+
 import com.rave.projectbabylonweapons.item.MagicProjectileStaffWeapon;
 import com.rave.projectbabylonweapons.skill.weapon_innate.DragonDescendSkill;
 import com.rave.projectbabylonweapons.world.entity.projectile.BasicSpellProjectileEntity;
@@ -87,6 +89,7 @@ public final class StaffProjectileAttackHelper {
                 weapon.getMagicProjectileLifetime(),
                 weapon.getMagicProjectileTrailColor()
         );
+        projectile.setBasicWandAttack(allowPassiveEffects);
         BattleWandPassiveHooks.configureProjectile(projectile, allowPassiveEffects);
         projectile.setVisualScale(renderScale);
         projectile.setPiercing(DragonDescendSkill.isDragonDescendActive(attacker));
@@ -107,3 +110,6 @@ public final class StaffProjectileAttackHelper {
         return flat.normalize();
     }
 }
+
+
+

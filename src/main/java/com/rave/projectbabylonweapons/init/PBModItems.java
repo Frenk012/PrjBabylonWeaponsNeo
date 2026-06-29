@@ -22,6 +22,7 @@ import com.rave.projectbabylonweapons.item.spear.*;
 import com.rave.projectbabylonweapons.item.staff.*;
 import com.rave.projectbabylonweapons.item.tool.*;
 import com.rave.projectbabylonweapons.item.wand.*;
+import com.rave.projectbabylonweapons.item.shield.*;
 import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.HoeItem;
 import net.minecraft.world.item.Item;
@@ -91,6 +92,12 @@ public class PBModItems {
     public static final RegistryObject<Item> IRON_BATTLE_WAND =
             ITEMS.register("iron_battle_wand", () -> new IronBattleWandItem());
 
+    public static final RegistryObject<Item> IRON_SMALL_SHIELD =
+            ITEMS.register("iron_small_shield", IronSmallShieldItem::new);
+
+    public static final RegistryObject<Item> IRON_BASTION_SHIELD =
+            ITEMS.register("iron_bastion_shield", IronBastionShieldItem::new);
+
 
     //GOLDEN
     public static final RegistryObject<Item> GOLDEN_PICKAXE =
@@ -143,6 +150,12 @@ public class PBModItems {
 
     public static final RegistryObject<Item> GOLDEN_BATTLE_WAND =
             ITEMS.register("golden_battle_wand", () -> new GoldenBattleWandItem());
+
+    public static final RegistryObject<Item> GOLDEN_SMALL_SHIELD =
+            ITEMS.register("golden_small_shield", GoldenSmallShieldItem::new);
+
+    public static final RegistryObject<Item> GOLDEN_BASTION_SHIELD =
+            ITEMS.register("golden_bastion_shield", GoldenBastionShieldItem::new);
 
 
     //DIAMOND
@@ -197,6 +210,12 @@ public class PBModItems {
     public static final RegistryObject<Item> DIAMOND_BATTLE_WAND =
             ITEMS.register("diamond_battle_wand", () -> new DiamondBattleWandItem());
 
+    public static final RegistryObject<Item> DIAMOND_BASTION_SHIELD =
+            ITEMS.register("diamond_bastion_shield", DiamondBastionShieldItem::new);
+
+    public static final RegistryObject<Item> DIAMOND_SMALL_SHIELD =
+            ITEMS.register("diamond_small_shield", DiamondSmallShieldItem::new);
+
 
 
     //NETHERITE
@@ -250,6 +269,12 @@ public class PBModItems {
 
     public static final RegistryObject<Item> NETHERITE_BATTLE_WAND =
             ITEMS.register("netherite_battle_wand", () -> new NetheriteBattleWandItem());
+
+    public static final RegistryObject<Item> NETHERITE_SMALL_SHIELD =
+            ITEMS.register("netherite_small_shield", NetheriteSmallShieldItem::new);
+
+    public static final RegistryObject<Item> NETHERITE_BASTION_SHIELD =
+            ITEMS.register("netherite_bastion_shield", NetheriteBastionShieldItem::new);
 
 
     //ICE
@@ -307,7 +332,11 @@ public class PBModItems {
     public static final RegistryObject<Item> ICE_BATTLE_WAND =
             ITEMS.register("ice_battle_wand", () -> new IceBattleWandItem());
 
+    public static final RegistryObject<Item> ICE_SMALL_SHIELD =
+            ITEMS.register("ice_small_shield", IceSmallShieldItem::new);
 
+    public static final RegistryObject<Item> ICE_BASTION_SHIELD =
+            ITEMS.register("ice_bastion_shield", IceBastionShieldItem::new);
 
     //DRAGONSTEEL
     public static final RegistryObject<Item> DRAGONSTEEL_BATTLEAXE =
@@ -352,6 +381,11 @@ public class PBModItems {
     public static final RegistryObject<Item> DRAGONSTEEL_BATTLE_WAND =
             ITEMS.register("dragonsteel_battle_wand", () -> new DragonsteelBattleWandItem());
 
+    public static final RegistryObject<Item> DRAGONSTEEL_SMALL_SHIELD =
+            ITEMS.register("dragonsteel_small_shield", DragonsteelSmallShieldItem::new);
+
+    public static final RegistryObject<Item> DRAGONSTEEL_BASTION_SHIELD =
+            ITEMS.register("dragonsteel_bastion_shield", DragonsteelBastionShieldItem::new);
 
 
     //ETHEREAL
@@ -397,6 +431,11 @@ public class PBModItems {
     public static final RegistryObject<Item> ETHEREAL_BATTLE_WAND =
             ITEMS.register("ethereal_battle_wand", () -> new EtherealBattleWandItem());
 
+    public static final RegistryObject<Item> ETHEREAL_SMALL_SHIELD =
+            ITEMS.register("ethereal_small_shield", EtherealSmallShieldItem::new);
+
+    public static final RegistryObject<Item> ETHEREAL_BASTION_SHIELD =
+            ITEMS.register("ethereal_bastion_shield", EtherealBastionShieldItem::new);
 
     //DEMON
     public static final RegistryObject<Item> DEMON_BATTLEAXE =

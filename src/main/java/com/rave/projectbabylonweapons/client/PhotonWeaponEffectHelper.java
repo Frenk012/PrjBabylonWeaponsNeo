@@ -1,6 +1,8 @@
 package com.rave.projectbabylonweapons.client;
 
 import com.rave.projectbabylonmaterials.client.photon.PBMPhotonEffectHelper;
+import com.rave.projectbabylonweapons.passive.bastion.BastionPermafrostBalance;
+import com.rave.projectbabylonweapons.passive.bastion.BastionRuleAuraBalance;
 import com.rave.projectbabylonweapons.world.entity.effect.FireStormEntity;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -114,12 +116,66 @@ public final class PhotonWeaponEffectHelper {
         PBMPhotonEffectHelper.spawnDiamondProjectileImpact(projectile, hitPos);
     }
 
+    public static void spawnDiamondShardOrbitTrail(Entity entity, Vec3 movement) {
+        PBMPhotonEffectHelper.spawnDiamondProjectileFlight(entity, movement.scale(1.15D));
+    }
+
+    public static void spawnDiamondShardFlightTrail(Entity entity, Vec3 movement) {
+        PBMPhotonEffectHelper.spawnDiamondProjectileFlight(entity, movement);
+    }
+
+    public static void spawnDiamondShardBurst(Entity entity) {
+        PBMPhotonEffectHelper.spawnDiamondProjectileImpact(entity, entity.position().add(0.0D, 0.08D, 0.0D));
+    }
+
+    public static void spawnDragonFuryChargeTrail(Entity entity, Vec3 movement) {
+        PBMPhotonEffectHelper.spawnEnderProjectileFlight(entity, movement.scale(1.05D));
+    }
+
+    public static void spawnDragonFuryChargeBurst(Entity entity) {
+        PBMPhotonEffectHelper.spawnEnderProjectileImpact(entity, entity.position().add(0.0D, 0.08D, 0.0D));
+    }
+
     public static void spawnBlessingHealPulse(Entity entity) {
         PBMPhotonEffectHelper.spawnBlessingHealPulse(entity);
     }
 
     public static void spawnBlessingAbsorptionPulse(Entity entity) {
         PBMPhotonEffectHelper.spawnBlessingAbsorptionPulse(entity);
+    }
+
+    public static void startBastionFrostAura(Entity entity) {
+        PBMPhotonEffectHelper.startBastionFrostAura(entity, resolveBastionAuraRadius(entity, true));
+    }
+
+    public static void stopBastionFrostAura(Entity entity) {
+        PBMPhotonEffectHelper.stopBastionFrostAura(entity);
+    }
+
+    public static void startBastionRuleAura(Entity entity) {
+        PBMPhotonEffectHelper.startBastionRuleAura(entity, resolveBastionAuraRadius(entity, false));
+    }
+
+    public static void stopBastionRuleAura(Entity entity) {
+        PBMPhotonEffectHelper.stopBastionRuleAura(entity);
+    }
+
+    private static float resolveBastionAuraRadius(Entity entity, boolean frost) {
+        if (entity instanceof LivingEntity livingEntity) {
+            if (frost) {
+                BastionPermafrostBalance.Profile profile = BastionPermafrostBalance.resolve(livingEntity.getOffhandItem());
+                if (profile != null) {
+                    return profile.radiusBlocks();
+                }
+            } else {
+                BastionRuleAuraBalance.Profile profile = BastionRuleAuraBalance.resolve(livingEntity.getOffhandItem());
+                if (profile != null) {
+                    return profile.radiusBlocks();
+                }
+            }
+        }
+
+        return 8.0F;
     }
 
     public static void spawnAbsorptionShield(LivingEntity entity, float progress, int tick, float absorptionAmount) {

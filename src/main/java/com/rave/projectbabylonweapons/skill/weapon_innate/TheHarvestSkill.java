@@ -1,7 +1,7 @@
 package com.rave.projectbabylonweapons.skill.weapon_innate;
 
 import com.rave.projectbabylonweapons.gameasset.PBAnimations;
-import com.rave.projectbabylonweapons.init.PBModEffects;
+import com.rave.projectbabylonmaterials.init.PBMEffects;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import yesman.epicfight.skill.SkillContainer;
@@ -49,7 +49,7 @@ public class TheHarvestSkill extends SimpleWeaponInnateSkill {
 
                     // MARKED 
                     target.addEffect(new MobEffectInstance(
-                            PBModEffects.MARKED.get(),
+                            PBMEffects.MARKED.get(),
                             MARKED_DURATION_TICKS,
                             0,
                             false,
@@ -66,3 +66,4 @@ public class TheHarvestSkill extends SimpleWeaponInnateSkill {
         super.onRemoved(container);
     }
 }
+

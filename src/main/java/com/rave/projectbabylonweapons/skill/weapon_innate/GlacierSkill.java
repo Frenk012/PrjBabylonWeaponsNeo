@@ -4,7 +4,7 @@ import com.rave.projectbabylonweapons.gameasset.PBAnimations;
 import com.rave.projectbabylonweapons.handler.WeaponVisualEffectHelper;
 import com.rave.projectbabylonweapons.handler.MagicMeleeWeaponHelper;
 import com.rave.projectbabylonweapons.handler.StaffMagicArmorHelper;
-import com.rave.projectbabylonweapons.init.PBModEffects;
+import com.rave.projectbabylonmaterials.init.PBMEffects;
 import com.rave.projectbabylonweapons.init.PBWSounds;
 import com.rave.projectbabylonweapons.world.entity.effect.GlacierIceSpikeEntity;
 import io.redspace.ironsspellbooks.registries.MobEffectRegistry;
@@ -397,7 +397,7 @@ public class GlacierSkill extends SimpleWeaponInnateSkill {
             double allowedForward = along >= 0.0D ? frontRadius : backRadius;
             double normalized = (along * along) / (allowedForward * allowedForward) + (side * side) / (sideRadius * sideRadius);
             if (normalized <= 1.0D) {
-                target.addEffect(new MobEffectInstance(PBModEffects.FROZEN.get(), FROZEN_DURATION_TICKS, 0, false, true, true));
+                target.addEffect(new MobEffectInstance(PBMEffects.FROZEN.get(), FROZEN_DURATION_TICKS, 0, false, true, true));
             }
         }
     }
@@ -450,6 +450,7 @@ public class GlacierSkill extends SimpleWeaponInnateSkill {
         return null;
     }
 }
+
 
 
 

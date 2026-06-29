@@ -1,6 +1,6 @@
 package com.rave.projectbabylonweapons.handler;
 
-import com.rave.projectbabylonweapons.init.PBModEffects;
+import com.rave.projectbabylonmaterials.init.PBMEffects;
 import com.rave.projectbabylonweapons.world.entity.projectile.SickleProjectileEntity;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
@@ -50,7 +50,7 @@ public class FearHandler {
     }
 
     public static boolean isFearActive(LivingEntity entity) {
-        return entity instanceof Player && entity.hasEffect(PBModEffects.FEAR_DEBUFF.get());
+        return entity instanceof Player && entity.hasEffect(PBMEffects.FEAR_DEBUFF.get());
     }
 
     public static boolean isSickleLocked(LivingEntity entity) {
@@ -180,3 +180,4 @@ public class FearHandler {
         clearSickleMovementLock(event.getEntity().getUUID(), "player_logout");
     }
 }
+

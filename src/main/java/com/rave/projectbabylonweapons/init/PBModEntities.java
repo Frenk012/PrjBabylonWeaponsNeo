@@ -1,6 +1,8 @@
 package com.rave.projectbabylonweapons.init;
 
 import com.rave.projectbabylonweapons.ProjectBabylonWeapons;
+import com.rave.projectbabylonweapons.world.entity.effect.DiamondShardEntity;
+import com.rave.projectbabylonweapons.world.entity.effect.DragonFuryChargeEntity;
 import com.rave.projectbabylonweapons.world.entity.effect.FireMagicalSealEntity;
 import com.rave.projectbabylonweapons.world.entity.effect.FireStormEntity;
 import com.rave.projectbabylonweapons.world.entity.effect.GlacierIceSpikeEntity;
@@ -136,6 +138,38 @@ public class PBModEntities {
                             .clientTrackingRange(64)
                             .updateInterval(1)
                             .build("fire_storm"));
+
+    public static final RegistryObject<EntityType<DiamondShardEntity>> DIAMOND_SHARD_1 =
+            ENTITIES.register("diamond_shard_1", () ->
+                    EntityType.Builder.<DiamondShardEntity>of(DiamondShardEntity::new, MobCategory.MISC)
+                            .sized(0.6f, 0.6f)
+                            .clientTrackingRange(64)
+                            .updateInterval(1)
+                            .build("diamond_shard_1"));
+
+    public static final RegistryObject<EntityType<DiamondShardEntity>> DIAMOND_SHARD_2 =
+            ENTITIES.register("diamond_shard_2", () ->
+                    EntityType.Builder.<DiamondShardEntity>of(DiamondShardEntity::new, MobCategory.MISC)
+                            .sized(0.6f, 0.6f)
+                            .clientTrackingRange(64)
+                            .updateInterval(1)
+                            .build("diamond_shard_2"));
+
+    public static final RegistryObject<EntityType<DiamondShardEntity>> DIAMOND_SHARD_3 =
+            ENTITIES.register("diamond_shard_3", () ->
+                    EntityType.Builder.<DiamondShardEntity>of(DiamondShardEntity::new, MobCategory.MISC)
+                            .sized(0.6f, 0.6f)
+                            .clientTrackingRange(64)
+                            .updateInterval(1)
+                            .build("diamond_shard_3"));
+
+    public static final RegistryObject<EntityType<DragonFuryChargeEntity>> DRAGON_FURY_CHARGE =
+            ENTITIES.register("dragon_fury_charge", () ->
+                    EntityType.Builder.<DragonFuryChargeEntity>of(DragonFuryChargeEntity::new, MobCategory.MISC)
+                            .sized(0.75f, 0.75f)
+                            .clientTrackingRange(64)
+                            .updateInterval(1)
+                            .build("dragon_fury_charge"));
 
     public static final RegistryObject<EntityType<TectonicFallingBlockEntity>> TECTONIC_FALLING_BLOCK =
             ENTITIES.register("tectonic_falling_block", () ->

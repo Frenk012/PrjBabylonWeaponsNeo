@@ -15,6 +15,18 @@ public final class WeaponPassiveIds {
     public static final ResourceLocation WAND_ETHEREAL_SANCTUARY = ResourceLocation.fromNamespaceAndPath(ProjectBabylonWeapons.MODID, "wand_ethereal_sanctuary");
     public static final ResourceLocation WAND_ICE_FROST_TOUCH = ResourceLocation.fromNamespaceAndPath(ProjectBabylonWeapons.MODID, "wand_ice_frost_touch");
     public static final ResourceLocation WAND_DRAGONSTEEL_DRAGONLORD = ResourceLocation.fromNamespaceAndPath(ProjectBabylonWeapons.MODID, "wand_dragonsteel_dragonlord");
+    public static final ResourceLocation BASTION_DIAMOND_CRUSHING = ResourceLocation.fromNamespaceAndPath(ProjectBabylonWeapons.MODID, "bastion_diamond_crushing");
+    public static final ResourceLocation BASTION_GOLDEN_CURSE = ResourceLocation.fromNamespaceAndPath(ProjectBabylonWeapons.MODID, "bastion_golden_curse");
+    public static final ResourceLocation BASTION_ICE_PERMAFROST = ResourceLocation.fromNamespaceAndPath(ProjectBabylonWeapons.MODID, "bastion_ice_permafrost");
+    public static final ResourceLocation BASTION_NETHERITE_WAR_SIGNAL = ResourceLocation.fromNamespaceAndPath(ProjectBabylonWeapons.MODID, "bastion_netherite_war_signal");
+    public static final ResourceLocation BASTION_ETHEREAL_HEAVENS_GIFT = ResourceLocation.fromNamespaceAndPath(ProjectBabylonWeapons.MODID, "bastion_ethereal_heavens_gift");
+    public static final ResourceLocation BASTION_DRAGONSTEEL_RULE_AURA = ResourceLocation.fromNamespaceAndPath(ProjectBabylonWeapons.MODID, "bastion_dragonsteel_rule_aura");
+    public static final ResourceLocation SMALL_SHIELD_DIAMOND_WOLF_GRIP = ResourceLocation.fromNamespaceAndPath(ProjectBabylonWeapons.MODID, "small_shield_diamond_wolf_grip");
+    public static final ResourceLocation SMALL_SHIELD_GOLDEN_WITHERING = ResourceLocation.fromNamespaceAndPath(ProjectBabylonWeapons.MODID, "small_shield_golden_withering");
+    public static final ResourceLocation SMALL_SHIELD_ICE_PRISON = ResourceLocation.fromNamespaceAndPath(ProjectBabylonWeapons.MODID, "small_shield_ice_prison");
+    public static final ResourceLocation SMALL_SHIELD_NETHERITE_SULFUR_BRAND = ResourceLocation.fromNamespaceAndPath(ProjectBabylonWeapons.MODID, "small_shield_netherite_sulfur_brand");
+    public static final ResourceLocation SMALL_SHIELD_ETHEREAL_PURIFICATION = ResourceLocation.fromNamespaceAndPath(ProjectBabylonWeapons.MODID, "small_shield_ethereal_purification");
+    public static final ResourceLocation SMALL_SHIELD_DRAGONSTEEL_RETRIBUTION = ResourceLocation.fromNamespaceAndPath(ProjectBabylonWeapons.MODID, "small_shield_dragonsteel_retribution");
 
     private WeaponPassiveIds() {
     }

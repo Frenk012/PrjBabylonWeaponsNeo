@@ -17,6 +17,7 @@
     "effect.project_babylon_weapons.chained_debuff":  "Прикован",
     "entity.project_babylon_weapons.sickle_projectile":  "Sickle Projectile",
     "entity.project_babylon_weapons.tectonic_falling_block":  "Tectonic Falling Block",
+    "attribute.project_babylon_weapons.magic_damage":  "Магический Урон",
     "item.project_babylon_weapons.arclight_sword":  "Арклайт",
     "item.project_babylon_weapons.demon_battleaxe":  "Демонический Боевой Топор",
     "item.project_babylon_weapons.demon_claws":  "Демонические Когти",

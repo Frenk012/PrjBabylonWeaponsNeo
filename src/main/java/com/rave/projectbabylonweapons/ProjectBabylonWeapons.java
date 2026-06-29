@@ -33,7 +33,6 @@ import org.slf4j.Logger;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import static com.rave.projectbabylonweapons.init.PBModEffects.EFFECTS;
 
 @Mod(ProjectBabylonWeapons.MODID)
 public class ProjectBabylonWeapons {
@@ -56,7 +55,6 @@ public class ProjectBabylonWeapons {
         PBModBlocks.register(modBus);
         PBModItems.ITEMS.register(modBus);
         PBModParticles.PARTICLES.register(modBus);
-        EFFECTS.register(modBus);
         PBWSounds.register(modBus);
         PBModEntities.ENTITIES.register(modBus);
 
@@ -101,3 +99,5 @@ public class ProjectBabylonWeapons {
         }
     }
 }
+
+

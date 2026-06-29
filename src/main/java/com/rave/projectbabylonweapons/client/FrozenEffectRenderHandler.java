@@ -3,7 +3,7 @@ package com.rave.projectbabylonweapons.client;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.rave.projectbabylonweapons.ProjectBabylonWeapons;
 import com.rave.projectbabylonweapons.block.renderer.FrozenDebuffIceBlockDisplayItemRenderer;
-import com.rave.projectbabylonweapons.init.PBModEffects;
+import com.rave.projectbabylonmaterials.init.PBMEffects;
 import com.rave.projectbabylonweapons.init.PBModItems;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
@@ -68,7 +68,7 @@ public class FrozenEffectRenderHandler {
                 continue;
             }
 
-            boolean hasFrozen = entity.hasEffect(PBModEffects.FROZEN.get());
+            boolean hasFrozen = entity.hasEffect(PBMEffects.FROZEN.get());
             boolean syncedFrozen = CLIENT_FROZEN_ENTITY_SYNC_UNTIL_MS.getOrDefault(entity.getId(), 0L) > now;
             boolean shouldRenderFrozen = hasFrozen || syncedFrozen;
             boolean isAlive = entity.isAlive();
@@ -117,3 +117,4 @@ public class FrozenEffectRenderHandler {
         lastLoggedLevel = null;
     }
 }
+

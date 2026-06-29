@@ -6,7 +6,7 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.network.chat.Component;
 import com.rave.projectbabylonweapons.passive.diamond.DiamondFangPassive;
 
-import com.rave.projectbabylonweapons.init.PBModEffects;
+import com.rave.projectbabylonmaterials.init.PBMEffects;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -16,13 +16,13 @@ import net.minecraft.world.item.Tiers;
 
 public class DiamondClawsItem extends SwordItem {
 
-    // Итог: урон 4.0, скорость 3.4, прочность 3460.
+    // РС‚РѕРі: СѓСЂРѕРЅ 4.0, СЃРєРѕСЂРѕСЃС‚СЊ 3.4, РїСЂРѕС‡РЅРѕСЃС‚СЊ 3460.
     public static final int   DURABILITY = 1458;
-    public static final int   ATTACK_DAMAGE_MOD = 3;     // +3.0 → 1.0 базовое = 4.0
+    public static final int   ATTACK_DAMAGE_MOD = 3;     // +3.0 в†’ 1.0 Р±Р°Р·РѕРІРѕРµ = 4.0
     public static final float ATTACK_SPEED_MOD = -3.0F; // 4.0 - 0.6 = 3.4
 
     public DiamondClawsItem(Properties props) {
-        // ВАЖНО: без stacksTo(...). Только durability(...)
+        // Р’РђР–РќРћ: Р±РµР· stacksTo(...). РўРѕР»СЊРєРѕ durability(...)
         super(Tiers.WOOD, ATTACK_DAMAGE_MOD, ATTACK_SPEED_MOD, props.durability(DURABILITY));
     }
 
@@ -30,7 +30,7 @@ public class DiamondClawsItem extends SwordItem {
     public boolean hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
         if (attacker instanceof Player player) {
             if (player.getRandom().nextFloat() < 0.05F) { // 5%
-                target.addEffect(new MobEffectInstance(PBModEffects.BLEED_DEBUFF.get(), 20 * 20, 0));
+                target.addEffect(new MobEffectInstance(PBMEffects.BLEED_DEBUFF.get(), 20 * 20, 0));
             }
         }
         return super.hurtEnemy(stack, target, attacker);
@@ -41,3 +41,4 @@ public class DiamondClawsItem extends SwordItem {
         DiamondFangPassive.appendTooltip(tooltip);
     }
 }
+

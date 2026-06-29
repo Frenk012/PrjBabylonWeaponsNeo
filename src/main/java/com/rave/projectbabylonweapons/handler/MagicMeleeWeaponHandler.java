@@ -31,6 +31,10 @@ public final class MagicMeleeWeaponHandler {
             return;
         }
 
+        if (event.getSource().getDirectEntity() != null && event.getSource().getDirectEntity() != attacker) {
+            return;
+        }
+
         ItemStack weaponStack = attacker.getMainHandItem();
         if (!(weaponStack.getItem() instanceof MagicMeleeWeapon magicWeapon)) {
             return;
@@ -79,3 +83,4 @@ public final class MagicMeleeWeaponHandler {
         }
     }
 }
+

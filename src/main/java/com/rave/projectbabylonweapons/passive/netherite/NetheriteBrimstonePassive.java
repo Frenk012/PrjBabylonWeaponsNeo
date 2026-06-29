@@ -3,7 +3,7 @@ package com.rave.projectbabylonweapons.passive.netherite;
 import com.rave.projectbabylonmaterials.ProjectBabylonMaterials;
 import com.rave.projectbabylonmaterials.tooltip.TooltipFrameStyle;
 import com.rave.projectbabylonweapons.ProjectBabylonWeapons;
-import com.rave.projectbabylonweapons.init.PBModEffects;
+import com.rave.projectbabylonmaterials.init.PBMEffects;
 import com.rave.projectbabylonweapons.init.PBWSounds;
 import com.rave.projectbabylonweapons.tooltip.WeaponPassiveTooltipData;
 import net.minecraft.ChatFormatting;
@@ -77,7 +77,7 @@ public final class NetheriteBrimstonePassive {
             return;
         }
 
-        if (target.hasEffect(PBModEffects.BRIMSTONE_FIRE.get())) {
+        if (target.hasEffect(PBMEffects.BRIMSTONE_FIRE.get())) {
             if (rollChance(attacker, profile.brimstoneBlastProcChance())) {
                 triggerBrimstoneBlast(attacker, target, event.getSource(), profile);
                 clearBrimstoneEffects(target);
@@ -85,10 +85,10 @@ public final class NetheriteBrimstonePassive {
             return;
         }
 
-        if (target.hasEffect(PBModEffects.BRIMSTONE_FLAMES.get())) {
+        if (target.hasEffect(PBMEffects.BRIMSTONE_FLAMES.get())) {
             if (rollChance(attacker, profile.brimstoneFireProcChance())) {
                 target.addEffect(new MobEffectInstance(
-                        PBModEffects.BRIMSTONE_FIRE.get(),
+                        PBMEffects.BRIMSTONE_FIRE.get(),
                         profile.brimstoneFireDurationTicks()
                 ));
             }
@@ -98,7 +98,7 @@ public final class NetheriteBrimstonePassive {
         if (target.isOnFire()) {
             if (rollChance(attacker, profile.brimstoneFlamesProcChance())) {
                 target.addEffect(new MobEffectInstance(
-                        PBModEffects.BRIMSTONE_FLAMES.get(),
+                        PBMEffects.BRIMSTONE_FLAMES.get(),
                         profile.brimstoneFlamesDurationTicks()
                 ));
             }
@@ -180,11 +180,12 @@ public final class NetheriteBrimstonePassive {
     }
 
     private static void clearBrimstoneEffects(LivingEntity target) {
-        target.removeEffect(PBModEffects.BRIMSTONE_FIRE.get());
-        target.removeEffect(PBModEffects.BRIMSTONE_FLAMES.get());
+        target.removeEffect(PBMEffects.BRIMSTONE_FIRE.get());
+        target.removeEffect(PBMEffects.BRIMSTONE_FLAMES.get());
     }
 
     private static boolean rollChance(LivingEntity attacker, float chance) {
         return attacker.getRandom().nextFloat() < chance;
     }
 }
+

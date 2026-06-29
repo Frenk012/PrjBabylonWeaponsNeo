@@ -4,7 +4,7 @@ import com.rave.projectbabylonmaterials.ProjectBabylonMaterials;
 import com.rave.projectbabylonweapons.handler.MagicMeleeWeaponHelper;
 import com.rave.projectbabylonweapons.handler.StaffMagicArmorHelper;
 import com.rave.projectbabylonmaterials.tooltip.TooltipFrameStyle;
-import com.rave.projectbabylonweapons.init.PBModEffects;
+import com.rave.projectbabylonmaterials.init.PBMEffects;
 import com.rave.projectbabylonweapons.item.MagicMeleeWeapon;
 import com.rave.projectbabylonweapons.tooltip.WeaponPassiveTooltipData;
 import com.rave.projectbabylonweapons.world.entity.projectile.BasicSpellProjectileEntity;
@@ -127,7 +127,7 @@ public final class IceFrostTouchPassive {
         target.removeEffect(chilledEffect);
         AABB area = target.getBoundingBox().inflate(profile.freezeRadiusBlocks(), 1.0D, profile.freezeRadiusBlocks());
         for (LivingEntity victim : owner.level().getEntitiesOfClass(LivingEntity.class, area, entity -> entity.isAlive() && entity != owner)) {
-            victim.addEffect(new MobEffectInstance(PBModEffects.FROZEN.get(), profile.frozenDurationTicks()));
+            victim.addEffect(new MobEffectInstance(PBMEffects.FROZEN.get(), profile.frozenDurationTicks()));
         }
     }
 
@@ -135,3 +135,4 @@ public final class IceFrostTouchPassive {
         return TOOLTIP;
     }
 }
+

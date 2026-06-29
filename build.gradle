@@ -84,11 +84,11 @@ dependencies {
 
     implementation fg.deobf("curse.maven:epic-fight-mod-405076:7476040")
     implementation fg.deobf("curse.maven:weapons-of-miracles-epicfight-918614:7363591")
-    //implementation fg.deobf("curse.maven:epicfight-resurrection-1151542:6931390")
+    implementation fg.deobf("curse.maven:epicfight-resurrection-1151542:6931390")
     //implementation fg.deobf("curse.maven:epic-fight-invincible-1184379:7445318")
     //implementation fg.deobf("curse.maven:official-epic-fight-x-parcool-1259252:6870242")
     //implementation fg.deobf("curse.maven:parcool-482378:6881000")
-    implementation fg.deobf("com.rave.projectbabylonmaterials:projectbabylonmaterials:1.1.15")
+    implementation fg.deobf("com.rave.projectbabylonmaterials:projectbabylonmaterials:1.1.19")
     //implementation fg.deobf("curse.maven:epic-fight-mod-rapier-moveset-addon-1036425:7728552")
     implementation fg.deobf("curse.maven:epicfight-acg-battlescythe-revived-1483383:7742473")
     implementation fg.deobf("curse.maven:project-babylon-armors-1550525:8127923")
@@ -157,6 +157,7 @@ publishing {
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
 }
+
 
 
 

@@ -1,6 +1,6 @@
 package com.rave.projectbabylonweapons.handler;
 
-import com.rave.projectbabylonweapons.init.PBModEffects;
+import com.rave.projectbabylonmaterials.init.PBMEffects;
 import com.rave.projectbabylonweapons.network.PBNetworkManager;
 import com.rave.projectbabylonweapons.network.SPFrozenVisualSync;
 import io.redspace.ironsspellbooks.util.ParticleHelper;
@@ -68,7 +68,7 @@ public class FrozenEffectHandler {
     public static void onLivingUpdate(LivingEvent.LivingTickEvent event) {
         LivingEntity entity = event.getEntity();
         UUID entityId = entity.getUUID();
-        boolean hasFrozen = entity.hasEffect(PBModEffects.FROZEN.get());
+        boolean hasFrozen = entity.hasEffect(PBMEffects.FROZEN.get());
 
         if (!entity.level().isClientSide) {
             boolean syncedFrozen = SYNCED_FROZEN_VISUALS.contains(entityId);
@@ -175,7 +175,7 @@ public class FrozenEffectHandler {
 
     @SubscribeEvent
     public static void onEffectRemoved(MobEffectEvent.Remove event) {
-        if (event.getEffect() == PBModEffects.FROZEN.get()) {
+        if (event.getEffect() == PBMEffects.FROZEN.get()) {
             if (!event.getEntity().level().isClientSide) {
                 PBNetworkManager.sendToTrackingAndSelf(event.getEntity(), new SPFrozenVisualSync(event.getEntity().getId(), false));
                 SYNCED_FROZEN_VISUALS.remove(event.getEntity().getUUID());
@@ -198,7 +198,7 @@ public class FrozenEffectHandler {
     @SubscribeEvent
     public static void onLivingDamage(LivingDamageEvent event) {
         LivingEntity entity = event.getEntity();
-        if (entity.level().isClientSide || !entity.hasEffect(PBModEffects.FROZEN.get())) {
+        if (entity.level().isClientSide || !entity.hasEffect(PBMEffects.FROZEN.get())) {
             return;
         }
 
@@ -209,7 +209,7 @@ public class FrozenEffectHandler {
         PBNetworkManager.sendToTrackingAndSelf(entity, new SPFrozenVisualSync(entity.getId(), false));
         SYNCED_FROZEN_VISUALS.remove(entity.getUUID());
         HIGH_HP_DURATION_ADJUSTED.remove(entity.getUUID());
-        entity.removeEffect(PBModEffects.FROZEN.get());
+        entity.removeEffect(PBMEffects.FROZEN.get());
         clearFrozenState(entity);
     }
 
@@ -217,7 +217,7 @@ public class FrozenEffectHandler {
 
     @SubscribeEvent
     public static void onEffectAdded(MobEffectEvent.Added event) {
-        if (event.getEffectInstance().getEffect() == PBModEffects.FROZEN.get()) {
+        if (event.getEffectInstance().getEffect() == PBMEffects.FROZEN.get()) {
             LivingEntity entity = event.getEntity();
 
             if (!entity.level().isClientSide) {
@@ -254,7 +254,7 @@ public class FrozenEffectHandler {
             return;
         }
 
-        if (living.hasEffect(PBModEffects.FROZEN.get())) {
+        if (living.hasEffect(PBMEffects.FROZEN.get())) {
             PBNetworkManager.sendToPlayer(player, new SPFrozenVisualSync(living.getId(), true));
             SYNCED_FROZEN_VISUALS.add(living.getUUID());
         }
@@ -277,7 +277,7 @@ public class FrozenEffectHandler {
             return;
         }
 
-        if (player.hasEffect(PBModEffects.FROZEN.get())) {
+        if (player.hasEffect(PBMEffects.FROZEN.get())) {
             PBNetworkManager.sendToPlayer(player, new SPFrozenVisualSync(player.getId(), true));
             SYNCED_FROZEN_VISUALS.add(player.getUUID());
         }
@@ -344,7 +344,7 @@ public class FrozenEffectHandler {
             return false;
         }
 
-        MobEffectInstance current = entity.getEffect(PBModEffects.FROZEN.get());
+        MobEffectInstance current = entity.getEffect(PBMEffects.FROZEN.get());
         if (current == null) {
             return false;
         }
@@ -355,9 +355,10 @@ public class FrozenEffectHandler {
             return false;
         }
 
-        entity.removeEffect(PBModEffects.FROZEN.get());
-        entity.addEffect(new MobEffectInstance(PBModEffects.FROZEN.get(), adjustedDuration));
+        entity.removeEffect(PBMEffects.FROZEN.get());
+        entity.addEffect(new MobEffectInstance(PBMEffects.FROZEN.get(), adjustedDuration));
         HIGH_HP_DURATION_ADJUSTED.add(entityId);
         return true;
     }
 }
+

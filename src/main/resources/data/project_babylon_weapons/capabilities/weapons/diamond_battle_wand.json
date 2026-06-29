@@ -3,7 +3,7 @@
     {
     "common":
     {
-      "damage_bonus": 0.0,
+      "damage_bonus": 1.0,
       "speed_bonus": 0.4,
       "impact": 1.0,
       "armor_negation": 25.0,
@@ -11,7 +11,7 @@
     },
     "two_hand":
     {
-      "damage_bonus": 0.0,
+      "damage_bonus": 1.0,
       "speed_bonus": 0.4,
       "impact": 1.0,
       "armor_negation": 10.0,

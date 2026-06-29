@@ -2,7 +2,7 @@ package com.rave.projectbabylonweapons.skill.weapon_innate;
 
 import com.rave.projectbabylonweapons.ProjectBabylonWeapons;
 import com.rave.projectbabylonweapons.gameasset.PBAnimations;
-import com.rave.projectbabylonweapons.init.PBModEffects;
+import com.rave.projectbabylonmaterials.init.PBMEffects;
 import com.rave.projectbabylonweapons.init.PBWSounds;
 import com.rave.projectbabylonweapons.world.entity.effect.TectonicFallingBlockEntity;
 import net.minecraft.core.BlockPos;
@@ -230,7 +230,7 @@ public class TectonicSkill extends SimpleWeaponInnateSkill {
 
             target.setDeltaMovement(push.x, KNOCKUP_VELOCITY, push.z);
             target.hurtMarked = true;
-            target.addEffect(new MobEffectInstance(PBModEffects.CONCUSSED.get(), CONCUSSED_DURATION_TICKS, 0, false, true, true));
+            target.addEffect(new MobEffectInstance(PBMEffects.CONCUSSED.get(), CONCUSSED_DURATION_TICKS, 0, false, true, true));
             waveState.hitTargets.add(target.getUUID());
         }
 
@@ -298,3 +298,4 @@ public class TectonicSkill extends SimpleWeaponInnateSkill {
     }
 
 }
+

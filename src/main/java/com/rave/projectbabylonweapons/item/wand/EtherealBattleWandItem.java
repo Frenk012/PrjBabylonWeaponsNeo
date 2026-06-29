@@ -31,7 +31,7 @@ public class EtherealBattleWandItem extends SwordItem implements MagicProjectile
     public static final int DURABILITY = 756;
     public static final int ATTACK_DAMAGE_MOD = 2;
     public static final float ATTACK_SPEED_MOD = -3.0F;
-    private static final float BASE_MAGIC_DAMAGE = 1.0F + ATTACK_DAMAGE_MOD;
+    private static final float BASE_MAGIC_DAMAGE = 3.3F;
 
     public EtherealBattleWandItem() {
         super(
@@ -167,6 +167,8 @@ public class EtherealBattleWandItem extends SwordItem implements MagicProjectile
         return 2.1F;
     }
 }
+
+
 
 
 

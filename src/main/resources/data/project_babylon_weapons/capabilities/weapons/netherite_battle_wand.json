@@ -3,7 +3,7 @@
     {
     "common":
     {
-      "damage_bonus": 0.0,
+      "damage_bonus": 2.0,
       "speed_bonus": 0.4,
       "impact": 1.0,
       "armor_negation": 25.0,
@@ -11,12 +11,12 @@
     },
     "two_hand":
     {
-      "damage_bonus": 0.0,
+      "damage_bonus": 2.0,
       "speed_bonus": 0.4,
       "impact": 1.0,
       "armor_negation": 10.0,
       "max_strikes": 2.0
     }
   },
-  "type":"project_babylon_weapons:pb_wand"
+  "type":"epicfight:fire_wand"
 }

@@ -3,7 +3,7 @@ package com.rave.projectbabylonweapons.world.entity.projectile;
 import javax.annotation.Nullable;
 
 import com.rave.projectbabylonmaterials.combat.PreserveOriginalOwnerOnReflect;
-import com.rave.projectbabylonweapons.init.PBModEffects;
+import com.rave.projectbabylonmaterials.init.PBMEffects;
 import com.rave.projectbabylonweapons.init.PBModEntities;
 import com.rave.projectbabylonweapons.init.PBWSounds;
 import com.rave.projectbabylonweapons.skill.weapon_innate.SickleThrowSkill;
@@ -268,9 +268,9 @@ public class SickleProjectileEntity extends ThrowableItemProjectile implements P
         target.hurt(epicSource, SickleThrowSkill.PROJECTILE_DAMAGE);
 
         // Apply effects
-        target.addEffect(new MobEffectInstance(PBModEffects.MARKED.get(), SickleThrowSkill.TETHER_DURATION_TICKS, 0, false, true, true));
+        target.addEffect(new MobEffectInstance(PBMEffects.MARKED.get(), SickleThrowSkill.TETHER_DURATION_TICKS, 0, false, true, true));
         target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, SickleThrowSkill.TETHER_DURATION_TICKS, 0, false, true, true)); // Slow effect during tether
-        target.addEffect(new MobEffectInstance(PBModEffects.CHAINED.get(), SickleThrowSkill.TETHER_DURATION_TICKS, 0, false, true, true));
+        target.addEffect(new MobEffectInstance(PBMEffects.CHAINED.get(), SickleThrowSkill.TETHER_DURATION_TICKS, 0, false, true, true));
 
         // Activate tether
         this.tetherTarget = target;
@@ -279,7 +279,7 @@ public class SickleProjectileEntity extends ThrowableItemProjectile implements P
         this.setDeltaMovement(Vec3.ZERO);
         playSickleFeedbackOnOwnerAndTarget(PBWSounds.CHAIN_UP.get(), owner, target);
 
-        // Лочим цель (если игрок), а не владельца
+        // Р›РѕС‡РёРј С†РµР»СЊ (РµСЃР»Рё РёРіСЂРѕРє), Р° РЅРµ РІР»Р°РґРµР»СЊС†Р°
         if (target instanceof ServerPlayer targetPlayer) {
             SickleThrowSkill.setTetherMovementLock(targetPlayer.getUUID(), true);
         }
@@ -339,8 +339,8 @@ public class SickleProjectileEntity extends ThrowableItemProjectile implements P
         LivingEntity owner = this.getOwner() instanceof LivingEntity living ? living : null;
         playSickleFeedbackOnOwnerAndTarget(PBWSounds.CHAIN_DOWN.get(), owner, this.tetherTarget);
         clearChainedEffect(this.tetherTarget);
-        // Эффекты истекают сами по таймеру
-        // Разлочиваем цель (если игрок)
+        // Р­С„С„РµРєС‚С‹ РёСЃС‚РµРєР°СЋС‚ СЃР°РјРё РїРѕ С‚Р°Р№РјРµСЂСѓ
+        // Р Р°Р·Р»РѕС‡РёРІР°РµРј С†РµР»СЊ (РµСЃР»Рё РёРіСЂРѕРє)
         if (this.tetherTarget instanceof ServerPlayer targetPlayer) {
             SickleThrowSkill.setTetherMovementLock(targetPlayer.getUUID(), false);
         }
@@ -390,7 +390,7 @@ public class SickleProjectileEntity extends ThrowableItemProjectile implements P
 
     private static void clearChainedEffect(@Nullable LivingEntity target) {
         if (target != null) {
-            target.removeEffect(PBModEffects.CHAINED.get());
+            target.removeEffect(PBMEffects.CHAINED.get());
         }
     }
 
@@ -408,3 +408,4 @@ public class SickleProjectileEntity extends ThrowableItemProjectile implements P
         }
     }
 }
+

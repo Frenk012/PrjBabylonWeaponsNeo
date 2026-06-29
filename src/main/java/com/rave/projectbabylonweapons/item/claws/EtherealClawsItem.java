@@ -1,6 +1,6 @@
 package com.rave.projectbabylonweapons.item.claws;
 
-import com.rave.projectbabylonweapons.init.PBModEffects;
+import com.rave.projectbabylonmaterials.init.PBMEffects;
 import com.rave.projectbabylonweapons.passive.ethereal.EtherealHolyPassive;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -28,7 +28,7 @@ public class EtherealClawsItem extends SwordItem {
     public boolean hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
         if (attacker instanceof Player player) {
             if (player.getRandom().nextFloat() < 0.05F) { // 5%
-                target.addEffect(new MobEffectInstance(PBModEffects.BLEED_DEBUFF.get(), 20 * 20, 0));
+                target.addEffect(new MobEffectInstance(PBMEffects.BLEED_DEBUFF.get(), 20 * 20, 0));
             }
         }
         return super.hurtEnemy(stack, target, attacker);
@@ -40,4 +40,5 @@ public class EtherealClawsItem extends SwordItem {
         EtherealHolyPassive.appendTooltip(tooltip);
     }
 }
+
 

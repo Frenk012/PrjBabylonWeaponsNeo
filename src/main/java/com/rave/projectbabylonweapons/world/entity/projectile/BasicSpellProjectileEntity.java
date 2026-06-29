@@ -1,5 +1,7 @@
 package com.rave.projectbabylonweapons.world.entity.projectile;
 
+import com.rave.projectbabylonweapons.ProjectBabylonWeapons;
+
 import com.rave.projectbabylonweapons.handler.BattleWandPassiveHooks;
 import com.rave.projectbabylonweapons.handler.MagicMeleeWeaponHelper;
 import com.rave.projectbabylonweapons.handler.StaffMagicArmorHelper;
@@ -59,8 +61,13 @@ public class BasicSpellProjectileEntity extends Projectile implements GeoEntity 
     private static final String TAG_PIERCING = "Piercing";
     private static final String TAG_REMAINING_RICOCHETS = "RemainingRicochets";
     private static final String TAG_VISUAL_SCALE = "VisualScale";
+    private static final String TAG_BASIC_WAND_ATTACK = "BasicWandAttack";
+    private static final String TAG_HOMING_ENABLED = "HomingEnabled";
     private static final EntityDataAccessor<Integer> DATA_TRAIL_COLOR = SynchedEntityData.defineId(BasicSpellProjectileEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Float> DATA_VISUAL_SCALE = SynchedEntityData.defineId(BasicSpellProjectileEntity.class, EntityDataSerializers.FLOAT);
+    private static final double HOMING_RANGE = 14.0D;
+    private static final double HOMING_TARGET_VERTICAL_OFFSET = 0.45D;
+    private static final float HOMING_TURN_RATE = 0.18F;
 
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
@@ -74,6 +81,8 @@ public class BasicSpellProjectileEntity extends Projectile implements GeoEntity 
     private boolean trailSpawnedClient;
     private boolean piercing;
     private int remainingRicochets;
+    private boolean basicWandAttack;
+    private boolean homingEnabled;
 
     public BasicSpellProjectileEntity(EntityType<? extends BasicSpellProjectileEntity> type, Level level) {
         super(type, level);
@@ -150,6 +159,30 @@ public class BasicSpellProjectileEntity extends Projectile implements GeoEntity 
         this.remainingRicochets = Math.max(0, remainingRicochets);
     }
 
+    public void multiplyRawMagicDamage(float multiplier) {
+        if (multiplier <= 0.0F) {
+            return;
+        }
+
+        this.rawMagicDamage *= multiplier;
+    }
+
+    public boolean isBasicWandAttack() {
+        return this.basicWandAttack;
+    }
+
+    public void setBasicWandAttack(boolean basicWandAttack) {
+        this.basicWandAttack = basicWandAttack;
+    }
+
+    public boolean isHomingEnabled() {
+        return this.homingEnabled;
+    }
+
+    public void setHomingEnabled(boolean homingEnabled) {
+        this.homingEnabled = homingEnabled;
+    }
+
     @Override
     public Packet<ClientGamePacketListener> getAddEntityPacket() {
         return NetworkHooks.getEntitySpawningPacket(this);
@@ -168,6 +201,8 @@ public class BasicSpellProjectileEntity extends Projectile implements GeoEntity 
         if (this.level().isClientSide) {
             this.spawnClientTrailOnce();
             this.spawnClientParticles();
+        } else {
+            this.applyHoming();
         }
 
         HitResult hitResult = ProjectileUtil.getHitResultOnMoveVector(this, this::canHitEntity);
@@ -207,6 +242,13 @@ public class BasicSpellProjectileEntity extends Projectile implements GeoEntity 
                     this.magicArmorNegation
             );
 
+            ProjectBabylonWeapons.LOGGER.info("[WandProjectileDebug] hit target={} rawMagicDamage={} schoolResistMultiplier={} magicArmorNegation={} targetSpellResist={} adjustedMagicDamage={}",
+                    target.getName().getString(),
+                    this.rawMagicDamage,
+                    schoolResistMultiplier,
+                    this.magicArmorNegation,
+                    target.getAttributeValue(net.minecraftforge.registries.ForgeRegistries.ATTRIBUTES.getValue(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("irons_spellbooks", "spell_resist"))),
+                    adjustedMagicDamage);
             if (adjustedMagicDamage > 0.0F) {
                 DamageSource magicDamageSource = MagicMeleeWeaponHelper.createMagicProjectileDamageSource(
                         owner,
@@ -269,6 +311,8 @@ public class BasicSpellProjectileEntity extends Projectile implements GeoEntity 
         tag.putBoolean(TAG_PIERCING, this.piercing);
         tag.putInt(TAG_REMAINING_RICOCHETS, this.remainingRicochets);
         tag.putFloat(TAG_VISUAL_SCALE, this.getVisualScale());
+        tag.putBoolean(TAG_BASIC_WAND_ATTACK, this.basicWandAttack);
+        tag.putBoolean(TAG_HOMING_ENABLED, this.homingEnabled);
         if (!this.sourceWeapon.isEmpty()) {
             tag.put(TAG_SOURCE_WEAPON, this.sourceWeapon.save(new CompoundTag()));
         }
@@ -285,6 +329,8 @@ public class BasicSpellProjectileEntity extends Projectile implements GeoEntity 
         this.maxLifetime = Math.max(1, tag.getInt(TAG_LIFETIME));
         this.piercing = tag.getBoolean(TAG_PIERCING);
         this.remainingRicochets = tag.getInt(TAG_REMAINING_RICOCHETS);
+        this.basicWandAttack = tag.getBoolean(TAG_BASIC_WAND_ATTACK);
+        this.homingEnabled = tag.getBoolean(TAG_HOMING_ENABLED);
         if (tag.contains(TAG_VISUAL_SCALE)) {
             this.setVisualScale(tag.getFloat(TAG_VISUAL_SCALE));
         }
@@ -374,6 +420,71 @@ public class BasicSpellProjectileEntity extends Projectile implements GeoEntity 
                 0.02D);
     }
 
+    private void applyHoming() {
+        if (!this.homingEnabled) {
+            return;
+        }
+
+        Vec3 movement = this.getDeltaMovement();
+        if (movement.lengthSqr() < 1.0E-6D) {
+            return;
+        }
+
+        LivingEntity target = this.findHomingTarget();
+        if (target == null) {
+            return;
+        }
+
+        Vec3 currentDirection = movement.normalize();
+        Vec3 desiredDirection = target.position()
+                .add(0.0D, target.getBbHeight() * HOMING_TARGET_VERTICAL_OFFSET, 0.0D)
+                .subtract(this.position())
+                .normalize();
+
+        if (desiredDirection.lengthSqr() < 1.0E-6D) {
+            return;
+        }
+
+        Vec3 adjustedDirection = currentDirection.lerp(desiredDirection, HOMING_TURN_RATE).normalize();
+        this.setDeltaMovement(adjustedDirection.scale(movement.length()));
+    }
+
+    private LivingEntity findHomingTarget() {
+        Entity ownerEntity = this.getOwner();
+        LivingEntity owner = ownerEntity instanceof LivingEntity livingOwner ? livingOwner : null;
+        Vec3 currentDirection = this.getDeltaMovement().normalize();
+        LivingEntity closestTarget = null;
+        double closestDistanceSq = HOMING_RANGE * HOMING_RANGE;
+
+        for (LivingEntity candidate : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(HOMING_RANGE))) {
+            if (!candidate.isAlive() || candidate == owner || !this.canHitEntity(candidate)) {
+                continue;
+            }
+
+            if (owner != null && candidate.isAlliedTo(owner)) {
+                continue;
+            }
+
+            Vec3 toCandidate = candidate.position()
+                    .add(0.0D, candidate.getBbHeight() * HOMING_TARGET_VERTICAL_OFFSET, 0.0D)
+                    .subtract(this.position());
+            double distanceSq = toCandidate.lengthSqr();
+            if (distanceSq < 1.0E-6D || distanceSq > closestDistanceSq) {
+                continue;
+            }
+
+            Vec3 directionToCandidate = toCandidate.normalize();
+            if (currentDirection.dot(directionToCandidate) <= 0.15D) {
+                continue;
+            }
+
+            closestDistanceSq = distanceSq;
+            closestTarget = candidate;
+        }
+
+        return closestTarget;
+    }
+
     private ResourceKey<DamageType> resolveMagicDamageType() {
         ResourceLocation damageTypeLocation = this.magicDamageTypeId.isEmpty()
                 ? ResourceLocation.fromNamespaceAndPath("irons_spellbooks", "evocation_magic")
@@ -406,4 +517,7 @@ public class BasicSpellProjectileEntity extends Projectile implements GeoEntity 
         return this.cache;
     }
 }
+
+
+
 

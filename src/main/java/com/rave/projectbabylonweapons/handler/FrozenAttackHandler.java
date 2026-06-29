@@ -1,6 +1,6 @@
 package com.rave.projectbabylonweapons.handler;
 
-import com.rave.projectbabylonweapons.init.PBModEffects;
+import com.rave.projectbabylonmaterials.init.PBMEffects;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.event.TickEvent;
@@ -31,7 +31,7 @@ public class FrozenAttackHandler {
         if (playerPatch == null) return;
 
         UUID playerId = player.getUUID();
-        boolean hasFrost = player.hasEffect(PBModEffects.FROZEN.get());
+        boolean hasFrost = player.hasEffect(PBMEffects.FROZEN.get());
         Boolean previousFrost = FROST_STATES.get(playerId);
 
         if (previousFrost == null || previousFrost != hasFrost) {
@@ -46,14 +46,14 @@ public class FrozenAttackHandler {
 
     @SubscribeEvent
     public static void onEffectRemoved(MobEffectEvent.Remove event) {
-        if (event.getEffect() == PBModEffects.FROZEN.get()) {
+        if (event.getEffect() == PBMEffects.FROZEN.get()) {
             removeListenersForEntity(event.getEntity());
         }
     }
 
     @SubscribeEvent
     public static void onEffectExpired(MobEffectEvent.Expired event) {
-        if (event.getEffectInstance().getEffect() == PBModEffects.FROZEN.get()) {
+        if (event.getEffectInstance().getEffect() == PBMEffects.FROZEN.get()) {
             removeListenersForEntity(event.getEntity());
         }
     }
@@ -81,7 +81,7 @@ public class FrozenAttackHandler {
                     (SkillCastEvent event) -> event.setCanceled(true)
             );
         } catch (Exception e) {
-            // логирование
+            // Р»РѕРіРёСЂРѕРІР°РЅРёРµ
         }
     }
 
@@ -92,7 +92,7 @@ public class FrozenAttackHandler {
                     FROST_SKILL_LISTENER
             );
         } catch (Exception e) {
-            // логирование
+            // Р»РѕРіРёСЂРѕРІР°РЅРёРµ
         }
     }
 }
