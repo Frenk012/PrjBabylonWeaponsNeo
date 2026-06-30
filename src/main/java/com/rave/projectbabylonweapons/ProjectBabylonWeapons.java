@@ -81,7 +81,7 @@ public class ProjectBabylonWeapons {
     public void addPackFindersEvent(AddPackFindersEvent event) {
         if (event.getPackType() == PackType.CLIENT_RESOURCES) {
             event.addPackFinders(
-                    ResourceLocation.fromNamespaceAndPath(MODID, "projectbabylonpack"),
+                    ResourceLocation.fromNamespaceAndPath(MODID, "resourcepacks/projectbabylonpack"),
                     PackType.CLIENT_RESOURCES,
                     Component.translatable("pack.projectbabylonpack.title"),
                     PackSource.BUILT_IN,
