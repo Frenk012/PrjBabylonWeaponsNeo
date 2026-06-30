@@ -1,6 +1,6 @@
 package com.rave.projectbabylonweapons.item.claws;
 
-import com.rave.projectbabylonweapons.init.PBModEffects;
+import com.rave.projectbabylonmaterials.init.PBMEffects;
 import com.rave.projectbabylonweapons.passive.golden.GoldenMagicPassive;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -22,24 +22,25 @@ public class GoldenClawsItem extends SwordItem {
     public static final float ATTACK_SPEED_MOD = -3.0F;
 
     public GoldenClawsItem(Properties props) {
-        super(Tiers.WOOD, (props.durability(DURABILITY)).attributes(SwordItem.createAttributes(Tiers.WOOD, ATTACK_DAMAGE_MOD, ATTACK_SPEED_MOD)));
+        super(Tiers.WOOD, ATTACK_DAMAGE_MOD, ATTACK_SPEED_MOD, props.durability(DURABILITY));
     }
 
     @Override
     public boolean hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
         if (attacker instanceof Player player) {
             if (player.getRandom().nextFloat() < 0.05F) { // 5%
-                target.addEffect(new MobEffectInstance(PBModEffects.BLEED_DEBUFF, 20 * 20, 0));
+                target.addEffect(new MobEffectInstance(PBMEffects.BLEED_DEBUFF.get(), 20 * 20, 0));
             }
         }
         return super.hurtEnemy(stack, target, attacker);
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, net.minecraft.world.item.Item.TooltipContext level, List<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, Level level, List<Component> tooltip, TooltipFlag flag) {
         super.appendHoverText(stack, level, tooltip, flag);
         GoldenMagicPassive.appendTooltip(tooltip);
     }
 }
+
 
 

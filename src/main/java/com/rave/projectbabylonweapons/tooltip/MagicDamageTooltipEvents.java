@@ -3,15 +3,17 @@ package com.rave.projectbabylonweapons.tooltip;
 import com.rave.projectbabylonweapons.ProjectBabylonWeapons;
 import com.rave.projectbabylonweapons.item.MagicMeleeWeapon;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.event.entity.player.ItemTooltipEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 
 import java.util.List;
+import java.util.Locale;
 
-@EventBusSubscriber(modid = ProjectBabylonWeapons.MODID, value = Dist.CLIENT, bus = EventBusSubscriber.Bus.GAME)
+@Mod.EventBusSubscriber(modid = ProjectBabylonWeapons.MODID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public final class MagicDamageTooltipEvents {
     private MagicDamageTooltipEvents() {
     }
@@ -25,7 +27,9 @@ public final class MagicDamageTooltipEvents {
 
         List<Component> tooltip = event.getToolTip();
         String attackDamageLabel = Component.translatable("attribute.name.generic.attack_damage").getString();
-        String magicDamageLabel = magicWeapon.getMagicDamageTooltipLabel().getString();
+        LivingEntity holder = event.getEntity();
+        float magicDamage = magicWeapon.getBaseMagicDamage(stack, holder);
+        String magicDamageLabel = String.format(Locale.ROOT, " %.1f %s", magicDamage, magicWeapon.getMagicDamageTooltipLabel().getString());
 
         for (int i = 0; i < tooltip.size(); i++) {
             Component line = tooltip.get(i);
@@ -34,9 +38,11 @@ public final class MagicDamageTooltipEvents {
                 continue;
             }
 
-            String replaced = text.replace(attackDamageLabel, magicDamageLabel);
-            tooltip.set(i, Component.literal(replaced).setStyle(line.getStyle()));
+            tooltip.set(i, Component.literal(magicDamageLabel).setStyle(line.getStyle()));
             return;
         }
     }
 }
+
+
+

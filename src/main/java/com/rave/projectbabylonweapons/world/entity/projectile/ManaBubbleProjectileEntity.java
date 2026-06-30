@@ -1,14 +1,11 @@
 package com.rave.projectbabylonweapons.world.entity.projectile;
 
 import com.rave.projectbabylonweapons.ProjectBabylonWeapons;
+import com.rave.projectbabylonweapons.client.PhotonWeaponEffectHelper;
 import com.rave.projectbabylonweapons.handler.MagicMeleeWeaponHelper;
 import com.rave.projectbabylonweapons.handler.StaffMagicArmorHelper;
 import com.rave.projectbabylonweapons.init.PBModEntities;
-import com.rave.projectbabylonweapons.init.PBModParticles;
 import com.rave.projectbabylonweapons.item.MagicMeleeWeapon;
-import io.redspace.ironsspellbooks.util.ParticleHelper;
-import net.minecraft.core.particles.DustParticleOptions;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
@@ -33,15 +30,14 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
-import net.minecraft.server.level.ServerEntity;
-import org.joml.Vector3f;
+import net.minecraftforge.network.NetworkHooks;
+import net.minecraftforge.network.PlayMessages;
 import software.bernie.geckolib.animatable.GeoEntity;
-import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.animation.AnimatableManager;
-import software.bernie.geckolib.animation.AnimationController;
-import software.bernie.geckolib.animation.RawAnimation;
-import software.bernie.geckolib.animation.PlayState;
+import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.core.animation.AnimationController;
+import software.bernie.geckolib.core.animation.RawAnimation;
+import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 import yesman.epicfight.world.damagesource.StunType;
 
@@ -55,112 +51,35 @@ public class ManaBubbleProjectileEntity extends Projectile implements GeoEntity 
                 ResourceLocation.fromNamespaceAndPath(ProjectBabylonWeapons.MODID, "geo/basic_spell_projectile.geo.json"),
                 ResourceLocation.fromNamespaceAndPath(ProjectBabylonWeapons.MODID, "textures/entity/projectile/basic_spell_projectile.png"),
                 ResourceLocation.fromNamespaceAndPath(ProjectBabylonWeapons.MODID, "animations/projectile_loop_animation.geo.json"),
-                "animation.basic_spell_projectile.idle",
-                0.0F,
-                ParticleTheme.BASIC,
-                false
-        ),
-        ICE(
-                ResourceLocation.fromNamespaceAndPath(ProjectBabylonWeapons.MODID, "geo/ice_spell_projectile.geo.json"),
-                ResourceLocation.fromNamespaceAndPath(ProjectBabylonWeapons.MODID, "textures/entity/projectile/ice_spell_projectile.png"),
-                ResourceLocation.fromNamespaceAndPath(ProjectBabylonWeapons.MODID, "animations/ice_spell_projectile_loop.animation.json"),
-                "animation.ice_spell_projectile.idle",
-                90.0F,
-                ParticleTheme.ICE,
-                false
-        ),
-        HOLY(
-                ResourceLocation.fromNamespaceAndPath(ProjectBabylonWeapons.MODID, "geo/holy_spell_projectile.geo.json"),
-                ResourceLocation.fromNamespaceAndPath(ProjectBabylonWeapons.MODID, "textures/entity/projectile/holy_spell_projectile.png"),
-                ResourceLocation.fromNamespaceAndPath(ProjectBabylonWeapons.MODID, "animations/holy_projectile_loop.animation.json"),
-                "animation.holy_spell_projectile.idle",
-                0.0F,
-                ParticleTheme.HOLY,
-                false
-        ),
-        FIRE(
-                ResourceLocation.fromNamespaceAndPath(ProjectBabylonWeapons.MODID, "geo/fire_spell_projectile.geo.json"),
-                ResourceLocation.fromNamespaceAndPath(ProjectBabylonWeapons.MODID, "textures/entity/projectile/fire_spell_projectile.png"),
-                ResourceLocation.fromNamespaceAndPath(ProjectBabylonWeapons.MODID, "animations/fire_projectile_loop.animation.json"),
-                "fire_spell_projectile.idle",
-                0.0F,
-                ParticleTheme.FIRE,
-                false
+                "animation.basic_spell_projectile.idle"
         );
-
         private final ResourceLocation modelResource;
         private final ResourceLocation textureResource;
         private final ResourceLocation animationResource;
         private final String animationName;
-        private final float yawOffset;
-        private final ParticleTheme particleTheme;
-        private final boolean usesItemRenderer;
-
         VisualPreset(ResourceLocation modelResource, ResourceLocation textureResource, ResourceLocation animationResource,
-                     String animationName, float yawOffset, ParticleTheme particleTheme, boolean usesItemRenderer) {
+                     String animationName) {
             this.modelResource = modelResource;
             this.textureResource = textureResource;
             this.animationResource = animationResource;
             this.animationName = animationName;
-            this.yawOffset = yawOffset;
-            this.particleTheme = particleTheme;
-            this.usesItemRenderer = usesItemRenderer;
         }
-
         public ResourceLocation modelResource() {
             return this.modelResource;
         }
-
         public ResourceLocation textureResource() {
             return this.textureResource;
         }
-
         public ResourceLocation animationResource() {
             return this.animationResource;
         }
-
         public String animationName() {
             return this.animationName;
         }
-
-        public float yawOffset() {
-            return this.yawOffset;
-        }
-
-        public ParticleTheme particleTheme() {
-            return this.particleTheme;
-        }
-
-        public boolean usesFireItemRenderer() {
-            return this.usesItemRenderer;
-        }
-
-        public static VisualPreset fromProjectile(BasicSpellProjectileEntity projectile) {
-            if (projectile instanceof IceSpellProjectileEntity) {
-                return ICE;
-            }
-            if (projectile instanceof FireSpellProjectileEntity) {
-                return FIRE;
-            }
-            if (projectile instanceof HolySpellProjectileEntity) {
-                return HOLY;
-            }
+        public static VisualPreset fromOrdinal(int ordinal) {
             return BASIC;
         }
-
-        public static VisualPreset fromOrdinal(int ordinal) {
-            VisualPreset[] values = values();
-            return ordinal >= 0 && ordinal < values.length ? values[ordinal] : BASIC;
-        }
     }
-
-    public enum ParticleTheme {
-        BASIC,
-        ICE,
-        HOLY,
-        FIRE
-    }
-
     private static final float INERTIA = 0.99F;
     private static final int DEFAULT_TRAIL_COLOR = 0xB970FF;
     private static final float DEFAULT_RENDER_SCALE = 10.0F;
@@ -191,7 +110,6 @@ public class ManaBubbleProjectileEntity extends Projectile implements GeoEntity 
     private int maxLifetime = 90;
     private float dragStrength = 0.9F;
     private ItemStack sourceWeapon = ItemStack.EMPTY;
-    private boolean trailSpawnedClient;
 
     public ManaBubbleProjectileEntity(EntityType<? extends ManaBubbleProjectileEntity> type, Level level) {
         super(type, level);
@@ -202,6 +120,9 @@ public class ManaBubbleProjectileEntity extends Projectile implements GeoEntity 
         this(PBModEntities.MANA_BUBBLE_PROJECTILE.get(), level);
     }
 
+    public ManaBubbleProjectileEntity(PlayMessages.SpawnEntity packet, Level level) {
+        this(PBModEntities.MANA_BUBBLE_PROJECTILE.get(), level);
+    }
 
     public void configureBubble(LivingEntity owner, ItemStack sourceWeapon, ResourceKey<DamageType> magicDamageType,
                                 float rawMagicDamage, float magicArmorNegation, float impact, StunType stunType,
@@ -222,15 +143,15 @@ public class ManaBubbleProjectileEntity extends Projectile implements GeoEntity 
     }
 
     @Override
-    public Packet<ClientGamePacketListener> getAddEntityPacket(ServerEntity serverEntity) {
-        return new ClientboundAddEntityPacket(this, serverEntity);
+    public Packet<ClientGamePacketListener> getAddEntityPacket() {
+        return NetworkHooks.getEntitySpawningPacket(this);
     }
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder builder) {
-        builder.define(DATA_TRAIL_COLOR, DEFAULT_TRAIL_COLOR);
-        builder.define(DATA_RENDER_SCALE, DEFAULT_RENDER_SCALE);
-        builder.define(DATA_VISUAL_PRESET, VisualPreset.BASIC.ordinal());
+    protected void defineSynchedData() {
+        this.entityData.define(DATA_TRAIL_COLOR, DEFAULT_TRAIL_COLOR);
+        this.entityData.define(DATA_RENDER_SCALE, DEFAULT_RENDER_SCALE);
+        this.entityData.define(DATA_VISUAL_PRESET, VisualPreset.BASIC.ordinal());
     }
 
     @Override
@@ -246,7 +167,6 @@ public class ManaBubbleProjectileEntity extends Projectile implements GeoEntity 
         }
 
         if (this.level().isClientSide) {
-            this.spawnClientTrailOnce();
             this.spawnClientParticles();
         } else {
             this.affectEntitiesAlongPath(movement);
@@ -279,6 +199,9 @@ public class ManaBubbleProjectileEntity extends Projectile implements GeoEntity 
 
     @Override
     protected void onHitBlock(BlockHitResult result) {
+        if (this.level().isClientSide) {
+            PhotonWeaponEffectHelper.spawnManaBubbleBasicImpact(this, result.getLocation());
+        }
         super.onHitBlock(result);
         if (!this.level().isClientSide) {
             this.discard();
@@ -307,7 +230,7 @@ public class ManaBubbleProjectileEntity extends Projectile implements GeoEntity 
         tag.putFloat(TAG_DRAG_STRENGTH, this.dragStrength);
         tag.putInt(TAG_VISUAL_PRESET, this.getVisualPreset().ordinal());
         if (!this.sourceWeapon.isEmpty()) {
-            tag.put(TAG_SOURCE_WEAPON, this.sourceWeapon.save(this.registryAccess()));
+            tag.put(TAG_SOURCE_WEAPON, this.sourceWeapon.save(new CompoundTag()));
         }
     }
 
@@ -325,7 +248,7 @@ public class ManaBubbleProjectileEntity extends Projectile implements GeoEntity 
         this.dragStrength = tag.contains(TAG_DRAG_STRENGTH) ? Math.max(0.0F, tag.getFloat(TAG_DRAG_STRENGTH)) : 0.9F;
         this.setVisualPreset(VisualPreset.fromOrdinal(tag.getInt(TAG_VISUAL_PRESET)));
         if (tag.contains(TAG_SOURCE_WEAPON)) {
-            this.sourceWeapon = ItemStack.parse(this.registryAccess(), tag.getCompound(TAG_SOURCE_WEAPON)).orElse(ItemStack.EMPTY);
+            this.sourceWeapon = ItemStack.of(tag.getCompound(TAG_SOURCE_WEAPON));
         }
     }
 
@@ -365,93 +288,13 @@ public class ManaBubbleProjectileEntity extends Projectile implements GeoEntity 
         this.entityData.set(DATA_VISUAL_PRESET, visualPreset.ordinal());
     }
 
-    private void spawnClientTrailOnce() {
-        if (this.trailSpawnedClient || !this.isAlive()) {
-            return;
-        }
-
-        this.level().addParticle(PBModParticles.BASIC_SPELL_PROJECTILE_TRAIL.get(), this.getId(), 0.0D, 0.0D, 0.0D, 0.0D, 0.0D);
-        this.trailSpawnedClient = true;
-    }
-
     private void spawnClientParticles() {
         Vec3 movement = this.getDeltaMovement();
         if (movement.lengthSqr() < 1.0E-5D) {
             return;
         }
 
-        Vec3 normalized = movement.normalize();
-        Vec3 center = this.position().subtract(normalized.scale(0.6D));
-        Vec3 right = new Vec3(-normalized.z, 0.0D, normalized.x);
-        if (right.lengthSqr() < 1.0E-6D) {
-            right = new Vec3(1.0D, 0.0D, 0.0D);
-        } else {
-            right = right.normalize();
-        }
-
-        Vec3 up = normalized.cross(right);
-        if (up.lengthSqr() < 1.0E-6D) {
-            up = new Vec3(0.0D, 1.0D, 0.0D);
-        } else {
-            up = up.normalize();
-        }
-
-        float radius = Math.max(0.18F, this.getRenderScale() * 0.035F);
-        float angle = this.tickCount * 0.42F;
-        Vec3 spiralOffset = right.scale(Math.cos(angle) * radius).add(up.scale(Math.sin(angle) * radius));
-        Vec3 oppositeOffset = spiralOffset.scale(-1.0D);
-
-        switch (this.getVisualPreset().particleTheme()) {
-            case ICE -> {
-                this.level().addParticle(ParticleHelper.SNOWFLAKE,
-                        center.x + spiralOffset.x,
-                        center.y + spiralOffset.y,
-                        center.z + spiralOffset.z,
-                        0.0D, 0.01D, 0.0D);
-                this.level().addParticle(ParticleHelper.SNOW_DUST,
-                        center.x + oppositeOffset.x,
-                        center.y + oppositeOffset.y,
-                        center.z + oppositeOffset.z,
-                        0.0D, 0.0D, 0.0D);
-            }
-            case FIRE -> {
-                this.level().addParticle(ParticleTypes.FLAME,
-                        center.x + spiralOffset.x,
-                        center.y + spiralOffset.y,
-                        center.z + spiralOffset.z,
-                        0.0D, 0.01D, 0.0D);
-                this.level().addParticle(ParticleTypes.SMOKE,
-                        center.x + oppositeOffset.x,
-                        center.y + oppositeOffset.y,
-                        center.z + oppositeOffset.z,
-                        0.0D, 0.0D, 0.0D);
-            }
-            case HOLY -> {
-                this.level().addParticle(ParticleTypes.END_ROD,
-                        center.x + spiralOffset.x,
-                        center.y + spiralOffset.y,
-                        center.z + spiralOffset.z,
-                        0.0D, 0.0D, 0.0D);
-                this.level().addParticle(ParticleTypes.END_ROD,
-                        center.x + oppositeOffset.x,
-                        center.y + oppositeOffset.y,
-                        center.z + oppositeOffset.z,
-                        0.0D, 0.0D, 0.0D);
-            }
-            case BASIC -> {
-                Vector3f color = new Vector3f(this.getTrailRed(), this.getTrailGreen(), this.getTrailBlue());
-                this.level().addParticle(new DustParticleOptions(color, 1.0F),
-                        center.x + spiralOffset.x,
-                        center.y + spiralOffset.y,
-                        center.z + spiralOffset.z,
-                        0.0D, 0.0D, 0.0D);
-                this.level().addParticle(new DustParticleOptions(color, 0.8F),
-                        center.x + oppositeOffset.x,
-                        center.y + oppositeOffset.y,
-                        center.z + oppositeOffset.z,
-                        0.0D, 0.0D, 0.0D);
-            }
-        }
+        PhotonWeaponEffectHelper.spawnManaBubbleBasicFlight(this, movement);
     }
 
     private void affectEntitiesAlongPath(Vec3 movement) {

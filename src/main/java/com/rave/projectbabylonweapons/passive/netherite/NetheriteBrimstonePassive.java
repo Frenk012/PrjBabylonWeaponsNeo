@@ -3,7 +3,8 @@ package com.rave.projectbabylonweapons.passive.netherite;
 import com.rave.projectbabylonmaterials.ProjectBabylonMaterials;
 import com.rave.projectbabylonmaterials.tooltip.TooltipFrameStyle;
 import com.rave.projectbabylonweapons.ProjectBabylonWeapons;
-import com.rave.projectbabylonweapons.init.PBModEffects;
+import com.rave.projectbabylonweapons.handler.WeaponVisualEffectHelper;
+import com.rave.projectbabylonmaterials.init.PBMEffects;
 import com.rave.projectbabylonweapons.init.PBWSounds;
 import com.rave.projectbabylonweapons.tooltip.WeaponPassiveTooltipData;
 import net.minecraft.ChatFormatting;
@@ -19,16 +20,16 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
+import net.minecraftforge.event.entity.living.LivingHurtEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-@EventBusSubscriber(modid = ProjectBabylonWeapons.MODID, bus = EventBusSubscriber.Bus.GAME)
+@Mod.EventBusSubscriber(modid = ProjectBabylonWeapons.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public final class NetheriteBrimstonePassive {
     private static final ThreadLocal<Set<UUID>> PROCESSING_ENTITIES = ThreadLocal.withInitial(HashSet::new);
     private static final ThreadLocal<Boolean> PROCESSING_BRIMSTONE_BLAST = ThreadLocal.withInitial(() -> false);
@@ -48,7 +49,7 @@ public final class NetheriteBrimstonePassive {
     }
 
     @SubscribeEvent
-    public static void onLivingHurt(LivingIncomingDamageEvent event) {
+    public static void onLivingHurt(LivingHurtEvent event) {
         if (event.isCanceled() || event.getAmount() <= 0.0F) {
             return;
         }
@@ -77,7 +78,7 @@ public final class NetheriteBrimstonePassive {
             return;
         }
 
-        if (target.hasEffect(PBModEffects.BRIMSTONE_FIRE)) {
+        if (target.hasEffect(PBMEffects.BRIMSTONE_FIRE.get())) {
             if (rollChance(attacker, profile.brimstoneBlastProcChance())) {
                 triggerBrimstoneBlast(attacker, target, event.getSource(), profile);
                 clearBrimstoneEffects(target);
@@ -85,10 +86,10 @@ public final class NetheriteBrimstonePassive {
             return;
         }
 
-        if (target.hasEffect(PBModEffects.BRIMSTONE_FLAMES)) {
+        if (target.hasEffect(PBMEffects.BRIMSTONE_FLAMES.get())) {
             if (rollChance(attacker, profile.brimstoneFireProcChance())) {
                 target.addEffect(new MobEffectInstance(
-                        PBModEffects.BRIMSTONE_FIRE,
+                        PBMEffects.BRIMSTONE_FIRE.get(),
                         profile.brimstoneFireDurationTicks()
                 ));
             }
@@ -98,7 +99,7 @@ public final class NetheriteBrimstonePassive {
         if (target.isOnFire()) {
             if (rollChance(attacker, profile.brimstoneFlamesProcChance())) {
                 target.addEffect(new MobEffectInstance(
-                        PBModEffects.BRIMSTONE_FLAMES,
+                        PBMEffects.BRIMSTONE_FLAMES.get(),
                         profile.brimstoneFlamesDurationTicks()
                 ));
             }
@@ -106,7 +107,7 @@ public final class NetheriteBrimstonePassive {
         }
 
         if (rollChance(attacker, profile.igniteProcChance())) {
-            target.igniteForSeconds(8);
+            target.setSecondsOnFire(8);
         }
     }
 
@@ -150,7 +151,7 @@ public final class NetheriteBrimstonePassive {
                 PROCESSING_BRIMSTONE_BLAST.set(false);
             }
 
-            spawnBlastParticles(serverLevel, centerTarget.position());
+            WeaponVisualEffectHelper.playBrimstoneBlast(centerTarget);
             serverLevel.playSound(
                     null,
                     centerTarget.getX(),
@@ -164,27 +165,14 @@ public final class NetheriteBrimstonePassive {
         }
     }
 
-    private static void spawnBlastParticles(ServerLevel level, Vec3 center) {
-        int ringPoints = 20;
-        double radius = 1.5D;
-        for (int i = 0; i < ringPoints; i++) {
-            double angle = (Math.PI * 2.0D * i) / ringPoints;
-            double x = center.x + Math.cos(angle) * radius;
-            double z = center.z + Math.sin(angle) * radius;
-            level.sendParticles(ParticleTypes.FLAME, x, center.y + 0.1D, z, 2, 0.0D, 0.02D, 0.0D, 0.01D);
-        }
-
-        level.sendParticles(ParticleTypes.FLAME, center.x, center.y + 0.5D, center.z, 24, 0.35D, 0.2D, 0.35D, 0.03D);
-        level.sendParticles(ParticleTypes.LAVA, center.x, center.y + 0.3D, center.z, 8, 0.25D, 0.15D, 0.25D, 0.01D);
-        level.sendParticles(ParticleTypes.SMOKE, center.x, center.y + 0.4D, center.z, 10, 0.25D, 0.2D, 0.25D, 0.01D);
-    }
-
     private static void clearBrimstoneEffects(LivingEntity target) {
-        target.removeEffect(PBModEffects.BRIMSTONE_FIRE);
-        target.removeEffect(PBModEffects.BRIMSTONE_FLAMES);
+        target.removeEffect(PBMEffects.BRIMSTONE_FIRE.get());
+        target.removeEffect(PBMEffects.BRIMSTONE_FLAMES.get());
     }
 
     private static boolean rollChance(LivingEntity attacker, float chance) {
         return attacker.getRandom().nextFloat() < chance;
     }
 }
+
+

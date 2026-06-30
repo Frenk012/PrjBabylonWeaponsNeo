@@ -1,8 +1,8 @@
 package com.rave.projectbabylonweapons.handler;
 
 import com.rave.projectbabylonweapons.item.MagicMeleeWeapon;
+import io.redspace.ironsspellbooks.api.registry.AttributeRegistry;
 import net.minecraft.core.Holder;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.damagesource.DamageSource;
@@ -15,7 +15,6 @@ import net.minecraft.world.item.ItemStack;
 import yesman.epicfight.world.damagesource.EpicFightDamageSource;
 import yesman.epicfight.world.damagesource.EpicFightDamageTypeTags;
 import yesman.epicfight.world.damagesource.StunType;
-import io.redspace.ironsspellbooks.api.registry.AttributeRegistry;
 
 public final class MagicMeleeWeaponHelper {
     private static final double MIN_ATTACK_DAMAGE_REFERENCE = 0.001D;
@@ -35,11 +34,25 @@ public final class MagicMeleeWeaponHelper {
             return 0.0F;
         }
 
-        double spellPower = Math.max(0.0D, attacker.getAttributeValue(AttributeRegistry.SPELL_POWER));
-        Holder<Attribute> schoolAttribute = BuiltInRegistries.ATTRIBUTE.wrapAsHolder(magicWeapon.getSchoolSpellPowerAttribute());
-        double schoolPower = Math.max(0.0D, attacker.getAttributeValue(schoolAttribute));
+        double spellPower = resolveSpellPowerMultiplier(AttributeRegistry.SPELL_POWER.get(), attacker.getAttributeValue(AttributeRegistry.SPELL_POWER.get()));
+        Attribute schoolAttribute = magicWeapon.getSchoolSpellPowerAttribute();
+        double schoolPower = resolveSpellPowerMultiplier(schoolAttribute, attacker.getAttributeValue(schoolAttribute));
 
         return (float) (baseMagicDamage * attackContextMultiplier * spellPower * schoolPower * damageMultiplier);
+    }
+
+    private static double resolveSpellPowerMultiplier(Attribute attribute, double attributeValue) {
+        double clampedValue = Math.max(0.0D, attributeValue);
+        if (attribute == null) {
+            return clampedValue;
+        }
+
+        double defaultValue = attribute.getDefaultValue();
+        if (Math.abs(defaultValue) < 0.0001D) {
+            return 1.0D + clampedValue;
+        }
+
+        return clampedValue;
     }
 
     public static DamageSource createMagicDamageSource(LivingEntity attacker, ItemStack weaponStack, MagicMeleeWeapon magicWeapon, DamageSource originalSource) {
@@ -57,6 +70,7 @@ public final class MagicMeleeWeaponHelper {
             magicSource.setBaseArmorNegation(originalEpicSource.getBaseArmorNegation());
             magicSource.setBaseImpact(originalEpicSource.getBaseImpact());
             magicSource.setStunType(originalEpicSource.getStunType());
+            magicSource.setBasicAttack(originalEpicSource.isBasicAttack());
             magicSource.setAnimation(originalEpicSource.getAnimation());
             magicSource.setInitialPosition(originalEpicSource.getInitialPosition());
             if (!originalEpicSource.getUsedItem().isEmpty()) {
@@ -81,6 +95,7 @@ public final class MagicMeleeWeaponHelper {
                 .setUsedItem(weaponStack)
                 .setBaseArmorNegation(Math.max(0.0F, armorNegation))
                 .setBaseImpact(Math.max(0.0F, impact))
+                .setBasicAttack(true)
                 .setInitialPosition(attacker.position());
 
         if (stunType != null) {

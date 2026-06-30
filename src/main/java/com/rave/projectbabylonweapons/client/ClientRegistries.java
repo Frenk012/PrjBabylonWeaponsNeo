@@ -4,6 +4,8 @@ import com.rave.projectbabylonweapons.ProjectBabylonWeapons;
 import com.rave.projectbabylonweapons.block.renderer.FrozenDebuffIceBlockTileRenderer;
 import com.rave.projectbabylonweapons.client.particle.BasicSpellProjectileTrailParticle;
 import com.rave.projectbabylonweapons.client.renderer.BasicSpellProjectileRenderer;
+import com.rave.projectbabylonweapons.client.renderer.DiamondShardRenderer;
+import com.rave.projectbabylonweapons.client.renderer.DragonFuryChargeRenderer;
 import com.rave.projectbabylonweapons.client.renderer.DiamondSpellProjectileRenderer;
 import com.rave.projectbabylonweapons.client.renderer.DragonDescendProjectileRenderer;
 import com.rave.projectbabylonweapons.client.renderer.GoldenSpellProjectileRenderer;
@@ -21,12 +23,12 @@ import com.rave.projectbabylonweapons.client.renderer.TectonicFallingBlockRender
 import com.rave.projectbabylonweapons.init.PBModBlocks;
 import com.rave.projectbabylonweapons.init.PBModEntities;
 import com.rave.projectbabylonweapons.init.PBModParticles;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.neoforge.client.event.EntityRenderersEvent;
-import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.common.EventBusSubscriber.Bus;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.EntityRenderersEvent;
+import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 
 @EventBusSubscriber(modid = ProjectBabylonWeapons.MODID, bus = Bus.MOD, value = Dist.CLIENT)
 public class ClientRegistries {
@@ -36,6 +38,10 @@ public class ClientRegistries {
         event.registerEntityRenderer(PBModEntities.BASIC_SPELL_PROJECTILE.get(), BasicSpellProjectileRenderer::new);
         event.registerEntityRenderer(PBModEntities.GOLDEN_SPELL_PROJECTILE.get(), GoldenSpellProjectileRenderer::new);
         event.registerEntityRenderer(PBModEntities.DIAMOND_SPELL_PROJECTILE.get(), DiamondSpellProjectileRenderer::new);
+        event.registerEntityRenderer(PBModEntities.DIAMOND_SHARD_1.get(), DiamondShardRenderer::new);
+        event.registerEntityRenderer(PBModEntities.DIAMOND_SHARD_2.get(), DiamondShardRenderer::new);
+        event.registerEntityRenderer(PBModEntities.DIAMOND_SHARD_3.get(), DiamondShardRenderer::new);
+        event.registerEntityRenderer(PBModEntities.DRAGON_FURY_CHARGE.get(), DragonFuryChargeRenderer::new);
         event.registerEntityRenderer(PBModEntities.ICE_SPELL_PROJECTILE.get(), IceSpellProjectileRenderer::new);
         event.registerEntityRenderer(PBModEntities.FIRE_SPELL_PROJECTILE.get(), FireSpellProjectileRenderer::new);
         event.registerEntityRenderer(PBModEntities.HOLY_SPELL_PROJECTILE.get(), HolySpellProjectileRenderer::new);

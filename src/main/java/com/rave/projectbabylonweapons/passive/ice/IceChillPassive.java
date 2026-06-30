@@ -3,24 +3,23 @@ package com.rave.projectbabylonweapons.passive.ice;
 import com.rave.projectbabylonmaterials.ProjectBabylonMaterials;
 import com.rave.projectbabylonmaterials.tooltip.TooltipFrameStyle;
 import com.rave.projectbabylonweapons.ProjectBabylonWeapons;
-import com.rave.projectbabylonweapons.init.PBModEffects;
+import com.rave.projectbabylonmaterials.init.PBMEffects;
 import com.rave.projectbabylonweapons.tooltip.WeaponPassiveTooltipData;
 import io.redspace.ironsspellbooks.registries.MobEffectRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.core.Holder;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
+import net.minecraftforge.event.entity.living.LivingHurtEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 
 import java.util.List;
 
-@EventBusSubscriber(modid = ProjectBabylonWeapons.MODID, bus = EventBusSubscriber.Bus.GAME)
+@Mod.EventBusSubscriber(modid = ProjectBabylonWeapons.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public final class IceChillPassive {
     private static final WeaponPassiveTooltipData TOOLTIP = new WeaponPassiveTooltipData(
             Component.translatable("tooltip.project_babylon_weapons.passive.ice.name"),
@@ -37,7 +36,7 @@ public final class IceChillPassive {
     }
 
     @SubscribeEvent
-    public static void onLivingHurt(LivingIncomingDamageEvent event) {
+    public static void onLivingHurt(LivingHurtEvent event) {
         if (event.isCanceled() || event.getAmount() <= 0.0F) {
             return;
         }
@@ -57,7 +56,7 @@ public final class IceChillPassive {
         }
 
         LivingEntity target = event.getEntity();
-        Holder<MobEffect> chilledEffect = MobEffectRegistry.CHILLED;
+        MobEffect chilledEffect = MobEffectRegistry.CHILLED.get();
         MobEffectInstance chilledInstance = target.getEffect(chilledEffect);
 
         if (chilledInstance == null) {
@@ -85,7 +84,7 @@ public final class IceChillPassive {
 
         if (rollChance(attacker, profile.frozenFromChillIIIProcChance())) {
             target.removeEffect(chilledEffect);
-            target.addEffect(new MobEffectInstance(PBModEffects.FROZEN, profile.frozenDurationTicks()));
+            target.addEffect(new MobEffectInstance(PBMEffects.FROZEN.get(), profile.frozenDurationTicks()));
         }
     }
 
@@ -97,7 +96,7 @@ public final class IceChillPassive {
         TOOLTIP.appendTooltip(tooltip);
     }
 
-    private static void applyChill(LivingEntity target, Holder<MobEffect> chilledEffect, int durationTicks, int amplifier) {
+    private static void applyChill(LivingEntity target, MobEffect chilledEffect, int durationTicks, int amplifier) {
         target.addEffect(new MobEffectInstance(chilledEffect, durationTicks, amplifier));
     }
 
@@ -105,3 +104,4 @@ public final class IceChillPassive {
         return attacker.getRandom().nextFloat() < chance;
     }
 }
+

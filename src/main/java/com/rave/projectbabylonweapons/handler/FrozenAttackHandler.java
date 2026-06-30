@@ -1,40 +1,37 @@
 package com.rave.projectbabylonweapons.handler;
 
-import com.rave.projectbabylonweapons.ProjectBabylonWeapons;
-import com.rave.projectbabylonweapons.init.PBModEffects;
-import net.minecraft.resources.ResourceLocation;
+import com.rave.projectbabylonmaterials.init.PBMEffects;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import net.neoforged.neoforge.event.tick.PlayerTickEvent;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.living.MobEffectEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 import yesman.epicfight.world.capabilities.EpicFightCapabilities;
 import yesman.epicfight.world.capabilities.entitypatch.player.PlayerPatch;
-import yesman.epicfight.api.event.EpicFightEventHooks;
-import yesman.epicfight.api.event.EventContext;
-import yesman.epicfight.api.event.IdentifierProvider;
-import yesman.epicfight.api.event.types.player.SkillCastEvent;
+import yesman.epicfight.world.entity.eventlistener.SkillCastEvent;
+import yesman.epicfight.world.entity.eventlistener.PlayerEventListener;
 
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-@EventBusSubscriber(modid = ProjectBabylonWeapons.MODID, bus = EventBusSubscriber.Bus.GAME)
+@Mod.EventBusSubscriber
 public class FrozenAttackHandler {
-    private static final IdentifierProvider FROST_SKILL_LISTENER = IdentifierProvider.constant(
-            ResourceLocation.fromNamespaceAndPath(ProjectBabylonWeapons.MODID, "frost_restriction"));
+    private static final UUID FROST_SKILL_LISTENER = UUID.fromString("f1e2d3c4-b5a6-7890-1234-56789abcdef0");
     private static final Map<UUID, Boolean> FROST_STATES = new ConcurrentHashMap<>();
 
     @SubscribeEvent
-    public static void onPlayerTick(PlayerTickEvent.Pre event) {
-        Player player = event.getEntity();
+    public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
+        if (event.phase != TickEvent.Phase.START) return;
+
+        Player player = event.player;
         PlayerPatch<?> playerPatch = EpicFightCapabilities.getEntityPatch(player, PlayerPatch.class);
         if (playerPatch == null) return;
 
         UUID playerId = player.getUUID();
-        boolean hasFrost = player.hasEffect(PBModEffects.FROZEN);
+        boolean hasFrost = player.hasEffect(PBMEffects.FROZEN.get());
         Boolean previousFrost = FROST_STATES.get(playerId);
 
         if (previousFrost == null || previousFrost != hasFrost) {
@@ -49,14 +46,14 @@ public class FrozenAttackHandler {
 
     @SubscribeEvent
     public static void onEffectRemoved(MobEffectEvent.Remove event) {
-        if (event.getEffect() == PBModEffects.FROZEN) {
+        if (event.getEffect() == PBMEffects.FROZEN.get()) {
             removeListenersForEntity(event.getEntity());
         }
     }
 
     @SubscribeEvent
     public static void onEffectExpired(MobEffectEvent.Expired event) {
-        if (event.getEffectInstance().getEffect() == PBModEffects.FROZEN) {
+        if (event.getEffectInstance().getEffect() == PBMEffects.FROZEN.get()) {
             removeListenersForEntity(event.getEntity());
         }
     }
@@ -78,21 +75,24 @@ public class FrozenAttackHandler {
 
     private static void addFrostListeners(PlayerPatch<?> playerPatch) {
         try {
-            playerPatch.getEventListener().registerContextAwareEvent(
-                    EpicFightEventHooks.Player.CAST_SKILL,
-                    (SkillCastEvent event, EventContext context) -> event.cancel(),
-                    FROST_SKILL_LISTENER
+            playerPatch.getEventListener().addEventListener(
+                    PlayerEventListener.EventType.SKILL_CAST_EVENT,
+                    FROST_SKILL_LISTENER,
+                    (SkillCastEvent event) -> event.setCanceled(true)
             );
         } catch (Exception e) {
-            // логирование
+            // Р»РѕРіРёСЂРѕРІР°РЅРёРµ
         }
     }
 
     private static void removeFrostListeners(PlayerPatch<?> playerPatch) {
         try {
-            playerPatch.getEventListener().removeListenersBelongTo(FROST_SKILL_LISTENER);
+            playerPatch.getEventListener().removeListener(
+                    PlayerEventListener.EventType.SKILL_CAST_EVENT,
+                    FROST_SKILL_LISTENER
+            );
         } catch (Exception e) {
-            // логирование
+            // Р»РѕРіРёСЂРѕРІР°РЅРёРµ
         }
     }
 }

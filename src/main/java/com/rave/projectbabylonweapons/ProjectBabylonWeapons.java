@@ -13,61 +13,63 @@ import com.rave.projectbabylonweapons.init.PBWSounds;
 import com.rave.projectbabylonweapons.network.PBNetworkManager;
 import com.rave.projectbabylonweapons.passive.data.WeaponPassivePatchManager;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackSource;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.ModContainer;
-import net.neoforged.fml.common.Mod;
-import net.neoforged.fml.config.ModConfig;
-import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.AddPackFindersEvent;
-import net.neoforged.neoforge.event.AddReloadListenerEvent;
-import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.AddPackFindersEvent;
+import net.minecraftforge.event.AddReloadListenerEvent;
+import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.ModList;
+import net.minecraftforge.fml.ModLoadingContext;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.resource.PathPackResources;
 import org.slf4j.Logger;
 
-import com.rave.projectbabylonweapons.world.capabilities.item.PBWeaponCapabilityPresets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
-import static com.rave.projectbabylonweapons.init.PBModEffects.EFFECTS;
 
 @Mod(ProjectBabylonWeapons.MODID)
 public class ProjectBabylonWeapons {
     public static final String MODID = "project_babylon_weapons";
     public static final Logger LOGGER = LogUtils.getLogger();
 
-    public ProjectBabylonWeapons(IEventBus modBus, ModContainer modContainer) {
-        IEventBus gameBus = NeoForge.EVENT_BUS;
+    public ProjectBabylonWeapons() {
+        IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
+        IEventBus forgeBus = MinecraftForge.EVENT_BUS;
 
-        modContainer.registerConfig(ModConfig.Type.COMMON, PBConfig.SPEC);
+        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, PBConfig.SPEC);
 
         modBus.addListener(this::commonSetup);
         modBus.addListener(this::addCreative);
         modBus.addListener(this::addPackFindersEvent);
+        modBus.addListener(PBSkills::buildSkillEvent);
         modBus.addListener(PBAnimations::registerAnimations);
-        modBus.addListener(PBNetworkManager::register);
-
-        PBSkills.REGISTRY.register(modBus);
 
         CreativeTabRegistry.TABS.register(modBus);
         PBModBlocks.register(modBus);
         PBModItems.ITEMS.register(modBus);
         PBModParticles.PARTICLES.register(modBus);
-        EFFECTS.register(modBus);
         PBWSounds.register(modBus);
         PBModEntities.ENTITIES.register(modBus);
 
-        // Epic Fight weapon-capability presets are registered through EF's own event system,
-        // not the NeoForge bus (the registry event is not a bus Event).
-        PBWeaponCapabilityPresets.register();
-
-        gameBus.addListener(this::addReloadListeners);
+        forgeBus.addListener(this::addReloadListeners);
+        forgeBus.register(this);
     }
 
     private void commonSetup(FMLCommonSetupEvent event) {
         event.enqueueWork(() -> {
             LOGGER.info("Project Babylon common setup started");
+
+            PBNetworkManager.register();
+            LOGGER.info("Network packets registered");
+
+            LOGGER.info("Fear animations registered");
         });
     }
 
@@ -80,13 +82,22 @@ public class ProjectBabylonWeapons {
 
     public void addPackFindersEvent(AddPackFindersEvent event) {
         if (event.getPackType() == PackType.CLIENT_RESOURCES) {
-            event.addPackFinders(
-                    ResourceLocation.fromNamespaceAndPath(MODID, "resourcepacks/projectbabylonpack"),
-                    PackType.CLIENT_RESOURCES,
-                    Component.translatable("pack.projectbabylonpack.title"),
-                    PackSource.BUILT_IN,
-                    false,
-                    Pack.Position.TOP);
+            Path resourcePath = ModList.get().getModFileById(ProjectBabylonWeapons.MODID).getFile().findResource("packs/projectbabylonpack");
+            if (!Files.exists(resourcePath)) {
+                LOGGER.warn("Builtin resource pack path is missing: {}", resourcePath);
+                return;
+            }
+
+            PathPackResources pack = new PathPackResources(ModList.get().getModFileById(ProjectBabylonWeapons.MODID).getFile().getFileName() + ":" + resourcePath, false, resourcePath);
+            Pack.ResourcesSupplier resourcesSupplier = (string) -> pack;
+            Pack.Info info = Pack.readPackInfo("projectbabylonpack", resourcesSupplier);
+
+            if (info != null) {
+                event.addRepositorySource((source) ->
+                        source.accept(Pack.create("projectbabylonpack", Component.translatable("pack.projectbabylonpack.title"), false, resourcesSupplier, info, PackType.CLIENT_RESOURCES, Pack.Position.TOP, false, PackSource.BUILT_IN)));
+            }
         }
     }
 }
+
+

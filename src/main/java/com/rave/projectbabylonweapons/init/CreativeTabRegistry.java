@@ -6,16 +6,16 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.neoforge.registries.DeferredHolder;
-import net.neoforged.neoforge.registries.DeferredRegister;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.RegistryObject;
 
 public class CreativeTabRegistry {
 
     public static final DeferredRegister<CreativeModeTab> TABS =
             DeferredRegister.create(Registries.CREATIVE_MODE_TAB, ProjectBabylonWeapons.MODID);
 
-    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> CLAWS = TABS.register("weapons", () ->
+    public static final RegistryObject<CreativeModeTab> CLAWS = TABS.register("weapons", () ->
             CreativeModeTab.builder().icon(() -> new ItemStack(PBModItems.ARCLIGHT_SWORD.get()))
                     .title(Component.translatable("creativetab.projectbabylonweapons.weapons"))
                     .displayItems((params, output) -> {
@@ -39,6 +39,8 @@ public class CreativeTabRegistry {
                         output.accept(PBModItems.IRON_PICKAXE.get());
                         output.accept(PBModItems.IRON_HOE.get());
                         output.accept(PBModItems.IRON_BATTLE_WAND.get());
+                        output.accept(PBModItems.IRON_SMALL_SHIELD.get());
+                        output.accept(PBModItems.IRON_BASTION_SHIELD.get());
 
                         //GOLDEN
                         output.accept(PBModItems.GOLDEN_CLAWS.get());
@@ -60,6 +62,8 @@ public class CreativeTabRegistry {
                         output.accept(PBModItems.GOLDEN_PICKAXE.get());
                         output.accept(PBModItems.GOLDEN_HOE.get());
                         output.accept(PBModItems.GOLDEN_BATTLE_WAND.get());
+                        output.accept(PBModItems.GOLDEN_SMALL_SHIELD.get());
+                        output.accept(PBModItems.GOLDEN_BASTION_SHIELD.get());
 
                         //DIAMOND
                         output.accept(PBModItems.DIAMOND_CLAWS.get());
@@ -81,6 +85,8 @@ public class CreativeTabRegistry {
                         output.accept(PBModItems.DIAMOND_PICKAXE.get());
                         output.accept(PBModItems.DIAMOND_HOE.get());
                         output.accept(PBModItems.DIAMOND_BATTLE_WAND.get());
+                        output.accept(PBModItems.DIAMOND_BASTION_SHIELD.get());
+                        output.accept(PBModItems.DIAMOND_SMALL_SHIELD.get());
 
 
                         //NETHERITE
@@ -103,6 +109,8 @@ public class CreativeTabRegistry {
                         output.accept(PBModItems.NETHERITE_PICKAXE.get());
                         output.accept(PBModItems.NETHERITE_HOE.get());
                         output.accept(PBModItems.NETHERITE_BATTLE_WAND.get());
+                        output.accept(PBModItems.NETHERITE_SMALL_SHIELD.get());
+                        output.accept(PBModItems.NETHERITE_BASTION_SHIELD.get());
 
                         //ICE
                         output.accept(PBModItems.ICE_CLAWS.get());
@@ -119,12 +127,14 @@ public class CreativeTabRegistry {
                         output.accept(PBModItems.ICE_STAFF.get());
                         output.accept(PBModItems.ICE_TACHI.get());
                         output.accept(PBModItems.ICE_RAPIER.get());
+                        output.accept(PBModItems.ICE_BATTLE_WAND.get());
+                        output.accept(PBModItems.ICE_SMALL_SHIELD.get());
+                        output.accept(PBModItems.ICE_BASTION_SHIELD.get());
 
                         output.accept(PBModItems.ICE_SHOVEL.get());
                         output.accept(PBModItems.ICE_AXE.get());
                         output.accept(PBModItems.ICE_PICKAXE.get());
                         output.accept(PBModItems.ICE_HOE.get());
-                        output.accept(PBModItems.ICE_BATTLE_WAND.get());
 
 
                         //DRAGONSTEEL
@@ -143,6 +153,8 @@ public class CreativeTabRegistry {
                         output.accept(PBModItems.DRAGONSTEEL_TACHI.get());
                         output.accept(PBModItems.DRAGONSTEEL_RAPIER.get());
                         output.accept(PBModItems.DRAGONSTEEL_BATTLE_WAND.get());
+                        output.accept(PBModItems.DRAGONSTEEL_SMALL_SHIELD.get());
+                        output.accept(PBModItems.DRAGONSTEEL_BASTION_SHIELD.get());
 
 
                         //ETHEREAL
@@ -161,6 +173,8 @@ public class CreativeTabRegistry {
                         output.accept(PBModItems.ETHEREAL_TACHI.get());
                         output.accept(PBModItems.ETHEREAL_RAPIER.get());
                         output.accept(PBModItems.ETHEREAL_BATTLE_WAND.get());
+                        output.accept(PBModItems.ETHEREAL_SMALL_SHIELD.get());
+                        output.accept(PBModItems.ETHEREAL_BASTION_SHIELD.get());
 
 
                         //DEMON

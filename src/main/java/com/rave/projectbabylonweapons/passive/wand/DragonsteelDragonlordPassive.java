@@ -5,6 +5,7 @@ import com.rave.projectbabylonmaterials.tooltip.TooltipFrameStyle;
 import com.rave.projectbabylonweapons.handler.StaffProjectileAttackHelper;
 import com.rave.projectbabylonweapons.item.MagicProjectileStaffWeapon;
 import com.rave.projectbabylonweapons.tooltip.WeaponPassiveTooltipData;
+import com.rave.projectbabylonweapons.world.entity.projectile.BasicSpellProjectileEntity;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -15,6 +16,8 @@ import yesman.epicfight.world.capabilities.entitypatch.player.ServerPlayerPatch;
 import java.util.List;
 
 public final class DragonsteelDragonlordPassive {
+    private static final double MINI_PROJECTILE_BACK_OFFSET = -0.35D;
+
     private static final WeaponPassiveTooltipData TOOLTIP = new WeaponPassiveTooltipData(
             Component.translatable("tooltip.project_babylon_weapons.passive.wand_dragonsteel.name"),
             ResourceLocation.fromNamespaceAndPath(ProjectBabylonMaterials.MODID, "textures/gui/tooltip/frame/material/dragonsteel_material_frame.png"),
@@ -36,12 +39,12 @@ public final class DragonsteelDragonlordPassive {
         }
 
         float miniMultiplier = damageMultiplier * profile.miniProjectileDamageMultiplier();
-        StaffProjectileAttackHelper.spawnProjectileWithoutPassives(playerPatch, weaponStack, weapon, direction, forwardOffset, -profile.miniProjectileSideOffset(), verticalOffset, miniMultiplier, 0.5F);
-        StaffProjectileAttackHelper.spawnProjectileWithoutPassives(playerPatch, weaponStack, weapon, direction, forwardOffset, profile.miniProjectileSideOffset(), verticalOffset, miniMultiplier, 0.5F);
+        double miniForwardOffset = forwardOffset + MINI_PROJECTILE_BACK_OFFSET;
+        StaffProjectileAttackHelper.spawnProjectileWithoutPassives(playerPatch, weaponStack, weapon, direction, miniForwardOffset, -profile.miniProjectileSideOffset(), verticalOffset, miniMultiplier, 0.5F, BasicSpellProjectileEntity::new);
+        StaffProjectileAttackHelper.spawnProjectileWithoutPassives(playerPatch, weaponStack, weapon, direction, miniForwardOffset, profile.miniProjectileSideOffset(), verticalOffset, miniMultiplier, 0.5F, BasicSpellProjectileEntity::new);
     }
 
     public static WeaponPassiveTooltipData getTooltipData() {
         return TOOLTIP;
     }
 }
-

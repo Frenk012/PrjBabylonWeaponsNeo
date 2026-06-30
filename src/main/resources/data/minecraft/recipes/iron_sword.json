@@ -1,1 +1,19 @@
-{  "type": "minecraft:crafting_shaped",  "pattern": [    " # ",    " # ",    " X "  ],  "key": {    "#": { "item": "minecraft:iron_ingot" },    "X": {      "item": "minecraft:stick"    }  },  "result": {    "item": "minecraft:iron_sword"  },  "conditions": [    {      "type": "forge:config",      "config": "project_babylon_weapons",      "path": "recipes.enable_vanilla_weapons_tools_recipes",      "value": true    }  ]}
+{
+    "type":  "minecraft:crafting_shaped",
+    "pattern":  [
+                    " # ",
+                    " # ",
+                    " X "
+                ],
+    "key":  {
+                "#":  {
+                          "item":  "minecraft:iron_ingot"
+                      },
+                "X":  {
+                          "item":  "minecraft:stick"
+                      }
+            },
+    "result":  {
+                   "item":  "minecraft:iron_sword"
+               }
+}

@@ -1,5 +1,6 @@
 package com.rave.projectbabylonweapons.world.entity.projectile;
 
+
 import com.rave.projectbabylonweapons.handler.BattleWandPassiveHooks;
 import com.rave.projectbabylonweapons.handler.MagicMeleeWeaponHelper;
 import com.rave.projectbabylonweapons.handler.StaffMagicArmorHelper;
@@ -11,8 +12,6 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
-import net.minecraft.server.level.ServerEntity;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -32,13 +31,15 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.network.NetworkHooks;
+import net.minecraftforge.network.PlayMessages;
 import org.joml.Vector3f;
 import software.bernie.geckolib.animatable.GeoEntity;
-import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.animation.AnimatableManager;
-import software.bernie.geckolib.animation.AnimationController;
-import software.bernie.geckolib.animation.RawAnimation;
-import software.bernie.geckolib.animation.PlayState;
+import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.core.animation.AnimationController;
+import software.bernie.geckolib.core.animation.RawAnimation;
+import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 import yesman.epicfight.world.damagesource.StunType;
 
@@ -59,8 +60,14 @@ public class BasicSpellProjectileEntity extends Projectile implements GeoEntity 
     private static final String TAG_PIERCING = "Piercing";
     private static final String TAG_REMAINING_RICOCHETS = "RemainingRicochets";
     private static final String TAG_VISUAL_SCALE = "VisualScale";
+    private static final String TAG_BASIC_WAND_ATTACK = "BasicWandAttack";
+    private static final String TAG_HOMING_ENABLED = "HomingEnabled";
     private static final EntityDataAccessor<Integer> DATA_TRAIL_COLOR = SynchedEntityData.defineId(BasicSpellProjectileEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Float> DATA_VISUAL_SCALE = SynchedEntityData.defineId(BasicSpellProjectileEntity.class, EntityDataSerializers.FLOAT);
+    private static final double HOMING_RANGE = 14.0D;
+    private static final double HOMING_TARGET_VERTICAL_OFFSET = 0.45D;
+    private static final float HOMING_TURN_RATE = 0.18F;
+    private static final double MAX_RENDER_DISTANCE = 72.0D;
 
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
@@ -74,6 +81,8 @@ public class BasicSpellProjectileEntity extends Projectile implements GeoEntity 
     private boolean trailSpawnedClient;
     private boolean piercing;
     private int remainingRicochets;
+    private boolean basicWandAttack;
+    private boolean homingEnabled;
 
     public BasicSpellProjectileEntity(EntityType<? extends BasicSpellProjectileEntity> type, Level level) {
         super(type, level);
@@ -84,6 +93,9 @@ public class BasicSpellProjectileEntity extends Projectile implements GeoEntity 
         this(PBModEntities.BASIC_SPELL_PROJECTILE.get(), level);
     }
 
+    public BasicSpellProjectileEntity(PlayMessages.SpawnEntity packet, Level level) {
+        this(PBModEntities.BASIC_SPELL_PROJECTILE.get(), level);
+    }
 
     public void configureMagicProjectile(LivingEntity owner, ItemStack sourceWeapon, ResourceKey<DamageType> magicDamageType,
                                          float rawMagicDamage, float magicArmorNegation, float impact,
@@ -147,15 +159,39 @@ public class BasicSpellProjectileEntity extends Projectile implements GeoEntity 
         this.remainingRicochets = Math.max(0, remainingRicochets);
     }
 
-    @Override
-    public Packet<ClientGamePacketListener> getAddEntityPacket(ServerEntity serverEntity) {
-        return new ClientboundAddEntityPacket(this, serverEntity);
+    public void multiplyRawMagicDamage(float multiplier) {
+        if (multiplier <= 0.0F) {
+            return;
+        }
+
+        this.rawMagicDamage *= multiplier;
+    }
+
+    public boolean isBasicWandAttack() {
+        return this.basicWandAttack;
+    }
+
+    public void setBasicWandAttack(boolean basicWandAttack) {
+        this.basicWandAttack = basicWandAttack;
+    }
+
+    public boolean isHomingEnabled() {
+        return this.homingEnabled;
+    }
+
+    public void setHomingEnabled(boolean homingEnabled) {
+        this.homingEnabled = homingEnabled;
     }
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder builder) {
-        builder.define(DATA_TRAIL_COLOR, DEFAULT_TRAIL_COLOR);
-        builder.define(DATA_VISUAL_SCALE, 1.0F);
+    public Packet<ClientGamePacketListener> getAddEntityPacket() {
+        return NetworkHooks.getEntitySpawningPacket(this);
+    }
+
+    @Override
+    protected void defineSynchedData() {
+        this.entityData.define(DATA_TRAIL_COLOR, DEFAULT_TRAIL_COLOR);
+        this.entityData.define(DATA_VISUAL_SCALE, 1.0F);
     }
 
     @Override
@@ -165,6 +201,8 @@ public class BasicSpellProjectileEntity extends Projectile implements GeoEntity 
         if (this.level().isClientSide) {
             this.spawnClientTrailOnce();
             this.spawnClientParticles();
+        } else {
+            this.applyHoming();
         }
 
         HitResult hitResult = ProjectileUtil.getHitResultOnMoveVector(this, this::canHitEntity);
@@ -203,7 +241,6 @@ public class BasicSpellProjectileEntity extends Projectile implements GeoEntity 
                     schoolResistMultiplier,
                     this.magicArmorNegation
             );
-
             if (adjustedMagicDamage > 0.0F) {
                 DamageSource magicDamageSource = MagicMeleeWeaponHelper.createMagicProjectileDamageSource(
                         owner,
@@ -266,8 +303,10 @@ public class BasicSpellProjectileEntity extends Projectile implements GeoEntity 
         tag.putBoolean(TAG_PIERCING, this.piercing);
         tag.putInt(TAG_REMAINING_RICOCHETS, this.remainingRicochets);
         tag.putFloat(TAG_VISUAL_SCALE, this.getVisualScale());
+        tag.putBoolean(TAG_BASIC_WAND_ATTACK, this.basicWandAttack);
+        tag.putBoolean(TAG_HOMING_ENABLED, this.homingEnabled);
         if (!this.sourceWeapon.isEmpty()) {
-            tag.put(TAG_SOURCE_WEAPON, this.sourceWeapon.save(this.registryAccess()));
+            tag.put(TAG_SOURCE_WEAPON, this.sourceWeapon.save(new CompoundTag()));
         }
     }
 
@@ -282,6 +321,8 @@ public class BasicSpellProjectileEntity extends Projectile implements GeoEntity 
         this.maxLifetime = Math.max(1, tag.getInt(TAG_LIFETIME));
         this.piercing = tag.getBoolean(TAG_PIERCING);
         this.remainingRicochets = tag.getInt(TAG_REMAINING_RICOCHETS);
+        this.basicWandAttack = tag.getBoolean(TAG_BASIC_WAND_ATTACK);
+        this.homingEnabled = tag.getBoolean(TAG_HOMING_ENABLED);
         if (tag.contains(TAG_VISUAL_SCALE)) {
             this.setVisualScale(tag.getFloat(TAG_VISUAL_SCALE));
         }
@@ -289,7 +330,7 @@ public class BasicSpellProjectileEntity extends Projectile implements GeoEntity 
             this.setTrailColor(tag.getInt(TAG_TRAIL_COLOR));
         }
         if (tag.contains(TAG_SOURCE_WEAPON)) {
-            this.sourceWeapon = ItemStack.parse(this.registryAccess(), tag.getCompound(TAG_SOURCE_WEAPON)).orElse(ItemStack.EMPTY);
+            this.sourceWeapon = ItemStack.of(tag.getCompound(TAG_SOURCE_WEAPON));
         }
     }
 
@@ -371,6 +412,71 @@ public class BasicSpellProjectileEntity extends Projectile implements GeoEntity 
                 0.02D);
     }
 
+    private void applyHoming() {
+        if (!this.homingEnabled) {
+            return;
+        }
+
+        Vec3 movement = this.getDeltaMovement();
+        if (movement.lengthSqr() < 1.0E-6D) {
+            return;
+        }
+
+        LivingEntity target = this.findHomingTarget();
+        if (target == null) {
+            return;
+        }
+
+        Vec3 currentDirection = movement.normalize();
+        Vec3 desiredDirection = target.position()
+                .add(0.0D, target.getBbHeight() * HOMING_TARGET_VERTICAL_OFFSET, 0.0D)
+                .subtract(this.position())
+                .normalize();
+
+        if (desiredDirection.lengthSqr() < 1.0E-6D) {
+            return;
+        }
+
+        Vec3 adjustedDirection = currentDirection.lerp(desiredDirection, HOMING_TURN_RATE).normalize();
+        this.setDeltaMovement(adjustedDirection.scale(movement.length()));
+    }
+
+    private LivingEntity findHomingTarget() {
+        Entity ownerEntity = this.getOwner();
+        LivingEntity owner = ownerEntity instanceof LivingEntity livingOwner ? livingOwner : null;
+        Vec3 currentDirection = this.getDeltaMovement().normalize();
+        LivingEntity closestTarget = null;
+        double closestDistanceSq = HOMING_RANGE * HOMING_RANGE;
+
+        for (LivingEntity candidate : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(HOMING_RANGE))) {
+            if (!candidate.isAlive() || candidate == owner || !this.canHitEntity(candidate)) {
+                continue;
+            }
+
+            if (owner != null && candidate.isAlliedTo(owner)) {
+                continue;
+            }
+
+            Vec3 toCandidate = candidate.position()
+                    .add(0.0D, candidate.getBbHeight() * HOMING_TARGET_VERTICAL_OFFSET, 0.0D)
+                    .subtract(this.position());
+            double distanceSq = toCandidate.lengthSqr();
+            if (distanceSq < 1.0E-6D || distanceSq > closestDistanceSq) {
+                continue;
+            }
+
+            Vec3 directionToCandidate = toCandidate.normalize();
+            if (currentDirection.dot(directionToCandidate) <= 0.15D) {
+                continue;
+            }
+
+            closestDistanceSq = distanceSq;
+            closestTarget = candidate;
+        }
+
+        return closestTarget;
+    }
+
     private ResourceKey<DamageType> resolveMagicDamageType() {
         ResourceLocation damageTypeLocation = this.magicDamageTypeId.isEmpty()
                 ? ResourceLocation.fromNamespaceAndPath("irons_spellbooks", "evocation_magic")
@@ -403,4 +509,7 @@ public class BasicSpellProjectileEntity extends Projectile implements GeoEntity 
         return this.cache;
     }
 }
+
+
+
 

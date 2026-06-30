@@ -1,16 +1,18 @@
 package com.rave.projectbabylonweapons.skill.weapon_innate;
 
 import com.rave.projectbabylonweapons.gameasset.PBAnimations;
-import com.rave.projectbabylonweapons.init.PBModEffects;
+import com.rave.projectbabylonmaterials.init.PBMEffects;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
-import yesman.epicfight.api.event.EntityEventListener;
-import yesman.epicfight.api.event.EpicFightEventHooks;
 import yesman.epicfight.skill.SkillContainer;
 import yesman.epicfight.skill.weaponinnate.SimpleWeaponInnateSkill;
+import yesman.epicfight.world.entity.eventlistener.PlayerEventListener.EventType;
+
+import java.util.UUID;
 
 public class TheHarvestSkill extends SimpleWeaponInnateSkill {
 
+    private static final UUID DAMAGE_UUID = UUID.fromString("d3a1f2c4-9b7e-4a11-8c3d-1f2e3a4b5c6d");
     private static final int MARKED_DURATION_TICKS = 12 * 20;
 
     public TheHarvestSkill(SimpleWeaponInnateSkill.Builder builder) {
@@ -18,18 +20,19 @@ public class TheHarvestSkill extends SimpleWeaponInnateSkill {
     }
 
     @Override
-    public void onInitiate(SkillContainer container, EntityEventListener eventListener) {
-        super.onInitiate(container, eventListener);
+    public void onInitiate(SkillContainer container) {
+        super.onInitiate(container);
 
-        eventListener.registerEvent(
-                EpicFightEventHooks.Entity.DELIVER_DAMAGE_POST,
+        container.getExecutor().getEventListener().addEventListener(
+                EventType.DEAL_DAMAGE_EVENT_HURT,
+                DAMAGE_UUID,
                 (event) -> {
                     var eventAnim = event.getDamageSource().getAnimation();
                     if (eventAnim == null) {
                         return;
                     }
 
-                    if (eventAnim != PBAnimations.THE_HARVEST) {
+                    if (!eventAnim.toString().equals(PBAnimations.THE_HARVEST.registryName().toString())) {
                         return;
                     }
 
@@ -38,28 +41,29 @@ public class TheHarvestSkill extends SimpleWeaponInnateSkill {
                         return;
                     }
 
-                    // Lifesteal
-                    float healAmount = event.getModifiedDamage() * 0.1f;
+
+                    float healAmount = event.getAttackDamage() * 0.18f;
                     if (healAmount > 0) {
                         container.getExecutor().getOriginal().heal(healAmount);
                     }
 
-                    // MARKED
+
                     target.addEffect(new MobEffectInstance(
-                            PBModEffects.MARKED,
+                            PBMEffects.MARKED.get(),
                             MARKED_DURATION_TICKS,
                             0,
                             false,
                             true,
                             true
                     ));
-                },
-                this
+                }
         );
     }
 
     @Override
     public void onRemoved(SkillContainer container) {
+        container.getExecutor().getEventListener().removeListener(EventType.DEAL_DAMAGE_EVENT_HURT, DAMAGE_UUID);
         super.onRemoved(container);
     }
 }
+

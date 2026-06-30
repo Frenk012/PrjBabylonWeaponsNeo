@@ -4,7 +4,7 @@ import com.rave.projectbabylonmaterials.ProjectBabylonMaterials;
 import com.rave.projectbabylonweapons.handler.MagicMeleeWeaponHelper;
 import com.rave.projectbabylonweapons.handler.StaffMagicArmorHelper;
 import com.rave.projectbabylonmaterials.tooltip.TooltipFrameStyle;
-import com.rave.projectbabylonweapons.init.PBModEffects;
+import com.rave.projectbabylonmaterials.init.PBMEffects;
 import com.rave.projectbabylonweapons.item.MagicMeleeWeapon;
 import com.rave.projectbabylonweapons.tooltip.WeaponPassiveTooltipData;
 import com.rave.projectbabylonweapons.world.entity.projectile.BasicSpellProjectileEntity;
@@ -12,7 +12,6 @@ import io.redspace.ironsspellbooks.registries.MobEffectRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.core.Holder;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.damagesource.DamageSource;
@@ -97,7 +96,7 @@ public final class IceFrostTouchPassive {
     }
 
     private static void applyFrostEffects(LivingEntity target, LivingEntity owner, IceFrostTouchBalance.Profile profile) {
-        Holder<MobEffect> chilledEffect = MobEffectRegistry.CHILLED;
+        MobEffect chilledEffect = MobEffectRegistry.CHILLED.get();
         MobEffectInstance chilledInstance = target.getEffect(chilledEffect);
         if (chilledInstance == null) {
             if (rollChance(owner, profile.chillIProcChance())) {
@@ -128,7 +127,7 @@ public final class IceFrostTouchPassive {
         target.removeEffect(chilledEffect);
         AABB area = target.getBoundingBox().inflate(profile.freezeRadiusBlocks(), 1.0D, profile.freezeRadiusBlocks());
         for (LivingEntity victim : owner.level().getEntitiesOfClass(LivingEntity.class, area, entity -> entity.isAlive() && entity != owner)) {
-            victim.addEffect(new MobEffectInstance(PBModEffects.FROZEN, profile.frozenDurationTicks()));
+            victim.addEffect(new MobEffectInstance(PBMEffects.FROZEN.get(), profile.frozenDurationTicks()));
         }
     }
 
@@ -136,3 +135,4 @@ public final class IceFrostTouchPassive {
         return TOOLTIP;
     }
 }
+

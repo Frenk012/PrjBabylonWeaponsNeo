@@ -23,7 +23,7 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import yesman.epicfight.world.capabilities.entitypatch.player.ServerPlayerPatch;
-import yesman.epicfight.api.event.types.animation.AttackPhaseEndEvent;
+import yesman.epicfight.world.entity.eventlistener.AttackPhaseEndEvent;
 
 import java.util.List;
 
@@ -31,12 +31,17 @@ public class EtherealBattleWandItem extends SwordItem implements MagicProjectile
     public static final int DURABILITY = 756;
     public static final int ATTACK_DAMAGE_MOD = 2;
     public static final float ATTACK_SPEED_MOD = -3.0F;
-    private static final float BASE_MAGIC_DAMAGE = 1.0F + ATTACK_DAMAGE_MOD;
+    private static final float BASE_MAGIC_DAMAGE = 3.3F;
 
     public EtherealBattleWandItem() {
-        super(Tiers.DIAMOND, (new Item.Properties()
+        super(
+                Tiers.DIAMOND,
+                ATTACK_DAMAGE_MOD,
+                ATTACK_SPEED_MOD,
+                new Item.Properties()
                         .durability(2600)
-                        .rarity(Rarity.COMMON)).attributes(SwordItem.createAttributes(Tiers.DIAMOND, ATTACK_DAMAGE_MOD, ATTACK_SPEED_MOD)));
+                        .rarity(Rarity.COMMON)
+        );
     }
 
     @Override
@@ -56,7 +61,7 @@ public class EtherealBattleWandItem extends SwordItem implements MagicProjectile
 
     @Override
     public float getSchoolResistMultiplier(LivingEntity target) {
-        return Math.max(0.0F, 1.0F + (float) target.getAttributeValue(AttributeRegistry.HOLY_MAGIC_RESIST));
+        return Math.max(0.0F, 1.0F + (float) target.getAttributeValue(AttributeRegistry.HOLY_MAGIC_RESIST.get()));
     }
 
     @Override
@@ -147,7 +152,7 @@ public class EtherealBattleWandItem extends SwordItem implements MagicProjectile
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, net.minecraft.world.item.Item.TooltipContext level, List<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, Level level, List<Component> tooltip, TooltipFlag flag) {
         super.appendHoverText(stack, level, tooltip, flag);
 
     }
@@ -162,6 +167,8 @@ public class EtherealBattleWandItem extends SwordItem implements MagicProjectile
         return 2.1F;
     }
 }
+
+
 
 
 

@@ -4,7 +4,7 @@ import com.rave.projectbabylonweapons.gameasset.PBAnimations;
 import com.rave.projectbabylonweapons.handler.WeaponVisualEffectHelper;
 import com.rave.projectbabylonweapons.handler.MagicMeleeWeaponHelper;
 import com.rave.projectbabylonweapons.handler.StaffMagicArmorHelper;
-import com.rave.projectbabylonweapons.init.PBModEffects;
+import com.rave.projectbabylonmaterials.init.PBMEffects;
 import com.rave.projectbabylonweapons.init.PBWSounds;
 import com.rave.projectbabylonweapons.world.entity.effect.GlacierIceSpikeEntity;
 import io.redspace.ironsspellbooks.registries.MobEffectRegistry;
@@ -14,7 +14,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.core.Holder;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
@@ -24,17 +23,15 @@ import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.tick.ServerTickEvent;
-import yesman.epicfight.api.event.EntityEventListener;
-import yesman.epicfight.api.event.EpicFightEventHooks;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import yesman.epicfight.skill.SkillContainer;
 import yesman.epicfight.skill.weaponinnate.SimpleWeaponInnateSkill;
 import yesman.epicfight.world.capabilities.entitypatch.player.ServerPlayerPatch;
 import yesman.epicfight.world.damagesource.EpicFightDamageSource;
 import yesman.epicfight.world.damagesource.EpicFightDamageTypeTags;
 import yesman.epicfight.world.damagesource.StunType;
+import yesman.epicfight.world.entity.eventlistener.PlayerEventListener.EventType;
 import com.rave.projectbabylonweapons.item.MagicMeleeWeapon;
 
 import java.util.ArrayList;
@@ -46,7 +43,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-@EventBusSubscriber(modid = com.rave.projectbabylonweapons.ProjectBabylonWeapons.MODID, bus = EventBusSubscriber.Bus.GAME)
+@net.minecraftforge.fml.common.Mod.EventBusSubscriber(modid = com.rave.projectbabylonweapons.ProjectBabylonWeapons.MODID, bus = net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus.FORGE)
 public class GlacierSkill extends SimpleWeaponInnateSkill {
     private static final UUID GLACIER_BEGIN_UUID = UUID.fromString("58f71a4a-e0d5-444f-b8b5-c86e8427a2bf");
     private static final UUID GLACIER_CONTACT_UUID = UUID.fromString("bb8934f5-b652-44a1-a8ef-1e7d9e5a1f24");
@@ -119,29 +116,30 @@ public class GlacierSkill extends SimpleWeaponInnateSkill {
     }
 
     @Override
-    public void onInitiate(SkillContainer container, EntityEventListener eventListener) {
-        super.onInitiate(container, eventListener);
+    public void onInitiate(SkillContainer container) {
+        super.onInitiate(container);
 
-        eventListener.registerEvent(
-                EpicFightEventHooks.Animation.BEGIN,
+        container.getExecutor().getEventListener().addEventListener(
+                EventType.ANIMATION_BEGIN_EVENT,
+                GLACIER_BEGIN_UUID,
                 event -> {
                     if (container.getExecutor().isLogicalClient()) {
                         return;
                     }
 
-                    if (event.getAnimation() != PBAnimations.GLACIER) {
+                    if (event.getAnimation() != PBAnimations.GLACIER.get()) {
                         return;
                     }
 
                     LivingEntity caster = container.getExecutor().getOriginal();
                     WeaponVisualEffectHelper.startGlacierCast(caster);
                     caster.level().playSound(null, caster.getX(), caster.getY(), caster.getZ(), PBWSounds.BLIZZARD.get(), SoundSource.PLAYERS, 1.25F, 1.0F);
-                },
-                this
+                }
         );
 
-        eventListener.registerEvent(
-                EpicFightEventHooks.Animation.ATTACK_PHASE_END,
+        container.getExecutor().getEventListener().addEventListener(
+                EventType.ATTACK_PHASE_END_EVENT,
+                GLACIER_CONTACT_UUID,
                 event -> {
                     if (container.getExecutor().isLogicalClient()) {
                         return;
@@ -155,38 +153,41 @@ public class GlacierSkill extends SimpleWeaponInnateSkill {
                         return;
                     }
 
-                    if (!(event.getEntityPatch() instanceof ServerPlayerPatch playerPatch)) {
+                    ServerPlayerPatch playerPatch = event.getPlayerPatch();
+                    if (playerPatch == null) {
                         return;
                     }
 
                     WeaponVisualEffectHelper.stopGlacierCast(playerPatch.getOriginal());
                     WeaponVisualEffectHelper.playGlacierContactWave(playerPatch.getOriginal());
                     spawnGlacier(playerPatch, playerPatch.getOriginal().getMainHandItem());
-                },
-                this
+                }
         );
 
-        eventListener.registerEvent(
-                EpicFightEventHooks.Animation.END,
+        container.getExecutor().getEventListener().addEventListener(
+                EventType.ANIMATION_END_EVENT,
+                GLACIER_END_UUID,
                 event -> {
-                    if (event.getAnimation() != PBAnimations.GLACIER) {
+                    if (event.getAnimation() != PBAnimations.GLACIER.get()) {
                         return;
                     }
 
                     WeaponVisualEffectHelper.stopGlacierCast(container.getExecutor().getOriginal());
-                },
-                this
+                }
         );
     }
 
     @Override
     public void onRemoved(SkillContainer container) {
+        container.getExecutor().getEventListener().removeListener(EventType.ANIMATION_BEGIN_EVENT, GLACIER_BEGIN_UUID);
+        container.getExecutor().getEventListener().removeListener(EventType.ATTACK_PHASE_END_EVENT, GLACIER_CONTACT_UUID);
+        container.getExecutor().getEventListener().removeListener(EventType.ANIMATION_END_EVENT, GLACIER_END_UUID);
         WeaponVisualEffectHelper.stopGlacierCast(container.getExecutor().getOriginal());
         super.onRemoved(container);
     }
     @SubscribeEvent
-    public static void onServerTick(ServerTickEvent.Post event) {
-        if (ACTIVE_CASTS.isEmpty()) {
+    public static void onServerTick(TickEvent.ServerTickEvent event) {
+        if (event.phase != TickEvent.Phase.END || ACTIVE_CASTS.isEmpty()) {
             return;
         }
 
@@ -328,7 +329,7 @@ public class GlacierSkill extends SimpleWeaponInnateSkill {
                 spikePos.x + SPIKE_DAMAGE_RADIUS, spikePos.y + 2.5D, spikePos.z + SPIKE_DAMAGE_RADIUS
         );
 
-        Holder<MobEffect> chilledEffect = MobEffectRegistry.CHILLED;
+        MobEffect chilledEffect = MobEffectRegistry.CHILLED.get();
 
         for (LivingEntity target : level.getEntitiesOfClass(LivingEntity.class, area, entity -> entity.isAlive() && entity != caster)) {
             if (target.isAlliedTo(caster) || hitTargets.contains(target.getUUID())) {
@@ -396,7 +397,7 @@ public class GlacierSkill extends SimpleWeaponInnateSkill {
             double allowedForward = along >= 0.0D ? frontRadius : backRadius;
             double normalized = (along * along) / (allowedForward * allowedForward) + (side * side) / (sideRadius * sideRadius);
             if (normalized <= 1.0D) {
-                target.addEffect(new MobEffectInstance(PBModEffects.FROZEN, FROZEN_DURATION_TICKS, 0, false, true, true));
+                target.addEffect(new MobEffectInstance(PBMEffects.FROZEN.get(), FROZEN_DURATION_TICKS, 0, false, true, true));
             }
         }
     }
@@ -449,6 +450,7 @@ public class GlacierSkill extends SimpleWeaponInnateSkill {
         return null;
     }
 }
+
 
 
 
