@@ -28,6 +28,8 @@ import net.neoforged.neoforge.event.AddReloadListenerEvent;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import org.slf4j.Logger;
 
+import com.rave.projectbabylonweapons.world.capabilities.item.PBWeaponCapabilityPresets;
+
 import static com.rave.projectbabylonweapons.init.PBModEffects.EFFECTS;
 
 @Mod(ProjectBabylonWeapons.MODID)
@@ -55,6 +57,10 @@ public class ProjectBabylonWeapons {
         EFFECTS.register(modBus);
         PBWSounds.register(modBus);
         PBModEntities.ENTITIES.register(modBus);
+
+        // Epic Fight weapon-capability presets are registered through EF's own event system,
+        // not the NeoForge bus (the registry event is not a bus Event).
+        PBWeaponCapabilityPresets.register();
 
         gameBus.addListener(this::addReloadListeners);
     }

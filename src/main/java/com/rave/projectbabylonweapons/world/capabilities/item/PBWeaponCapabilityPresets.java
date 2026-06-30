@@ -9,10 +9,9 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.TieredItem;
 import net.minecraft.world.item.Tiers;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
 import yesman.epicfight.api.animation.AnimationManager;
 import yesman.epicfight.api.animation.LivingMotions;
+import yesman.epicfight.api.event.EpicFightEventHooks;
 import yesman.epicfight.api.event.types.registry.WeaponCapabilityPresetRegistryEvent;
 import yesman.epicfight.gameasset.Animations;
 import yesman.epicfight.registry.entries.EpicFightSounds;
@@ -23,11 +22,18 @@ import yesman.epicfight.world.capabilities.item.WeaponCapability;
 import com.rave.projectbabylonweapons.gameasset.PBAnimations;
 import com.rave.projectbabylonweapons.gameasset.PBSkills;
 
-@EventBusSubscriber(
-        modid = "project_babylon_weapons",
-        bus = EventBusSubscriber.Bus.MOD
-)
 public class PBWeaponCapabilityPresets {
+
+    /**
+     * Subscribes the weapon-preset registration to Epic Fight's own event system.
+     * {@link WeaponCapabilityPresetRegistryEvent} extends Epic Fight's {@code api.event.Event}
+     * (not a NeoForge bus event), so it cannot be handled with {@code @SubscribeEvent}; it is
+     * fired by Epic Fight's WeaponTypeReloadListener through {@link EpicFightEventHooks}.
+     * Call this once during mod construction.
+     */
+    public static void register() {
+        EpicFightEventHooks.Registry.WEAPON_CAPABILITY_PRESET.registerEvent(PBWeaponCapabilityPresets::registerWeaponPresets);
+    }
 
     public static final Function<Item, CapabilityItem.Builder<?>> SICKLE = (item) -> {
         WeaponCapability.Builder builder = WeaponCapability.builder()
@@ -218,7 +224,6 @@ public class PBWeaponCapabilityPresets {
         return builder;
     };
 
-    @SubscribeEvent
     public static void registerWeaponPresets(WeaponCapabilityPresetRegistryEvent event) {
         event.getTypeEntry().put(
                 ResourceLocation.fromNamespaceAndPath("project_babylon_weapons", "pb_sickle"),
