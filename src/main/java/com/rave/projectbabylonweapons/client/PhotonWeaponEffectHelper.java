@@ -76,6 +76,18 @@ public final class PhotonWeaponEffectHelper {
         PBMPhotonEffectHelper.spawnEnderProjectileImpact(projectile, hitPos);
     }
 
+    public static void spawnManaBubbleBasicContact(Entity entity) {
+        PBMPhotonEffectHelper.spawnEnderProjectileImpact(entity, entity.position().add(0.0D, entity.getBbHeight() * 0.6D, 0.0D));
+    }
+
+    public static void spawnManaBubbleBasicFlight(Entity projectile, Vec3 movement) {
+        PBMPhotonEffectHelper.spawnEnderProjectileFlight(projectile, movement);
+    }
+
+    public static void spawnManaBubbleBasicImpact(Entity projectile, Vec3 hitPos) {
+        PBMPhotonEffectHelper.spawnEnderProjectileImpact(projectile, hitPos);
+    }
+
     public static void spawnHolyProjectileFlight(Entity projectile, Vec3 movement) {
         PBMPhotonEffectHelper.spawnHolyProjectileFlight(projectile, movement);
     }
@@ -100,6 +112,10 @@ public final class PhotonWeaponEffectHelper {
         PBMPhotonEffectHelper.spawnFireProjectileImpact(projectile, hitPos);
     }
 
+
+    public static void spawnBrimstoneBlast(Entity entity) {
+        PBMPhotonEffectHelper.spawnFireProjectileImpact(entity, entity.position().add(0.0D, entity.getBbHeight() * 0.5D, 0.0D));
+    }
     public static void spawnGoldenProjectileFlight(Entity projectile, Vec3 movement) {
         PBMPhotonEffectHelper.spawnGoldenProjectileFlight(projectile, movement);
     }

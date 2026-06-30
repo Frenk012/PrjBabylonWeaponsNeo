@@ -41,13 +41,13 @@ public class TheHarvestSkill extends SimpleWeaponInnateSkill {
                         return;
                     }
 
-                    // Lifesteal
-                    float healAmount = event.getAttackDamage() * 0.1f;
+
+                    float healAmount = event.getAttackDamage() * 0.18f;
                     if (healAmount > 0) {
                         container.getExecutor().getOriginal().heal(healAmount);
                     }
 
-                    // MARKED 
+
                     target.addEffect(new MobEffectInstance(
                             PBMEffects.MARKED.get(),
                             MARKED_DURATION_TICKS,

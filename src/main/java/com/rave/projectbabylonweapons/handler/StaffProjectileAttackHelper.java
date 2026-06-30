@@ -7,8 +7,11 @@ import com.rave.projectbabylonweapons.skill.weapon_innate.DragonDescendSkill;
 import com.rave.projectbabylonweapons.world.entity.projectile.BasicSpellProjectileEntity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import yesman.epicfight.world.capabilities.entitypatch.player.ServerPlayerPatch;
+
+import java.util.function.Function;
 
 public final class StaffProjectileAttackHelper {
     private StaffProjectileAttackHelper() {
@@ -18,13 +21,13 @@ public final class StaffProjectileAttackHelper {
         LivingEntity attacker = playerPatch.getOriginal();
         Vec3 forward = horizontalForward(attacker);
         spawnProjectileInternal(playerPatch, weaponStack, weapon, forward, weapon.getMagicProjectileSpawnForwardOffset(), 0.0D,
-                weapon.getMagicProjectileSpawnVerticalOffset(), weapon.getProjectileMagicDamageMultiplier(), true, 1.0F);
+                weapon.getMagicProjectileSpawnVerticalOffset(), weapon.getProjectileMagicDamageMultiplier(), true, 1.0F, null);
     }
 
     public static void spawnProjectile(ServerPlayerPatch playerPatch, ItemStack weaponStack, MagicProjectileStaffWeapon weapon,
                                        Vec3 direction, double forwardOffset, double sideOffset, double verticalOffset,
                                        float damageMultiplier) {
-        spawnProjectileInternal(playerPatch, weaponStack, weapon, direction, forwardOffset, sideOffset, verticalOffset, damageMultiplier, true, 1.0F);
+        spawnProjectileInternal(playerPatch, weaponStack, weapon, direction, forwardOffset, sideOffset, verticalOffset, damageMultiplier, true, 1.0F, null);
     }
 
     public static void spawnProjectileWithoutPassives(ServerPlayerPatch playerPatch, ItemStack weaponStack, MagicProjectileStaffWeapon weapon,
@@ -36,14 +39,24 @@ public final class StaffProjectileAttackHelper {
     public static void spawnProjectileWithoutPassives(ServerPlayerPatch playerPatch, ItemStack weaponStack, MagicProjectileStaffWeapon weapon,
                                                       Vec3 direction, double forwardOffset, double sideOffset, double verticalOffset,
                                                       float damageMultiplier, float renderScale) {
-        spawnProjectileInternal(playerPatch, weaponStack, weapon, direction, forwardOffset, sideOffset, verticalOffset, damageMultiplier, false, renderScale);
+        spawnProjectileInternal(playerPatch, weaponStack, weapon, direction, forwardOffset, sideOffset, verticalOffset, damageMultiplier, false, renderScale, null);
+    }
+
+    public static void spawnProjectileWithoutPassives(ServerPlayerPatch playerPatch, ItemStack weaponStack, MagicProjectileStaffWeapon weapon,
+                                                      Vec3 direction, double forwardOffset, double sideOffset, double verticalOffset,
+                                                      float damageMultiplier, float renderScale,
+                                                      Function<Level, BasicSpellProjectileEntity> projectileFactory) {
+        spawnProjectileInternal(playerPatch, weaponStack, weapon, direction, forwardOffset, sideOffset, verticalOffset, damageMultiplier, false, renderScale, projectileFactory);
     }
 
     private static void spawnProjectileInternal(ServerPlayerPatch playerPatch, ItemStack weaponStack, MagicProjectileStaffWeapon weapon,
                                                 Vec3 direction, double forwardOffset, double sideOffset, double verticalOffset,
-                                                float damageMultiplier, boolean allowPassiveEffects, float renderScale) {
+                                                float damageMultiplier, boolean allowPassiveEffects, float renderScale,
+                                                Function<Level, BasicSpellProjectileEntity> projectileFactory) {
         LivingEntity attacker = playerPatch.getOriginal();
-        BasicSpellProjectileEntity projectile = weapon.createMagicProjectile(attacker.level());
+        BasicSpellProjectileEntity projectile = projectileFactory != null
+                ? projectileFactory.apply(attacker.level())
+                : weapon.createMagicProjectile(attacker.level());
         if (projectile == null) {
             return;
         }
@@ -110,6 +123,3 @@ public final class StaffProjectileAttackHelper {
         return flat.normalize();
     }
 }
-
-
-

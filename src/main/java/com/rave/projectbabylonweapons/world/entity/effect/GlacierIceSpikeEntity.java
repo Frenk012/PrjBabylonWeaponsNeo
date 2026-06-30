@@ -24,6 +24,7 @@ public class GlacierIceSpikeEntity extends Entity implements GeoEntity {
     public static final int RISE_TIME = 6;
     public static final int REST_TIME = 14;
     public static final int LOWER_TIME = 10;
+    private static final float EMERGE_SOUND_VOLUME_MULTIPLIER = 0.625F;
     private static final String TAG_WAIT_TIME = "WaitTime";
     private static final String TAG_RISE_HEIGHT = "RiseHeight";
     private static final String TAG_SPIKE_SCALE = "SpikeScale";
@@ -36,6 +37,7 @@ public class GlacierIceSpikeEntity extends Entity implements GeoEntity {
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
     private boolean initializedBaseY;
     private double hiddenBaseY;
+    private boolean emergeSoundPlayed;
 
     public GlacierIceSpikeEntity(EntityType<? extends GlacierIceSpikeEntity> type, Level level) {
         super(type, level);
@@ -119,9 +121,10 @@ public class GlacierIceSpikeEntity extends Entity implements GeoEntity {
         float positionOffset = this.getPositionOffset(0.0F);
         this.setPos(this.getX(), this.hiddenBaseY + this.getRiseHeight() * (positionOffset + 1.0F), this.getZ());
 
-        if (!this.level().isClientSide && this.tickCount == this.getWaitTime()) {
+        if (!this.level().isClientSide && !this.emergeSoundPlayed && this.tickCount >= this.getWaitTime()) {
+            this.emergeSoundPlayed = true;
             this.level().playSound(null, this.blockPosition(), SoundRegistry.ICE_SPIKE_EMERGE.get(), SoundSource.NEUTRAL,
-                    1.25F * this.getSpikeScale(), Mth.randomBetweenInclusive(this.random, 6, 12) * 0.1F);
+                    EMERGE_SOUND_VOLUME_MULTIPLIER * this.getSpikeScale(), Mth.randomBetweenInclusive(this.random, 6, 12) * 0.1F);
         }
 
         if (this.tickCount > this.getWaitTime() + RISE_TIME + REST_TIME + LOWER_TIME) {

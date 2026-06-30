@@ -40,11 +40,11 @@ public class TectonicSkill extends SimpleWeaponInnateSkill {
     private static final float KNOCKUP_VELOCITY = 0.90F;
     private static final float HORIZONTAL_PUSH = 0.24F;
     private static final float WAVE_DAMAGE_MULTIPLIER = 0.5F;
-    private static final double WAVE_RANGE = 8.0D;
+    private static final double WAVE_RANGE = 10.0D;
     private static final double WAVE_HALF_ANGLE_DEGREES = 38.0D;
     private static final double RING_THICKNESS = 1.0D;
     private static final int RING_DELAY_TICKS = 2;
-    private static final int WAVE_START_DELAY_TICKS = 80;
+    private static final int WAVE_START_DELAY_TICKS = 40;
     private static final float BLOCK_POPUP_INITIAL_VELOCITY = 0.32F;
     private static final Map<UUID, CastSnapshot> PENDING_CASTS = new HashMap<>();
     private static final Map<UUID, WaveState> ACTIVE_WAVES = new HashMap<>();

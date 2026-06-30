@@ -105,6 +105,14 @@ public final class WeaponVisualEffectClientHelper {
         }
         if (WeaponVisualEffectHelper.DRAGON_FURY_CHARGE_DESPAWN.equals(effectId)) {
             PhotonWeaponEffectHelper.spawnDragonFuryChargeBurst(entity);
+            return;
+        }
+        if (WeaponVisualEffectHelper.MANA_BUBBLE_CONTACT_BASIC.equals(effectId)) {
+            PhotonWeaponEffectHelper.spawnManaBubbleBasicContact(entity);
+            return;
+        }
+        if (WeaponVisualEffectHelper.NETHERITE_BRIMSTONE_BLAST.equals(effectId)) {
+            PhotonWeaponEffectHelper.spawnBrimstoneBlast(entity);
         }
     }
 }

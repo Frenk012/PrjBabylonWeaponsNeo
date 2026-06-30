@@ -27,6 +27,9 @@ public final class WeaponVisualEffectHelper {
     public static final String DIAMOND_SHARD_DESPAWN = "diamond_shard_despawn";
     public static final String DRAGON_FURY_CHARGE_SPAWN = "dragon_fury_charge_spawn";
     public static final String DRAGON_FURY_CHARGE_DESPAWN = "dragon_fury_charge_despawn";
+    public static final String MANA_BUBBLE_CONTACT_BASIC = "mana_bubble_contact_basic";
+
+    public static final String NETHERITE_BRIMSTONE_BLAST = "netherite_brimstone_blast";
 
     private WeaponVisualEffectHelper() {
     }
@@ -53,6 +56,9 @@ public final class WeaponVisualEffectHelper {
     public static void playDiamondShardDespawn(Entity entity) { play(entity, DIAMOND_SHARD_DESPAWN); }
     public static void playDragonFuryChargeSpawn(Entity entity) { play(entity, DRAGON_FURY_CHARGE_SPAWN); }
     public static void playDragonFuryChargeDespawn(Entity entity) { play(entity, DRAGON_FURY_CHARGE_DESPAWN); }
+    public static void playManaBubbleBasicContact(Entity entity) { play(entity, MANA_BUBBLE_CONTACT_BASIC); }
+
+    public static void playBrimstoneBlast(Entity entity) { play(entity, NETHERITE_BRIMSTONE_BLAST); }
 
     private static void play(Entity entity, String effectId) {
         if (entity == null || entity.level().isClientSide) {
@@ -62,3 +68,4 @@ public final class WeaponVisualEffectHelper {
         PBNetworkManager.sendToTrackingAndSelf(entity, new SPPlayWeaponVisualEffect(effectId, entity.getId()));
     }
 }
+

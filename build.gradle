@@ -107,7 +107,7 @@ dependencies {
     implementation fg.deobf("curse.maven:geckolib-388172:6789487")
     implementation fg.deobf("curse.maven:caelus-308989:5281700")
 
-    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor' // Yesman added
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }
 
 tasks.named('processResources', ProcessResources).configure {

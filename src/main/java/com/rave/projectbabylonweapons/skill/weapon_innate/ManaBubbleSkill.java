@@ -1,25 +1,20 @@
 package com.rave.projectbabylonweapons.skill.weapon_innate;
 
 import com.rave.projectbabylonweapons.gameasset.PBAnimations;
+import com.rave.projectbabylonweapons.handler.WeaponVisualEffectHelper;
 import com.rave.projectbabylonweapons.handler.MagicMeleeWeaponHelper;
 import com.rave.projectbabylonweapons.handler.StaffMagicArmorHelper;
 import com.rave.projectbabylonweapons.item.MagicProjectileStaffWeapon;
-import com.rave.projectbabylonweapons.world.entity.projectile.BasicSpellProjectileEntity;
 import com.rave.projectbabylonweapons.world.entity.projectile.ManaBubbleProjectileEntity;
 import io.redspace.ironsspellbooks.registries.SoundRegistry;
-import io.redspace.ironsspellbooks.util.ParticleHelper;
 import net.minecraft.client.KeyMapping;
-import net.minecraft.core.particles.DustParticleOptions;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import org.joml.Vector3f;
 import yesman.epicfight.client.input.EpicFightKeyMappings;
 import yesman.epicfight.skill.SkillBuilder;
 import yesman.epicfight.skill.SkillContainer;
@@ -38,14 +33,6 @@ public class ManaBubbleSkill extends WeaponInnateSkill {
     private static final float RENDER_SCALE = 7.0F;
     private static final float DRAG_STRENGTH = 0.82F;
     private static final int MIN_LIFETIME = 40;
-    private static final int OUTER_RING_COUNT = 18;
-    private static final int INNER_RING_COUNT = 12;
-    private static final double GROUND_RING_RADIUS = 1.25D;
-    private static final double TORSO_RING_RADIUS = 0.75D;
-    private static final double GROUND_RING_SPEED = 0.18D;
-    private static final double TORSO_RING_SPEED = 0.12D;
-    private static final double GROUND_RING_Y_OFFSET = 0.08D;
-    private static final double TORSO_RING_Y_MULTIPLIER = 0.62D;
 
     public ManaBubbleSkill(SkillBuilder<? extends WeaponInnateSkill> builder) {
         super(builder);
@@ -165,8 +152,7 @@ public class ManaBubbleSkill extends WeaponInnateSkill {
         }
 
         ManaBubbleProjectileEntity bubble = new ManaBubbleProjectileEntity(playerPatch.getOriginal().level());
-        BasicSpellProjectileEntity visualProjectile = weapon.createMagicProjectile(playerPatch.getOriginal().level());
-        ManaBubbleProjectileEntity.VisualPreset visualPreset = ManaBubbleProjectileEntity.VisualPreset.fromProjectile(visualProjectile);
+        ManaBubbleProjectileEntity.VisualPreset visualPreset = ManaBubbleProjectileEntity.VisualPreset.BASIC;
 
         bubble.configureBubble(
                 playerPatch.getOriginal(),
@@ -197,7 +183,7 @@ public class ManaBubbleSkill extends WeaponInnateSkill {
             forward = forward.normalize();
         }
 
-        spawnContactParticles(playerPatch, visualPreset, weapon.getMagicProjectileTrailColor());
+        WeaponVisualEffectHelper.playManaBubbleBasicContact(playerPatch.getOriginal());
 
         double spawnX = playerPatch.getOriginal().getX() + forward.x * weapon.getMagicProjectileSpawnForwardOffset();
         double spawnY = playerPatch.getOriginal().getY() + playerPatch.getOriginal().getBbHeight() * 0.6D + weapon.getMagicProjectileSpawnVerticalOffset();
@@ -205,58 +191,6 @@ public class ManaBubbleSkill extends WeaponInnateSkill {
         bubble.setPos(spawnX, spawnY, spawnZ);
         bubble.shoot(forward.x, 0.0D, forward.z, weapon.getMagicProjectileSpeed() * SPEED_MULTIPLIER, 0.0F);
         playerPatch.getOriginal().level().addFreshEntity(bubble);
-    }
-
-    private static void spawnContactParticles(ServerPlayerPatch playerPatch, ManaBubbleProjectileEntity.VisualPreset visualPreset,
-                                              int trailColor) {
-        if (!(playerPatch.getOriginal().level() instanceof ServerLevel serverLevel)) {
-            return;
-        }
-
-        Vec3 origin = playerPatch.getOriginal().position();
-        double groundY = origin.y + GROUND_RING_Y_OFFSET;
-        double torsoY = origin.y + playerPatch.getOriginal().getBbHeight() * TORSO_RING_Y_MULTIPLIER;
-
-        spawnParticleRing(serverLevel, origin, groundY, OUTER_RING_COUNT, GROUND_RING_RADIUS, GROUND_RING_SPEED, visualPreset, trailColor, false);
-        spawnParticleRing(serverLevel, origin, torsoY, INNER_RING_COUNT, TORSO_RING_RADIUS, TORSO_RING_SPEED, visualPreset, trailColor, true);
-    }
-
-    private static void spawnParticleRing(ServerLevel level, Vec3 origin, double y, int count, double radius,
-                                          double outwardSpeed, ManaBubbleProjectileEntity.VisualPreset visualPreset,
-                                          int trailColor, boolean elevated) {
-        for (int i = 0; i < count; i++) {
-            double angle = (Math.PI * 2.0D * i) / count;
-            double cos = Math.cos(angle);
-            double sin = Math.sin(angle);
-            double spawnX = origin.x + cos * radius;
-            double spawnY = y + (elevated && (i & 1) == 0 ? 0.08D : 0.0D);
-            double spawnZ = origin.z + sin * radius;
-            double velocityX = cos * outwardSpeed;
-            double velocityZ = sin * outwardSpeed;
-
-            switch (visualPreset.particleTheme()) {
-                case ICE -> {
-                    level.sendParticles(ParticleHelper.SNOWFLAKE, spawnX, spawnY, spawnZ, 1, velocityX, 0.02D, velocityZ, 0.0D);
-                    level.sendParticles(ParticleHelper.SNOW_DUST, spawnX, spawnY, spawnZ, 1, velocityX * 0.75D, 0.01D, velocityZ * 0.75D, 0.0D);
-                }
-                case FIRE -> {
-                    level.sendParticles(ParticleTypes.FLAME, spawnX, spawnY, spawnZ, 1, velocityX, 0.02D, velocityZ, 0.0D);
-                    level.sendParticles(ParticleTypes.SMOKE, spawnX, spawnY, spawnZ, 1, velocityX * 0.7D, 0.01D, velocityZ * 0.7D, 0.0D);
-                }
-                case HOLY -> {
-                    level.sendParticles(ParticleTypes.END_ROD, spawnX, spawnY, spawnZ, 1, velocityX, 0.015D, velocityZ, 0.0D);
-                    level.sendParticles(ParticleTypes.END_ROD, spawnX, spawnY, spawnZ, 1, velocityX * 0.7D, 0.0D, velocityZ * 0.7D, 0.0D);
-                }
-                case BASIC -> {
-                    Vector3f color = new Vector3f(
-                            ((trailColor >> 16) & 0xFF) / 255.0F,
-                            ((trailColor >> 8) & 0xFF) / 255.0F,
-                            (trailColor & 0xFF) / 255.0F
-                    );
-                    level.sendParticles(new DustParticleOptions(color, elevated ? 0.9F : 1.1F), spawnX, spawnY, spawnZ, 1, velocityX, 0.0D, velocityZ, 0.0D);
-                }
-            }
-        }
     }
 
     @OnlyIn(Dist.CLIENT)

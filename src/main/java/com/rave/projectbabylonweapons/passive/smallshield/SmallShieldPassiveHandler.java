@@ -83,6 +83,7 @@ public final class SmallShieldPassiveHandler {
         tickTemporaryStates(player);
     }
 
+
     @SubscribeEvent
     public static void onPlayerLogout(PlayerEvent.PlayerLoggedOutEvent event) {
         UUID playerId = event.getEntity().getUUID();
@@ -107,28 +108,29 @@ public final class SmallShieldPassiveHandler {
             return;
         }
 
-        ItemStack offhand = player.getOffhandItem();
-        if (offhand.isEmpty()) {
+        ItemStack shieldStack = getEquippedSmallShieldStack(player);
+        if (shieldStack.isEmpty()) {
             return;
         }
 
-        DiamondSmallShieldBalance.Profile diamond = DiamondSmallShieldBalance.resolve(offhand);
+        DiamondSmallShieldBalance.Profile diamond = DiamondSmallShieldBalance.resolve(shieldStack);
         if (diamond != null && player.level() instanceof ServerLevel serverLevel) {
             launchDiamondShards(serverLevel, player, diamond);
         }
     }
 
     private static void onTakeDamageAttack(Player player, TakeDamageEvent.Attack event) {
-        ItemStack offhand = player.getOffhandItem();
-        if (offhand.isEmpty()) {
+        ItemStack shieldStack = getEquippedSmallShieldStack(player);
+        if (shieldStack.isEmpty()) {
             return;
         }
 
         boolean ordinaryBlocked = event.getResult() == AttackResult.ResultType.BLOCKED;
+        boolean vanillaShieldBlock = isVanillaShieldBlock(player, event);
         boolean shieldBashParry = isShieldBashParry(event);
 
-        DiamondSmallShieldBalance.Profile diamond = DiamondSmallShieldBalance.resolve(offhand);
-        if (diamond != null && (ordinaryBlocked || shieldBashParry) && player.level() instanceof ServerLevel serverLevel) {
+        DiamondSmallShieldBalance.Profile diamond = DiamondSmallShieldBalance.resolve(shieldStack);
+        if (diamond != null && (ordinaryBlocked || vanillaShieldBlock || shieldBashParry) && player.level() instanceof ServerLevel serverLevel) {
             spawnDiamondShard(serverLevel, player, diamond);
         }
 
@@ -141,33 +143,35 @@ public final class SmallShieldPassiveHandler {
             return;
         }
 
-        GoldenSmallShieldBalance.Profile golden = GoldenSmallShieldBalance.resolve(offhand);
+        GoldenSmallShieldBalance.Profile golden = GoldenSmallShieldBalance.resolve(shieldStack);
         if (golden != null) {
             attacker.addEffect(new MobEffectInstance(PBMEffects.EXHAUSTED.get(), golden.exhaustedDurationTicks(), 0, false, true, true));
         }
 
-        EtherealSmallShieldBalance.Profile ethereal = EtherealSmallShieldBalance.resolve(offhand);
+        EtherealSmallShieldBalance.Profile ethereal = EtherealSmallShieldBalance.resolve(shieldStack);
         if (ethereal != null) {
             int removedBuffs = removeBeneficialEffects(attacker);
             if (removedBuffs > 0) {
-                restoreWeaponInnateCharge(event.getPlayerPatch(), ethereal.weaponChargeRestorePerBuff() * removedBuffs);
-                grantTemporaryAbsorption(player, player.getMaxHealth() * ethereal.absorptionPercentPerBuff() * removedBuffs, ethereal.absorptionDurationTicks());
+                float restoreAmount = ethereal.weaponChargeRestorePerBuff() * removedBuffs;
+                float absorptionAmount = player.getMaxHealth() * ethereal.absorptionPercentPerBuff() * removedBuffs;
+                restoreWeaponInnateCharge(event.getPlayerPatch(), restoreAmount);
+                grantTemporaryAbsorption(player, absorptionAmount, ethereal.absorptionDurationTicks());
             }
         }
 
-        IceSmallShieldBalance.Profile ice = IceSmallShieldBalance.resolve(offhand);
+        IceSmallShieldBalance.Profile ice = IceSmallShieldBalance.resolve(shieldStack);
         if (ice != null) {
             attacker.addEffect(new MobEffectInstance(PBMEffects.FROZEN.get(), ice.frozenDurationTicks(), 0, false, true, true));
             attacker.addEffect(new MobEffectInstance(MobEffectRegistry.CHILLED.get(), ice.chillDurationTicks(), 0, false, true, true));
         }
 
-        NetheriteSmallShieldBalance.Profile netherite = NetheriteSmallShieldBalance.resolve(offhand);
+        NetheriteSmallShieldBalance.Profile netherite = NetheriteSmallShieldBalance.resolve(shieldStack);
         if (netherite != null) {
             attacker.setSecondsOnFire(netherite.fireDurationSeconds());
             attacker.addEffect(new MobEffectInstance(PBMEffects.BRIMSTONE_FLAMES.get(), netherite.brimstoneDurationTicks(), 0, false, true, true));
         }
 
-        DragonsteelSmallShieldBalance.Profile dragonsteel = DragonsteelSmallShieldBalance.resolve(offhand);
+        DragonsteelSmallShieldBalance.Profile dragonsteel = DragonsteelSmallShieldBalance.resolve(shieldStack);
         if (dragonsteel != null) {
             int nextCharges = Math.min(dragonsteel.maxCharges(), DRAGON_FURY_CHARGES.getOrDefault(player.getUUID(), 0) + 1);
             DRAGON_FURY_CHARGES.put(player.getUUID(), nextCharges);
@@ -183,7 +187,7 @@ public final class SmallShieldPassiveHandler {
     }
 
     private static void applyDragonFuryIfPresent(Player player, DealDamageEvent.Hurt event) {
-        DragonsteelSmallShieldBalance.Profile profile = DragonsteelSmallShieldBalance.resolve(player.getOffhandItem());
+        DragonsteelSmallShieldBalance.Profile profile = DragonsteelSmallShieldBalance.resolve(getEquippedSmallShieldStack(player));
         if (profile == null) {
             DRAGON_FURY_CHARGES.remove(player.getUUID());
             return;
@@ -211,7 +215,7 @@ public final class SmallShieldPassiveHandler {
     private static void tickTemporaryStates(Player player) {
         UUID playerId = player.getUUID();
 
-        DragonsteelSmallShieldBalance.Profile dragonsteelProfile = DragonsteelSmallShieldBalance.resolve(player.getOffhandItem());
+        DragonsteelSmallShieldBalance.Profile dragonsteelProfile = DragonsteelSmallShieldBalance.resolve(getEquippedSmallShieldStack(player));
         if (dragonsteelProfile == null) {
             DRAGON_FURY_CHARGES.remove(playerId);
             discardDragonFuryCharges(player);
@@ -259,6 +263,14 @@ public final class SmallShieldPassiveHandler {
     private static boolean isShieldBashAnimation(DealDamageEvent.Hurt event) {
         var animation = event.getDamageSource().getAnimation();
         return animation != null && animation.toString().equals(CorruptAnimations.SHILED_SLASH.registryName().toString());
+    }
+
+    private static boolean isVanillaShieldBlock(Player player, TakeDamageEvent.Attack event) {
+        if (!player.isBlocking()) {
+            return false;
+        }
+
+        return isFrontBlockableSource(event.getPlayerPatch(), event.getDamageSource());
     }
 
     private static boolean isFrontBlockableSource(ServerPlayerPatch playerPatch, DamageSource damageSource) {
@@ -405,6 +417,32 @@ public final class SmallShieldPassiveHandler {
         return new DiamondShardEntity(PBModEntities.DIAMOND_SHARD_1.get(), level);
     }
 
+    private static ItemStack getEquippedSmallShieldStack(Player player) {
+        ItemStack offhand = player.getOffhandItem();
+        if (isSupportedSmallShield(offhand)) {
+            return offhand;
+        }
+
+        ItemStack mainhand = player.getMainHandItem();
+        if (isSupportedSmallShield(mainhand)) {
+            return mainhand;
+        }
+
+        return ItemStack.EMPTY;
+    }
+
+    private static boolean isSupportedSmallShield(ItemStack stack) {
+        if (stack.isEmpty()) {
+            return false;
+        }
+
+        return DiamondSmallShieldBalance.resolve(stack) != null
+                || GoldenSmallShieldBalance.resolve(stack) != null
+                || IceSmallShieldBalance.resolve(stack) != null
+                || NetheriteSmallShieldBalance.resolve(stack) != null
+                || EtherealSmallShieldBalance.resolve(stack) != null
+                || DragonsteelSmallShieldBalance.resolve(stack) != null;
+    }
     private static LivingEntity resolveLivingAttacker(DamageSource damageSource) {
         if (damageSource.getDirectEntity() instanceof LivingEntity living) {
             return living;

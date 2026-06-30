@@ -1,6 +1,5 @@
 package com.rave.projectbabylonweapons.world.entity.projectile;
 
-import com.rave.projectbabylonweapons.ProjectBabylonWeapons;
 
 import com.rave.projectbabylonweapons.handler.BattleWandPassiveHooks;
 import com.rave.projectbabylonweapons.handler.MagicMeleeWeaponHelper;
@@ -68,6 +67,7 @@ public class BasicSpellProjectileEntity extends Projectile implements GeoEntity 
     private static final double HOMING_RANGE = 14.0D;
     private static final double HOMING_TARGET_VERTICAL_OFFSET = 0.45D;
     private static final float HOMING_TURN_RATE = 0.18F;
+    private static final double MAX_RENDER_DISTANCE = 72.0D;
 
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
@@ -241,14 +241,6 @@ public class BasicSpellProjectileEntity extends Projectile implements GeoEntity 
                     schoolResistMultiplier,
                     this.magicArmorNegation
             );
-
-            ProjectBabylonWeapons.LOGGER.info("[WandProjectileDebug] hit target={} rawMagicDamage={} schoolResistMultiplier={} magicArmorNegation={} targetSpellResist={} adjustedMagicDamage={}",
-                    target.getName().getString(),
-                    this.rawMagicDamage,
-                    schoolResistMultiplier,
-                    this.magicArmorNegation,
-                    target.getAttributeValue(net.minecraftforge.registries.ForgeRegistries.ATTRIBUTES.getValue(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("irons_spellbooks", "spell_resist"))),
-                    adjustedMagicDamage);
             if (adjustedMagicDamage > 0.0F) {
                 DamageSource magicDamageSource = MagicMeleeWeaponHelper.createMagicProjectileDamageSource(
                         owner,

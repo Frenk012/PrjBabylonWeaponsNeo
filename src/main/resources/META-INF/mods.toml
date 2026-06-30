@@ -33,9 +33,16 @@ ordering="NONE"
 side="BOTH"
 
 [[dependencies.project_babylon_weapons]]
+modId="cdmoveset"
+mandatory=true
+versionRange="[2.0,)"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.project_babylon_weapons]]
 modId="project_babylon_materials"
 mandatory=true
-versionRange="[1.1.3,)"
+versionRange="[1.5.0,)"
 ordering="NONE"
 side="BOTH"
 
@@ -57,5 +64,19 @@ side="BOTH"
 modId="geckolib"
 mandatory=true
 versionRange="[4.5.4.1,)"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.project_babylon_weapons]]
+modId="photon"
+mandatory=true
+versionRange="[1.1.17,)"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.project_babylon_weapons]]
+modId="ldlib"
+mandatory=true
+versionRange="[1.0.50,)"
 ordering="NONE"
 side="BOTH"
