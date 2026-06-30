@@ -4,17 +4,17 @@ import com.rave.projectbabylonweapons.ProjectBabylonWeapons;
 import com.rave.projectbabylonweapons.config.PBConfig;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeManager;
-import net.minecraftforge.event.server.ServerStartedEvent;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.server.ServerStartedEvent;
 
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Mod.EventBusSubscriber(modid = ProjectBabylonWeapons.MODID)
+@EventBusSubscriber(modid = ProjectBabylonWeapons.MODID)
 public final class VanillaRecipeToggleHandler {
     private static final Set<ResourceLocation> DISABLED_RECIPE_IDS = Set.of(
             ResourceLocation.parse("minecraft:diamond_axe"),
@@ -50,8 +50,8 @@ public final class VanillaRecipeToggleHandler {
 
         MinecraftServer server = event.getServer();
         RecipeManager recipeManager = server.getRecipeManager();
-        List<Recipe<?>> filteredRecipes = recipeManager.getRecipes().stream()
-                .filter(recipe -> !DISABLED_RECIPE_IDS.contains(recipe.getId()))
+        List<RecipeHolder<?>> filteredRecipes = recipeManager.getRecipes().stream()
+                .filter(recipe -> !DISABLED_RECIPE_IDS.contains(recipe.id()))
                 .collect(Collectors.toList());
 
         int removedCount = recipeManager.getRecipes().size() - filteredRecipes.size();

@@ -12,6 +12,7 @@ import io.redspace.ironsspellbooks.registries.MobEffectRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.Holder;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.damagesource.DamageSource;
@@ -96,7 +97,7 @@ public final class IceFrostTouchPassive {
     }
 
     private static void applyFrostEffects(LivingEntity target, LivingEntity owner, IceFrostTouchBalance.Profile profile) {
-        MobEffect chilledEffect = MobEffectRegistry.CHILLED.get();
+        Holder<MobEffect> chilledEffect = MobEffectRegistry.CHILLED;
         MobEffectInstance chilledInstance = target.getEffect(chilledEffect);
         if (chilledInstance == null) {
             if (rollChance(owner, profile.chillIProcChance())) {
@@ -127,7 +128,7 @@ public final class IceFrostTouchPassive {
         target.removeEffect(chilledEffect);
         AABB area = target.getBoundingBox().inflate(profile.freezeRadiusBlocks(), 1.0D, profile.freezeRadiusBlocks());
         for (LivingEntity victim : owner.level().getEntitiesOfClass(LivingEntity.class, area, entity -> entity.isAlive() && entity != owner)) {
-            victim.addEffect(new MobEffectInstance(PBModEffects.FROZEN.get(), profile.frozenDurationTicks()));
+            victim.addEffect(new MobEffectInstance(PBModEffects.FROZEN, profile.frozenDurationTicks()));
         }
     }
 

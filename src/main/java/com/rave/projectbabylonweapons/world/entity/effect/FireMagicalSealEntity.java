@@ -15,8 +15,8 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.network.NetworkHooks;
-import net.minecraftforge.network.PlayMessages;
+import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
+import net.minecraft.server.level.ServerEntity;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.AnimatableManager;
@@ -50,10 +50,6 @@ public class FireMagicalSealEntity extends Entity implements GeoEntity {
     }
 
     public FireMagicalSealEntity(Level level) {
-        this(PBModEntities.FIRE_MAGICAL_SEAL.get(), level);
-    }
-
-    public FireMagicalSealEntity(PlayMessages.SpawnEntity packet, Level level) {
         this(PBModEntities.FIRE_MAGICAL_SEAL.get(), level);
     }
 
@@ -151,8 +147,8 @@ public class FireMagicalSealEntity extends Entity implements GeoEntity {
     }
 
     @Override
-    protected void defineSynchedData() {
-        this.entityData.define(DATA_DESPAWNING, false);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        builder.define(DATA_DESPAWNING, false);
     }
 
     @Override
@@ -174,8 +170,8 @@ public class FireMagicalSealEntity extends Entity implements GeoEntity {
     }
 
     @Override
-    public Packet<ClientGamePacketListener> getAddEntityPacket() {
-        return NetworkHooks.getEntitySpawningPacket(this);
+    public Packet<ClientGamePacketListener> getAddEntityPacket(ServerEntity serverEntity) {
+        return new ClientboundAddEntityPacket(this, serverEntity);
     }
 
     @Override

@@ -10,6 +10,8 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -24,8 +26,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.network.NetworkHooks;
-import net.minecraftforge.network.PlayMessages;
+import net.minecraft.server.level.ServerEntity;
 import yesman.epicfight.world.damagesource.EpicFightDamageSource;
 import yesman.epicfight.world.damagesource.EpicFightDamageTypeTags;
 import yesman.epicfight.world.damagesource.StunType;
@@ -76,10 +77,6 @@ public class FireStormEntity extends Projectile {
     }
 
     public FireStormEntity(Level level) {
-        this(PBModEntities.FIRE_STORM.get(), level);
-    }
-
-    public FireStormEntity(PlayMessages.SpawnEntity packet, Level level) {
         this(PBModEntities.FIRE_STORM.get(), level);
     }
 
@@ -200,7 +197,7 @@ public class FireStormEntity extends Projectile {
                 this.damageCooldowns.put(target.getUUID(), gameTime + DAMAGE_INTERVAL_TICKS);
                 this.damageTarget(owner, target);
                 if (level.random.nextFloat() < BURN_CHANCE) {
-                    target.setSecondsOnFire(BURN_DURATION_SECONDS);
+                    target.igniteForSeconds(BURN_DURATION_SECONDS);
                 }
             }
         }
@@ -310,7 +307,7 @@ public class FireStormEntity extends Projectile {
     }
 
     @Override
-    protected void defineSynchedData() {
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
     }
 
     @Override
@@ -319,7 +316,7 @@ public class FireStormEntity extends Projectile {
             this.ownerUuid = tag.getUUID(TAG_OWNER_UUID);
         }
         if (tag.contains(TAG_SOURCE_WEAPON)) {
-            this.sourceWeapon = ItemStack.of(tag.getCompound(TAG_SOURCE_WEAPON));
+            this.sourceWeapon = ItemStack.parse(this.registryAccess(), tag.getCompound(TAG_SOURCE_WEAPON)).orElse(ItemStack.EMPTY);
         }
         if (tag.contains(TAG_DAMAGE_TYPE)) {
             this.magicDamageType = ResourceKey.create(Registries.DAMAGE_TYPE, ResourceLocation.parse(tag.getString(TAG_DAMAGE_TYPE)));
@@ -340,7 +337,7 @@ public class FireStormEntity extends Projectile {
             tag.putUUID(TAG_OWNER_UUID, this.ownerUuid);
         }
         if (!this.sourceWeapon.isEmpty()) {
-            tag.put(TAG_SOURCE_WEAPON, this.sourceWeapon.save(new CompoundTag()));
+            tag.put(TAG_SOURCE_WEAPON, this.sourceWeapon.save(this.registryAccess()));
         }
         tag.putString(TAG_DAMAGE_TYPE, this.magicDamageType.location().toString());
         tag.putFloat(TAG_RAW_MAGIC_DAMAGE, this.rawMagicDamage);
@@ -352,8 +349,8 @@ public class FireStormEntity extends Projectile {
     }
 
     @Override
-    public Packet<ClientGamePacketListener> getAddEntityPacket() {
-        return NetworkHooks.getEntitySpawningPacket(this);
+    public Packet<ClientGamePacketListener> getAddEntityPacket(ServerEntity serverEntity) {
+        return new ClientboundAddEntityPacket(this, serverEntity);
     }
 }
 

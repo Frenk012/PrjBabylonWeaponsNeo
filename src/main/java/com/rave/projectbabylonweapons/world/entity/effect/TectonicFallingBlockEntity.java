@@ -15,7 +15,8 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.network.NetworkHooks;
+import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
+import net.minecraft.server.level.ServerEntity;
 
 public class TectonicFallingBlockEntity extends Entity {
     public static final float GRAVITY = 0.1F;
@@ -57,9 +58,9 @@ public class TectonicFallingBlockEntity extends Entity {
     }
 
     @Override
-    protected void defineSynchedData() {
-        this.entityData.define(BLOCK_STATE, Blocks.DIRT.defaultBlockState());
-        this.entityData.define(ANIM_VY, 0.32F);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        builder.define(BLOCK_STATE, Blocks.DIRT.defaultBlockState());
+        builder.define(ANIM_VY, 0.32F);
     }
 
     @Override
@@ -83,8 +84,8 @@ public class TectonicFallingBlockEntity extends Entity {
     }
 
     @Override
-    public Packet<ClientGamePacketListener> getAddEntityPacket() {
-        return NetworkHooks.getEntitySpawningPacket(this);
+    public Packet<ClientGamePacketListener> getAddEntityPacket(ServerEntity serverEntity) {
+        return new ClientboundAddEntityPacket(this, serverEntity);
     }
 
     @Override

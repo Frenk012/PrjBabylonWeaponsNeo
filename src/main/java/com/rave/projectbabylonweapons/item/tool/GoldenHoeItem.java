@@ -13,11 +13,11 @@ import java.util.List;
 public class GoldenHoeItem extends HoeItem {
 
     public GoldenHoeItem(Properties props) {
-        super(PBToolTiers.GOLDEN_DURABLE, 0, -3.0F, props);
+        super(PBToolTiers.GOLDEN_DURABLE, (props).attributes(HoeItem.createAttributes(PBToolTiers.GOLDEN_DURABLE, 0, -3.0F)));
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Level level, List<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, net.minecraft.world.item.Item.TooltipContext level, List<Component> tooltip, TooltipFlag flag) {
         super.appendHoverText(stack, level, tooltip, flag);
         GoldenMagicPassive.appendTooltip(tooltip);
     }

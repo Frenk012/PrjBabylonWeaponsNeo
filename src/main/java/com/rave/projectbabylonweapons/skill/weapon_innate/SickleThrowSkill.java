@@ -16,16 +16,15 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.fml.common.EventBusSubscriber;
 import yesman.epicfight.api.animation.types.StaticAnimation;
 import yesman.epicfight.api.asset.AssetAccessor;
 import yesman.epicfight.client.input.EpicFightKeyMappings;
-import yesman.epicfight.network.server.SPSkillExecutionFeedback;
-import yesman.epicfight.skill.SkillBuilder;
+import yesman.epicfight.network.server.SPSkillFeedback;
 import yesman.epicfight.skill.SkillContainer;
 import yesman.epicfight.skill.modules.ChargeableSkill;
 import yesman.epicfight.skill.weaponinnate.WeaponInnateSkill;
@@ -36,9 +35,9 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Mod.EventBusSubscriber(modid = ProjectBabylonWeapons.MODID)
+@EventBusSubscriber(modid = ProjectBabylonWeapons.MODID, bus = EventBusSubscriber.Bus.GAME)
 public class SickleThrowSkill extends WeaponInnateSkill implements ChargeableSkill {
-    private static final UUID CHARGING_SLOW_UUID = UUID.fromString("f2fd8aa1-ec8a-4da4-a67f-b18620d4f6d2");
+    private static final net.minecraft.resources.ResourceLocation CHARGING_SLOW_ID = net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(ProjectBabylonWeapons.MODID, "sickle_throw_charging_slow");
     private static final double CHARGING_SLOW_MULTIPLIER = -0.7D;
     public static final int TETHER_DURATION_TICKS = 7 * 20;
     public static final double MAX_CHAIN_DISTANCE = 10.0;
@@ -62,13 +61,13 @@ public class SickleThrowSkill extends WeaponInnateSkill implements ChargeableSki
         }
     }
 
-    public SickleThrowSkill(SkillBuilder<? extends WeaponInnateSkill> builder) {
+    public SickleThrowSkill(WeaponInnateSkill.Builder<?> builder) {
         super(builder);
     }
 
     @Override
-    public void onInitiate(SkillContainer container) {
-        super.onInitiate(container);
+    public void onInitiate(SkillContainer container, yesman.epicfight.api.event.EntityEventListener eventListener) {
+        super.onInitiate(container, eventListener);
     }
 
     @Override
@@ -123,7 +122,7 @@ public class SickleThrowSkill extends WeaponInnateSkill implements ChargeableSki
     }
 
     @Override
-    public void onStopHolding(SkillContainer container, SPSkillExecutionFeedback feedback) {
+    public void onStopHolding(SkillContainer container, SPSkillFeedback feedback) {
         removeChargingSlow(container);
 
         if (container.getExecutor().isLogicalClient()) {
@@ -153,7 +152,7 @@ public class SickleThrowSkill extends WeaponInnateSkill implements ChargeableSki
         }
 
         // Calculate throw distance from charge amount (6-10 blocks)
-        float chargeAmount = playerPatch.getAccumulatedChargeAmount();
+        float chargeAmount = playerPatch.getAccumulatedChargeTicks();
         float chargeRatio = Math.min(chargeAmount / (float)getMaxChargingTicks(), 1.0f);
         double throwDistance = MIN_CHAIN_DISTANCE + (MAX_CHAIN_DISTANCE - MIN_CHAIN_DISTANCE) * chargeRatio;
 
@@ -188,15 +187,14 @@ public class SickleThrowSkill extends WeaponInnateSkill implements ChargeableSki
         }
 
         AttributeInstance movementSpeed = player.getAttribute(Attributes.MOVEMENT_SPEED);
-        if (movementSpeed == null || movementSpeed.getModifier(CHARGING_SLOW_UUID) != null) {
+        if (movementSpeed == null || movementSpeed.getModifier(CHARGING_SLOW_ID) != null) {
             return;
         }
 
         movementSpeed.addTransientModifier(new AttributeModifier(
-                CHARGING_SLOW_UUID,
-                "GetOverHere charging slow",
+                CHARGING_SLOW_ID,
                 CHARGING_SLOW_MULTIPLIER,
-                AttributeModifier.Operation.MULTIPLY_TOTAL
+                AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL
         ));
     }
 
@@ -211,7 +209,7 @@ public class SickleThrowSkill extends WeaponInnateSkill implements ChargeableSki
 
         AttributeInstance movementSpeed = player.getAttribute(Attributes.MOVEMENT_SPEED);
         if (movementSpeed != null) {
-            movementSpeed.removeModifier(CHARGING_SLOW_UUID);
+            movementSpeed.removeModifier(CHARGING_SLOW_ID);
         }
     }
 
@@ -310,8 +308,8 @@ public class SickleThrowSkill extends WeaponInnateSkill implements ChargeableSki
     }
 
     @SubscribeEvent
-    public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
-        if (event.phase != TickEvent.Phase.END || !(event.player instanceof ServerPlayer serverPlayer)) {
+    public static void onPlayerTick(PlayerTickEvent.Post event) {
+        if (!(event.getEntity() instanceof ServerPlayer serverPlayer)) {
             return;
         }
         UUID uuid = serverPlayer.getUUID();

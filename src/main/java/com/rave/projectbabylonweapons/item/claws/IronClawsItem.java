@@ -17,14 +17,14 @@ public class IronClawsItem extends SwordItem {
 
     public IronClawsItem(Properties props) {
         // ВАЖНО: без stacksTo(...). Только durability(...)
-        super(Tiers.WOOD, ATTACK_DAMAGE_MOD, ATTACK_SPEED_MOD, props.durability(DURABILITY));
+        super(Tiers.WOOD, (props.durability(DURABILITY)).attributes(SwordItem.createAttributes(Tiers.WOOD, ATTACK_DAMAGE_MOD, ATTACK_SPEED_MOD)));
     }
 
     @Override
     public boolean hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
         if (attacker instanceof Player player) {
             if (player.getRandom().nextFloat() < 0.05F) { // 5%
-                target.addEffect(new MobEffectInstance(PBModEffects.BLEED_DEBUFF.get(), 20 * 20, 0));
+                target.addEffect(new MobEffectInstance(PBModEffects.BLEED_DEBUFF, 20 * 20, 0));
             }
         }
         return super.hurtEnemy(stack, target, attacker);

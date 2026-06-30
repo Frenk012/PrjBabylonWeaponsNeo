@@ -19,12 +19,13 @@ public class NetheriteDaggerItem extends SwordItem {
 
     public NetheriteDaggerItem(Properties props) {
 
-        super(Tiers.WOOD, ATTACK_DAMAGE_MOD, ATTACK_SPEED_MOD, props.durability(DURABILITY));
+        super(Tiers.WOOD, (props.durability(DURABILITY)).attributes(SwordItem.createAttributes(Tiers.WOOD, ATTACK_DAMAGE_MOD, ATTACK_SPEED_MOD)));
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Level level, List<Component> tooltip, TooltipFlag flag) {
-        super.appendHoverText(stack, level, tooltip, flag);
+    public void appendHoverText(ItemStack stack, net.minecraft.world.item.Item.TooltipContext level, List<Component> tooltip, TooltipFlag flag) {
+        super.appendHoverText(stack, level, tooltip, flag);
+
         NetheriteBrimstonePassive.appendTooltip(tooltip);
     }
 }

@@ -1,10 +1,10 @@
 package com.rave.projectbabylonweapons.handler;
 
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import yesman.epicfight.api.animation.types.DashAttackAnimation;
@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Mod.EventBusSubscriber
+@EventBusSubscriber
 public class EpicFightIntegration {
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -28,12 +28,8 @@ public class EpicFightIntegration {
     private static final Map<UUID, Boolean> FEAR_STATES = new ConcurrentHashMap<>();
 
     @SubscribeEvent
-    public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
-        if (event.phase != TickEvent.Phase.START) {
-            return;
-        }
-
-        Player player = event.player;
+    public static void onPlayerTick(PlayerTickEvent.Pre event) {
+        Player player = event.getEntity();
         PlayerPatch<?> playerPatch = EpicFightCapabilities.getEntityPatch(player, PlayerPatch.class);
         if (playerPatch == null) {
             return;

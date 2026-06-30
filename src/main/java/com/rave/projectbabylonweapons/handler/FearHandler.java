@@ -1,23 +1,24 @@
 package com.rave.projectbabylonweapons.handler;
 
+import com.rave.projectbabylonweapons.ProjectBabylonWeapons;
 import com.rave.projectbabylonweapons.init.PBModEffects;
 import com.rave.projectbabylonweapons.world.entity.projectile.SickleProjectileEntity;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.event.entity.living.LivingEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.tick.EntityTickEvent;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Mod.EventBusSubscriber
+@EventBusSubscriber(modid = ProjectBabylonWeapons.MODID, bus = EventBusSubscriber.Bus.GAME)
 public class FearHandler {
     private static final Set<ResourceLocation> BLOCKED_ANIMATIONS = new HashSet<>();
     private static final Set<String> BLOCKED_PATTERNS = new HashSet<>();
@@ -50,7 +51,7 @@ public class FearHandler {
     }
 
     public static boolean isFearActive(LivingEntity entity) {
-        return entity instanceof Player && entity.hasEffect(PBModEffects.FEAR_DEBUFF.get());
+        return entity instanceof Player && entity.hasEffect(PBModEffects.FEAR_DEBUFF);
     }
 
     public static boolean isSickleLocked(LivingEntity entity) {
@@ -127,9 +128,8 @@ public class FearHandler {
     }
 
     @SubscribeEvent
-    public static void onLivingTick(LivingEvent.LivingTickEvent event) {
-        LivingEntity entity = event.getEntity();
-        if (!(entity instanceof Player player) || !isMobilityRestricted(player)) {
+    public static void onLivingTick(EntityTickEvent.Post event) {
+        if (!(event.getEntity() instanceof Player player) || !isMobilityRestricted(player)) {
             return;
         }
 
@@ -148,12 +148,12 @@ public class FearHandler {
     }
 
     @SubscribeEvent
-    public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
-        if (event.phase != TickEvent.Phase.END || event.player.level().isClientSide()) {
+    public static void onPlayerTick(PlayerTickEvent.Post event) {
+        if (event.getEntity().level().isClientSide()) {
             return;
         }
 
-        Player player = event.player;
+        Player player = event.getEntity();
         if (!isSickleLocked(player)) {
             return;
         }

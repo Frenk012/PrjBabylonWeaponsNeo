@@ -12,6 +12,6 @@ public class DragonsteelSpearItem extends SwordItem {
 
     public DragonsteelSpearItem(Properties props) {
         // ВАЖНО: без stacksTo(...). Только durability(...)
-        super(Tiers.WOOD, ATTACK_DAMAGE_MOD, ATTACK_SPEED_MOD, props.durability(DURABILITY));
+        super(Tiers.WOOD, (props.durability(DURABILITY)).attributes(SwordItem.createAttributes(Tiers.WOOD, ATTACK_DAMAGE_MOD, ATTACK_SPEED_MOD)));
     }
 }

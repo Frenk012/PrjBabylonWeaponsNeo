@@ -34,8 +34,8 @@ public final class MagicMeleeWeaponHelper {
             return 0.0F;
         }
 
-        double spellPower = Math.max(0.0D, attacker.getAttributeValue(AttributeRegistry.SPELL_POWER.get()));
-        Attribute schoolAttribute = magicWeapon.getSchoolSpellPowerAttribute();
+        double spellPower = Math.max(0.0D, attacker.getAttributeValue(AttributeRegistry.SPELL_POWER));
+        Holder<Attribute> schoolAttribute = magicWeapon.getSchoolSpellPowerAttribute();
         double schoolPower = Math.max(0.0D, attacker.getAttributeValue(schoolAttribute));
 
         return (float) (baseMagicDamage * attackContextMultiplier * spellPower * schoolPower * damageMultiplier);

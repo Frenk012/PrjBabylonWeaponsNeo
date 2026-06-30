@@ -4,66 +4,61 @@ import com.rave.projectbabylonweapons.gameasset.PBAnimations;
 import com.rave.projectbabylonweapons.handler.WeaponVisualEffectHelper;
 import com.rave.projectbabylonweapons.world.entity.effect.HolyMagicalSealEntity;
 import net.minecraft.client.KeyMapping;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.phys.AABB;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import yesman.epicfight.api.event.EntityEventListener;
+import yesman.epicfight.api.event.EpicFightEventHooks;
+import yesman.epicfight.api.event.types.animation.AnimationEndEvent;
 import yesman.epicfight.client.input.EpicFightKeyMappings;
-import yesman.epicfight.skill.SkillBuilder;
 import yesman.epicfight.skill.SkillContainer;
 import yesman.epicfight.skill.weaponinnate.WeaponInnateSkill;
-import yesman.epicfight.world.entity.eventlistener.AnimationEndEvent;
-import yesman.epicfight.world.entity.eventlistener.PlayerEventListener.EventType;
 
 import java.util.List;
-import java.util.UUID;
 
 public class BlessingSkill extends WeaponInnateSkill {
-    private static final UUID BEGIN_UUID = UUID.fromString("9648e31a-b95f-4f52-9816-f55d49dc929a");
-    private static final UUID END_UUID = UUID.fromString("7c59f197-4d6f-43e5-9e02-d4d9f0e59cb8");
     private static final double ALLY_RADIUS = 15.0D;
 
-    public BlessingSkill(SkillBuilder<? extends WeaponInnateSkill> builder) {
+    public BlessingSkill(WeaponInnateSkill.Builder<?> builder) {
         super(builder);
     }
 
     @Override
-    public void onInitiate(SkillContainer container) {
-        super.onInitiate(container);
-        container.getExecutor().getEventListener().addEventListener(
-                EventType.ANIMATION_BEGIN_EVENT,
-                BEGIN_UUID,
+    public void onInitiate(SkillContainer container, EntityEventListener eventListener) {
+        super.onInitiate(container, eventListener);
+        eventListener.registerEvent(
+                EpicFightEventHooks.Animation.BEGIN,
                 event -> {
                     if (container.getExecutor().isLogicalClient()) {
                         return;
                     }
 
-                    if (event.getAnimation() != PBAnimations.BLESSING.get()) {
+                    if (event.getAnimation() != PBAnimations.BLESSING) {
                         return;
                     }
 
                     WeaponVisualEffectHelper.startBlessingCast(container.getExecutor().getOriginal());
-                }
+                },
+                this
         );
-        container.getExecutor().getEventListener().addEventListener(
-                EventType.ANIMATION_END_EVENT,
-                END_UUID,
-                event -> onAnimationEnd(container, event)
+        eventListener.registerEvent(
+                EpicFightEventHooks.Animation.END,
+                event -> onAnimationEnd(container, event),
+                this
         );
     }
 
     @Override
     public void onRemoved(SkillContainer container) {
-        container.getExecutor().getEventListener().removeListener(EventType.ANIMATION_BEGIN_EVENT, BEGIN_UUID);
-        container.getExecutor().getEventListener().removeListener(EventType.ANIMATION_END_EVENT, END_UUID);
         WeaponVisualEffectHelper.stopBlessingCast(container.getExecutor().getOriginal());
         super.onRemoved(container);
     }
 
     @Override
-    public void executeOnServer(SkillContainer container, FriendlyByteBuf args) {
+    public void executeOnServer(SkillContainer container, CompoundTag args) {
         if (this.isActivated(container)) {
             this.cancelOnServer(container, args);
         } else {
@@ -78,13 +73,13 @@ public class BlessingSkill extends WeaponInnateSkill {
     }
 
     @Override
-    public void executeOnClient(SkillContainer container, FriendlyByteBuf args) {
+    public void executeOnClient(SkillContainer container, CompoundTag args) {
         super.executeOnClient(container, args);
         container.activate();
     }
 
     @Override
-    public void cancelOnServer(SkillContainer container, FriendlyByteBuf args) {
+    public void cancelOnServer(SkillContainer container, CompoundTag args) {
         WeaponVisualEffectHelper.stopBlessingCast(container.getExecutor().getOriginal());
         container.deactivate();
         super.cancelOnServer(container, args);
@@ -92,13 +87,13 @@ public class BlessingSkill extends WeaponInnateSkill {
     }
 
     @Override
-    public void cancelOnClient(SkillContainer container, FriendlyByteBuf args) {
+    public void cancelOnClient(SkillContainer container, CompoundTag args) {
         container.deactivate();
         super.cancelOnClient(container, args);
     }
 
     private static void onAnimationEnd(SkillContainer container, AnimationEndEvent event) {
-        if (event.getAnimation() != PBAnimations.BLESSING.get()) {
+        if (event.getAnimation() != PBAnimations.BLESSING) {
             return;
         }
 

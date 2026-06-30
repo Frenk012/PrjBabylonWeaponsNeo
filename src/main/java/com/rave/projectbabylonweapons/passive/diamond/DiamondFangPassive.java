@@ -9,15 +9,15 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import yesman.epicfight.world.damagesource.EpicFightDamageSource;
 
 import java.util.List;
 
-@Mod.EventBusSubscriber(modid = ProjectBabylonWeapons.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+@EventBusSubscriber(modid = ProjectBabylonWeapons.MODID, bus = EventBusSubscriber.Bus.GAME)
 public final class DiamondFangPassive {
     private static final float FULL_ARMOR_NEGATION = 100.0F;
     private static final WeaponPassiveTooltipData TOOLTIP = new WeaponPassiveTooltipData(
@@ -34,7 +34,7 @@ public final class DiamondFangPassive {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public static void onLivingHurt(LivingHurtEvent event) {
+    public static void onLivingHurt(LivingIncomingDamageEvent event) {
         if (event.isCanceled() || event.getAmount() <= 0.0F) {
             return;
         }

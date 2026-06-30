@@ -1,17 +1,16 @@
 package com.rave.projectbabylonweapons.effect;
 
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 
-import java.util.UUID;
-
 public class BrokenArmorDebuff extends MobEffect {
-    private static final UUID ARMOR_REDUCTION_UUID = UUID.fromString("c28a4c9f-bd02-4d3e-9ab0-f6e1a28ffb5a");
+    private static final ResourceLocation ARMOR_REDUCTION_ID = ResourceLocation.fromNamespaceAndPath("project_babylon_weapons", "broken_armor_reduction");
 
     public BrokenArmorDebuff() {
         super(MobEffectCategory.HARMFUL, 0x6B6B6B);
-        addAttributeModifier(Attributes.ARMOR, ARMOR_REDUCTION_UUID.toString(), -0.20D, AttributeModifier.Operation.MULTIPLY_TOTAL);
+        addAttributeModifier(Attributes.ARMOR, ARMOR_REDUCTION_ID, -0.20D, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
     }
 }

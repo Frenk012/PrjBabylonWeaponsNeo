@@ -18,18 +18,14 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import yesman.epicfight.api.event.EntityEventListener;
+import yesman.epicfight.api.event.EpicFightEventHooks;
 import yesman.epicfight.client.input.EpicFightKeyMappings;
 import yesman.epicfight.skill.SkillContainer;
 import yesman.epicfight.skill.weaponinnate.SimpleWeaponInnateSkill;
 import yesman.epicfight.world.capabilities.entitypatch.player.ServerPlayerPatch;
-import yesman.epicfight.world.entity.eventlistener.PlayerEventListener.EventType;
-
-import java.util.UUID;
 
 public class FireStormSkill extends SimpleWeaponInnateSkill {
-    private static final UUID FIRE_STORM_BEGIN_UUID = UUID.fromString("8df94a6e-a458-44d8-b98b-d4ab8894f530");
-    private static final UUID FIRE_STORM_CONTACT_UUID = UUID.fromString("9edb2eb6-0529-44ad-8df9-74b68e60754e");
-    private static final UUID FIRE_STORM_END_UUID = UUID.fromString("dcaec719-7208-49c5-ab0b-3f7976da17b0");
     private static final double SPAWN_FORWARD_OFFSET = 1.1D;
     private static final int TORNADO_LIFETIME_TICKS = 20 * 20;
     private static final int SEAL_FALLBACK_DURATION_TICKS = 60;
@@ -40,18 +36,17 @@ public class FireStormSkill extends SimpleWeaponInnateSkill {
     }
 
     @Override
-    public void onInitiate(SkillContainer container) {
-        super.onInitiate(container);
+    public void onInitiate(SkillContainer container, EntityEventListener eventListener) {
+        super.onInitiate(container, eventListener);
 
-        container.getExecutor().getEventListener().addEventListener(
-                EventType.ANIMATION_BEGIN_EVENT,
-                FIRE_STORM_BEGIN_UUID,
+        eventListener.registerEvent(
+                EpicFightEventHooks.Animation.BEGIN,
                 event -> {
                     if (container.getExecutor().isLogicalClient()) {
                         return;
                     }
 
-                    if (event.getAnimation() != PBAnimations.FIRE_STORM.get()) {
+                    if (event.getAnimation() != PBAnimations.FIRE_STORM) {
                         return;
                     }
 
@@ -60,12 +55,12 @@ public class FireStormSkill extends SimpleWeaponInnateSkill {
                     if (caster instanceof ServerPlayer serverPlayer) {
                         spawnSeal(serverPlayer, TORNADO_LIFETIME_TICKS);
                     }
-                }
+                },
+                this
         );
 
-        container.getExecutor().getEventListener().addEventListener(
-                EventType.ATTACK_PHASE_END_EVENT,
-                FIRE_STORM_CONTACT_UUID,
+        eventListener.registerEvent(
+                EpicFightEventHooks.Animation.ATTACK_PHASE_END,
                 event -> {
                     if (container.getExecutor().isLogicalClient()) {
                         return;
@@ -79,36 +74,33 @@ public class FireStormSkill extends SimpleWeaponInnateSkill {
                         return;
                     }
 
-                    ServerPlayerPatch playerPatch = event.getPlayerPatch();
-                    if (playerPatch == null) {
+                    if (!(event.getEntityPatch() instanceof ServerPlayerPatch playerPatch)) {
                         return;
                     }
 
                     WeaponVisualEffectHelper.burstFireStormCast(playerPatch.getOriginal());
                     playFireStormStart(playerPatch.getOriginal());
                     spawnTornado(playerPatch, playerPatch.getOriginal().getMainHandItem());
-                }
+                },
+                this
         );
 
-        container.getExecutor().getEventListener().addEventListener(
-                EventType.ANIMATION_END_EVENT,
-                FIRE_STORM_END_UUID,
+        eventListener.registerEvent(
+                EpicFightEventHooks.Animation.END,
                 event -> {
-                    if (event.getAnimation() != PBAnimations.FIRE_STORM.get()) {
+                    if (event.getAnimation() != PBAnimations.FIRE_STORM) {
                         return;
                     }
 
                     LivingEntity caster = container.getExecutor().getOriginal();
                     WeaponVisualEffectHelper.stopFireStormCast(caster);
-                }
+                },
+                this
         );
     }
 
     @Override
     public void onRemoved(SkillContainer container) {
-        container.getExecutor().getEventListener().removeListener(EventType.ANIMATION_BEGIN_EVENT, FIRE_STORM_BEGIN_UUID);
-        container.getExecutor().getEventListener().removeListener(EventType.ATTACK_PHASE_END_EVENT, FIRE_STORM_CONTACT_UUID);
-        container.getExecutor().getEventListener().removeListener(EventType.ANIMATION_END_EVENT, FIRE_STORM_END_UUID);
         WeaponVisualEffectHelper.stopFireStormCast(container.getExecutor().getOriginal());
         super.onRemoved(container);
     }

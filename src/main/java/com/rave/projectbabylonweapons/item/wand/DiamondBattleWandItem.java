@@ -22,7 +22,7 @@ import net.minecraft.world.item.SwordItem;
 import net.minecraft.world.item.Tiers;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.client.extensions.common.IClientItemExtensions;
+import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.AnimatableManager;
@@ -32,7 +32,7 @@ import software.bernie.geckolib.animation.RawAnimation;
 import software.bernie.geckolib.animation.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 import yesman.epicfight.world.capabilities.entitypatch.player.ServerPlayerPatch;
-import yesman.epicfight.world.entity.eventlistener.AttackPhaseEndEvent;
+import yesman.epicfight.api.event.types.animation.AttackPhaseEndEvent;
 
 import java.util.function.Consumer;
 
@@ -46,14 +46,9 @@ public class DiamondBattleWandItem extends SwordItem implements GeoItem, MagicPr
     private static final float BASE_MAGIC_DAMAGE = 1.0F + ATTACK_DAMAGE_MOD;
 
     public DiamondBattleWandItem() {
-        super(
-                Tiers.DIAMOND,
-                ATTACK_DAMAGE_MOD,
-                ATTACK_SPEED_MOD,
-                new Item.Properties()
+        super(Tiers.DIAMOND, (new Item.Properties()
                         .durability(2600)
-                        .rarity(Rarity.COMMON)
-        );
+                        .rarity(Rarity.COMMON)).attributes(SwordItem.createAttributes(Tiers.DIAMOND, ATTACK_DAMAGE_MOD, ATTACK_SPEED_MOD)));
     }
 
     @Override
@@ -73,7 +68,7 @@ public class DiamondBattleWandItem extends SwordItem implements GeoItem, MagicPr
 
     @Override
     public float getSchoolResistMultiplier(LivingEntity target) {
-        return Math.max(0.0F, 1.0F + (float) target.getAttributeValue(AttributeRegistry.EVOCATION_MAGIC_RESIST.get()));
+        return Math.max(0.0F, 1.0F + (float) target.getAttributeValue(AttributeRegistry.EVOCATION_MAGIC_RESIST));
     }
 
     @Override

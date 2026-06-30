@@ -1,16 +1,17 @@
 package com.rave.projectbabylonweapons.effect;
 
+import com.rave.projectbabylonweapons.ProjectBabylonWeapons;
 import com.rave.projectbabylonweapons.init.PBModEffects;
 import io.redspace.ironsspellbooks.damage.ISSDamageTypes;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
-import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 
-@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE)
+@EventBusSubscriber(modid = ProjectBabylonWeapons.MODID, bus = EventBusSubscriber.Bus.GAME)
 public class BrimstoneFlamesDebuff extends MobEffect {
 
     public static final float FIRE_DAMAGE_BONUS = 0.15F;
@@ -20,12 +21,12 @@ public class BrimstoneFlamesDebuff extends MobEffect {
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
-    public static void onLivingHurt(LivingHurtEvent event) {
-        if (event.isCanceled() || event.getAmount() <= 0.0F) {
+    public static void onLivingHurt(LivingIncomingDamageEvent event) {
+        if (event.getAmount() <= 0.0F) {
             return;
         }
 
-        if (!event.getEntity().hasEffect(PBModEffects.BRIMSTONE_FLAMES.get())) {
+        if (!event.getEntity().hasEffect(PBModEffects.BRIMSTONE_FLAMES)) {
             return;
         }
 

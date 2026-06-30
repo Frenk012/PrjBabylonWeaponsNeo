@@ -13,11 +13,11 @@ import java.util.List;
 public class IceAxeItem extends AxeItem {
 
     public IceAxeItem(Properties props) {
-        super(PBToolTiers.ICE, 5.0F, -3.0F, props);
+        super(PBToolTiers.ICE, (props).attributes(AxeItem.createAttributes(PBToolTiers.ICE, 5.0F, -3.0F)));
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Level level, List<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, net.minecraft.world.item.Item.TooltipContext level, List<Component> tooltip, TooltipFlag flag) {
         super.appendHoverText(stack, level, tooltip, flag);
         IceChillPassive.appendTooltip(tooltip);
     }

@@ -13,11 +13,11 @@ import java.util.List;
 public class IcePickaxeItem extends PickaxeItem {
 
     public IcePickaxeItem(Properties props) {
-        super(PBToolTiers.ICE, 1, -2.8F, props);
+        super(PBToolTiers.ICE, (props).attributes(PickaxeItem.createAttributes(PBToolTiers.ICE, 1, -2.8F)));
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Level level, List<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, net.minecraft.world.item.Item.TooltipContext level, List<Component> tooltip, TooltipFlag flag) {
         super.appendHoverText(stack, level, tooltip, flag);
         IceChillPassive.appendTooltip(tooltip);
     }

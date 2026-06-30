@@ -10,26 +10,26 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.TieredItem;
 import net.minecraft.world.item.Tiers;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.fml.common.EventBusSubscriber;
 import yesman.epicfight.api.animation.AnimationManager;
 import yesman.epicfight.api.animation.LivingMotions;
-import yesman.epicfight.api.forgeevent.WeaponCapabilityPresetRegistryEvent;
+import yesman.epicfight.api.event.types.registry.WeaponCapabilityPresetRegistryEvent;
 import yesman.epicfight.gameasset.Animations;
-import yesman.epicfight.gameasset.EpicFightSounds;
-import yesman.epicfight.particle.EpicFightParticles;
+import yesman.epicfight.registry.entries.EpicFightSounds;
+import yesman.epicfight.registry.entries.EpicFightParticles;
 import yesman.epicfight.world.capabilities.EpicFightCapabilities;
 import yesman.epicfight.world.capabilities.item.CapabilityItem;
 import yesman.epicfight.world.capabilities.item.WeaponCapability;
 import com.rave.projectbabylonweapons.gameasset.PBAnimations;
 import com.rave.projectbabylonweapons.gameasset.PBSkills;
 
-@Mod.EventBusSubscriber(
+@EventBusSubscriber(
         modid = "project_babylon_weapons",
-        bus = Mod.EventBusSubscriber.Bus.MOD
+        bus = EventBusSubscriber.Bus.MOD
 )
 public class PBWeaponCapabilityPresets {
 
-    public static final Function<Item, CapabilityItem.Builder> SICKLE = (item) -> {
+    public static final Function<Item, CapabilityItem.Builder<?>> SICKLE = (item) -> {
         WeaponCapability.Builder builder = WeaponCapability.builder()
                 .category(PBWeaponCategories.PB_SICKLE)
                 .styleProvider((playerpatch) -> {
@@ -80,8 +80,8 @@ public class PBWeaponCapabilityPresets {
                         Animations.SWORD_MOUNT_ATTACK
                 })
 
-                .innateSkill(CapabilityItem.Styles.ONE_HAND, (itemstack) -> PBSkills.SICKLE_THROW)
-                .innateSkill(CapabilityItem.Styles.TWO_HAND, (itemstack) -> PBSkills.THE_HARVEST)
+                .innateSkill(CapabilityItem.Styles.ONE_HAND, (itemstack) -> PBSkills.SICKLE_THROW.get())
+                .innateSkill(CapabilityItem.Styles.TWO_HAND, (itemstack) -> PBSkills.THE_HARVEST.get())
 
                 .livingMotionModifier(CapabilityItem.Styles.ONE_HAND, LivingMotions.IDLE, PBAnimations.SICKLE_IDLE)
                 .livingMotionModifier(CapabilityItem.Styles.ONE_HAND, LivingMotions.KNEEL, PBAnimations.SICKLE_HOLD)
@@ -108,7 +108,7 @@ public class PBWeaponCapabilityPresets {
         return builder;
     };
 
-    public static final Function<Item, CapabilityItem.Builder> ARCLIGHT = (item) -> {
+    public static final Function<Item, CapabilityItem.Builder<?>> ARCLIGHT = (item) -> {
         WeaponCapability.Builder builder = WeaponCapability.builder()
                 .category(PBWeaponCategories.ARCLIGHT)
                 .styleProvider((playerpatch) -> CapabilityItem.Styles.TWO_HAND)
@@ -147,7 +147,7 @@ public class PBWeaponCapabilityPresets {
                         Animations.SWORD_MOUNT_ATTACK
                 })
 
-                .innateSkill(CapabilityItem.Styles.TWO_HAND, (itemstack) -> PBSkills.THE_HARVEST)
+                .innateSkill(CapabilityItem.Styles.TWO_HAND, (itemstack) -> PBSkills.THE_HARVEST.get())
 
 
                 .livingMotionModifier(CapabilityItem.Styles.TWO_HAND, LivingMotions.IDLE, PBAnimations.ARCLIGHT_IDLE)
@@ -163,7 +163,7 @@ public class PBWeaponCapabilityPresets {
         return builder;
     };
 
-    public static final Function<Item, CapabilityItem.Builder> PB_WAND = (item) -> {
+    public static final Function<Item, CapabilityItem.Builder<?>> PB_WAND = (item) -> {
         WeaponCapability.Builder builder = WeaponCapability.builder()
                 .category(PBWeaponCategories.PB_WAND)
                 .styleProvider((playerpatch) -> CapabilityItem.Styles.TWO_HAND)
@@ -202,7 +202,7 @@ public class PBWeaponCapabilityPresets {
                         Animations.SWORD_MOUNT_ATTACK
                 })
 
-                .innateSkill(CapabilityItem.Styles.TWO_HAND, (itemstack) -> PBSkills.BLESSING)
+                .innateSkill(CapabilityItem.Styles.TWO_HAND, (itemstack) -> PBSkills.BLESSING.get())
 
 
                 .livingMotionModifier(CapabilityItem.Styles.TWO_HAND, LivingMotions.IDLE, PBAnimations.WAND_IDLE)

@@ -19,12 +19,13 @@ import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.event.TickEvent;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.tick.ServerTickEvent;
+import yesman.epicfight.api.event.EntityEventListener;
+import yesman.epicfight.api.event.EpicFightEventHooks;
 import yesman.epicfight.skill.SkillContainer;
 import yesman.epicfight.skill.weaponinnate.SimpleWeaponInnateSkill;
-import yesman.epicfight.world.entity.eventlistener.PlayerEventListener.EventType;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -32,10 +33,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-@Mod.EventBusSubscriber(modid = ProjectBabylonWeapons.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+@EventBusSubscriber(modid = ProjectBabylonWeapons.MODID, bus = EventBusSubscriber.Bus.GAME)
 public class TectonicSkill extends SimpleWeaponInnateSkill {
 
-    private static final UUID TECTONIC_BEGIN_UUID = UUID.fromString("f306ba6f-4842-455e-b9ec-2ca8c6f79e5d");
     private static final int CONCUSSED_DURATION_TICKS = 7 * 20;
     private static final float KNOCKUP_VELOCITY = 0.90F;
     private static final float HORIZONTAL_PUSH = 0.24F;
@@ -85,39 +85,38 @@ public class TectonicSkill extends SimpleWeaponInnateSkill {
     }
 
     @Override
-    public void onInitiate(SkillContainer container) {
-        super.onInitiate(container);
+    public void onInitiate(SkillContainer container, EntityEventListener eventListener) {
+        super.onInitiate(container, eventListener);
 
-        container.getExecutor().getEventListener().addEventListener(
-                EventType.ANIMATION_BEGIN_EVENT,
-                TECTONIC_BEGIN_UUID,
+        eventListener.registerEvent(
+                EpicFightEventHooks.Animation.BEGIN,
                 (event) -> {
                     if (container.getExecutor().isLogicalClient()) {
                         return;
                     }
 
-                    if (event.getAnimation() != PBAnimations.TECTONIC.get()) {
+                    if (event.getAnimation() != PBAnimations.TECTONIC) {
                         return;
                     }
 
                     LivingEntity caster = container.getExecutor().getOriginal();
                     captureCastSnapshot(caster);
                     queueWaveFromSnapshot(caster);
-                }
+                },
+                this
         );
 
     }
 
     @Override
     public void onRemoved(SkillContainer container) {
-        container.getExecutor().getEventListener().removeListener(EventType.ANIMATION_BEGIN_EVENT, TECTONIC_BEGIN_UUID);
         PENDING_CASTS.remove(container.getExecutor().getOriginal().getUUID());
         super.onRemoved(container);
     }
 
     @SubscribeEvent
-    public static void onServerTick(TickEvent.ServerTickEvent event) {
-        if (event.phase != TickEvent.Phase.END || ACTIVE_WAVES.isEmpty()) {
+    public static void onServerTick(ServerTickEvent.Post event) {
+        if (ACTIVE_WAVES.isEmpty()) {
             return;
         }
 
@@ -230,7 +229,7 @@ public class TectonicSkill extends SimpleWeaponInnateSkill {
 
             target.setDeltaMovement(push.x, KNOCKUP_VELOCITY, push.z);
             target.hurtMarked = true;
-            target.addEffect(new MobEffectInstance(PBModEffects.CONCUSSED.get(), CONCUSSED_DURATION_TICKS, 0, false, true, true));
+            target.addEffect(new MobEffectInstance(PBModEffects.CONCUSSED, CONCUSSED_DURATION_TICKS, 0, false, true, true));
             waveState.hitTargets.add(target.getUUID());
         }
 

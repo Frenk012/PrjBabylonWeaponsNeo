@@ -47,7 +47,7 @@ public final class EtherealSanctuaryPassive {
         }
 
         MobEffectInstance negativeEffect = ally.getActiveEffects().stream()
-                .filter(effect -> effect.getEffect().getCategory() == MobEffectCategory.HARMFUL)
+                .filter(effect -> effect.getEffect().value().getCategory() == MobEffectCategory.HARMFUL)
                 .findFirst()
                 .orElse(null);
         if (negativeEffect == null) {
@@ -59,7 +59,7 @@ public final class EtherealSanctuaryPassive {
     }
 
     private static boolean hasNegativeEffect(LivingEntity entity) {
-        return entity.getActiveEffects().stream().anyMatch(effect -> effect.getEffect().getCategory() == MobEffectCategory.HARMFUL);
+        return entity.getActiveEffects().stream().anyMatch(effect -> effect.getEffect().value().getCategory() == MobEffectCategory.HARMFUL);
     }
 
     public static WeaponPassiveTooltipData getTooltipData() {

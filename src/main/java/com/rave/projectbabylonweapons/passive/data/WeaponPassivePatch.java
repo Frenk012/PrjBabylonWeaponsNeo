@@ -6,7 +6,7 @@ import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.core.registries.BuiltInRegistries;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -31,7 +31,7 @@ public record WeaponPassivePatch(ResourceLocation id,
             return false;
         }
 
-        ResourceLocation stackItemId = ForgeRegistries.ITEMS.getKey(stack.getItem());
+        ResourceLocation stackItemId = BuiltInRegistries.ITEM.getKey(stack.getItem());
         return this.weaponIds.contains(stackItemId);
     }
 

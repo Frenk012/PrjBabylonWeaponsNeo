@@ -16,7 +16,7 @@ import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.core.registries.BuiltInRegistries;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -146,7 +146,7 @@ public final class WeaponPassivePatchManager extends SimpleJsonResourceReloadLis
                 return List.of();
             }
 
-            if (!ForgeRegistries.ITEMS.containsKey(weaponId)) {
+            if (!BuiltInRegistries.ITEM.containsKey(weaponId)) {
                 ProjectBabylonWeapons.LOGGER.warn("Skipping passive patch {} because weapon item {} is not registered", patchId, weaponId);
                 return List.of();
             }
@@ -163,7 +163,7 @@ public final class WeaponPassivePatchManager extends SimpleJsonResourceReloadLis
                     return List.of();
                 }
 
-                if (!ForgeRegistries.ITEMS.containsKey(weaponId)) {
+                if (!BuiltInRegistries.ITEM.containsKey(weaponId)) {
                     ProjectBabylonWeapons.LOGGER.warn("Skipping passive patch {} because weapon item {} is not registered", patchId, weaponId);
                     return List.of();
                 }

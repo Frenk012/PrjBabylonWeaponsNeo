@@ -1,18 +1,17 @@
 package com.rave.projectbabylonweapons.effect;
 
-import java.util.UUID;
-
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 
-import yesman.epicfight.world.entity.ai.attribute.EpicFightAttributes;
+import yesman.epicfight.registry.entries.EpicFightAttributes;
 
 public class ImpactBreakDebuff extends MobEffect {
-    private static final UUID IMPACT_REDUCTION_UUID = UUID.fromString("b5ef8de5-4a54-4b5c-80b6-8ef5ff0a3a77");
+    private static final ResourceLocation IMPACT_REDUCTION_ID = ResourceLocation.fromNamespaceAndPath("project_babylon_weapons", "impact_break_reduction");
 
     public ImpactBreakDebuff() {
         super(MobEffectCategory.HARMFUL, 0x7A2D2D);
-        addAttributeModifier(EpicFightAttributes.IMPACT.get(), IMPACT_REDUCTION_UUID.toString(), -0.25D, AttributeModifier.Operation.MULTIPLY_TOTAL);
+        addAttributeModifier(EpicFightAttributes.IMPACT, IMPACT_REDUCTION_ID, -0.25D, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
     }
 }

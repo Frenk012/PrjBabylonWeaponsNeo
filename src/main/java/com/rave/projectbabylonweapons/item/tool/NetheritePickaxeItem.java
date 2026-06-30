@@ -13,11 +13,11 @@ import java.util.List;
 public class NetheritePickaxeItem extends PickaxeItem {
 
     public NetheritePickaxeItem(Properties props) {
-        super(Tiers.NETHERITE, 1, -2.8F, props);
+        super(Tiers.NETHERITE, (props).attributes(PickaxeItem.createAttributes(Tiers.NETHERITE, 1, -2.8F)));
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Level level, List<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, net.minecraft.world.item.Item.TooltipContext level, List<Component> tooltip, TooltipFlag flag) {
         super.appendHoverText(stack, level, tooltip, flag);
         NetheriteBrimstonePassive.appendTooltip(tooltip);
     }

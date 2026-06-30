@@ -7,26 +7,25 @@ import com.rave.projectbabylonweapons.handler.WeaponVisualEffectHelper;
 import com.rave.projectbabylonweapons.item.MagicProjectileStaffWeapon;
 import com.rave.projectbabylonweapons.world.entity.projectile.DragonDescendProjectileEntity;
 import net.minecraft.client.KeyMapping;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import yesman.epicfight.api.event.EntityEventListener;
+import yesman.epicfight.api.event.EpicFightEventHooks;
 import yesman.epicfight.client.input.EpicFightKeyMappings;
-import yesman.epicfight.skill.SkillBuilder;
 import yesman.epicfight.skill.SkillContainer;
 import yesman.epicfight.skill.weaponinnate.WeaponInnateSkill;
 import yesman.epicfight.world.capabilities.entitypatch.player.ServerPlayerPatch;
-import yesman.epicfight.world.entity.eventlistener.PlayerEventListener.EventType;
 
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class DragonDescendSkill extends WeaponInnateSkill {
-    private static final UUID CONTACT_UUID = UUID.fromString("277c7359-6857-4ef3-bc44-f7297f94c22a");
     private static final Set<UUID> ACTIVE_CASTER_IDS = ConcurrentHashMap.newKeySet();
     private static final float DIRECT_DAMAGE_MULTIPLIER = 1.0F;
     private static final float TRAIL_DAMAGE_MULTIPLIER = 0.25F;
@@ -34,7 +33,7 @@ public class DragonDescendSkill extends WeaponInnateSkill {
     private static final double LAUNCH_FORWARD_OFFSET = 1.35D;
     private static final double LAUNCH_HEIGHT_FACTOR = 0.72D;
 
-    public DragonDescendSkill(SkillBuilder<? extends WeaponInnateSkill> builder) {
+    public DragonDescendSkill(WeaponInnateSkill.Builder<?> builder) {
         super(builder);
     }
 
@@ -43,11 +42,10 @@ public class DragonDescendSkill extends WeaponInnateSkill {
     }
 
     @Override
-    public void onInitiate(SkillContainer container) {
-        super.onInitiate(container);
-        container.getExecutor().getEventListener().addEventListener(
-                EventType.ATTACK_PHASE_END_EVENT,
-                CONTACT_UUID,
+    public void onInitiate(SkillContainer container, EntityEventListener eventListener) {
+        super.onInitiate(container, eventListener);
+        eventListener.registerEvent(
+                EpicFightEventHooks.Animation.ATTACK_PHASE_END,
                 event -> {
                     if (container.getExecutor().isLogicalClient()) {
                         return;
@@ -57,27 +55,26 @@ public class DragonDescendSkill extends WeaponInnateSkill {
                         return;
                     }
 
-                    ServerPlayerPatch playerPatch = event.getPlayerPatch();
-                    if (playerPatch == null) {
+                    if (!(event.getEntityPatch() instanceof ServerPlayerPatch playerPatch)) {
                         return;
                     }
 
                     WeaponVisualEffectHelper.burstDragonDescendCast(playerPatch.getOriginal());
                     spawnAndLaunchProjectile(playerPatch, playerPatch.getOriginal().getMainHandItem());
-                }
+                },
+                this
         );
     }
 
     @Override
     public void onRemoved(SkillContainer container) {
-        container.getExecutor().getEventListener().removeListener(EventType.ATTACK_PHASE_END_EVENT, CONTACT_UUID);
         ACTIVE_CASTER_IDS.remove(container.getExecutor().getOriginal().getUUID());
         WeaponVisualEffectHelper.stopDragonDescendCast(container.getExecutor().getOriginal());
         super.onRemoved(container);
     }
 
     @Override
-    public void executeOnServer(SkillContainer container, FriendlyByteBuf args) {
+    public void executeOnServer(SkillContainer container, CompoundTag args) {
         if (this.isActivated(container)) {
             this.cancelOnServer(container, args);
         } else {
@@ -91,13 +88,13 @@ public class DragonDescendSkill extends WeaponInnateSkill {
     }
 
     @Override
-    public void executeOnClient(SkillContainer container, FriendlyByteBuf args) {
+    public void executeOnClient(SkillContainer container, CompoundTag args) {
         super.executeOnClient(container, args);
         container.activate();
     }
 
     @Override
-    public void cancelOnServer(SkillContainer container, FriendlyByteBuf args) {
+    public void cancelOnServer(SkillContainer container, CompoundTag args) {
         ACTIVE_CASTER_IDS.remove(container.getExecutor().getOriginal().getUUID());
         WeaponVisualEffectHelper.stopDragonDescendCast(container.getExecutor().getOriginal());
         container.deactivate();
@@ -106,7 +103,7 @@ public class DragonDescendSkill extends WeaponInnateSkill {
     }
 
     @Override
-    public void cancelOnClient(SkillContainer container, FriendlyByteBuf args) {
+    public void cancelOnClient(SkillContainer container, CompoundTag args) {
         container.deactivate();
         super.cancelOnClient(container, args);
     }

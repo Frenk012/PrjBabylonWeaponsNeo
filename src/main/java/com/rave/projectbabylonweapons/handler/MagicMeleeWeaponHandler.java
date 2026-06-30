@@ -5,16 +5,16 @@ import com.rave.projectbabylonweapons.item.MagicMeleeWeapon;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.event.entity.living.LivingHurtEvent;
+import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.fml.common.EventBusSubscriber;
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-@Mod.EventBusSubscriber(modid = ProjectBabylonWeapons.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+@EventBusSubscriber(modid = ProjectBabylonWeapons.MODID, bus = EventBusSubscriber.Bus.GAME)
 public final class MagicMeleeWeaponHandler {
     private static final ThreadLocal<Set<UUID>> PROCESSING_ENTITIES = ThreadLocal.withInitial(HashSet::new);
 
@@ -22,7 +22,7 @@ public final class MagicMeleeWeaponHandler {
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
-    public static void onLivingHurt(LivingHurtEvent event) {
+    public static void onLivingHurt(LivingIncomingDamageEvent event) {
         if (event.isCanceled() || event.getAmount() <= 0.0F) {
             return;
         }

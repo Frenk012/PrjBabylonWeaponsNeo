@@ -12,17 +12,17 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-@Mod.EventBusSubscriber(modid = ProjectBabylonWeapons.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+@EventBusSubscriber(modid = ProjectBabylonWeapons.MODID, bus = EventBusSubscriber.Bus.GAME)
 public final class EtherealHolyPassive {
     private static final ThreadLocal<Set<UUID>> PROCESSING_ENTITIES = ThreadLocal.withInitial(HashSet::new);
     private static final WeaponPassiveTooltipData TOOLTIP = new WeaponPassiveTooltipData(
@@ -39,7 +39,7 @@ public final class EtherealHolyPassive {
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
-    public static void onLivingHurt(LivingHurtEvent event) {
+    public static void onLivingHurt(LivingIncomingDamageEvent event) {
         UUID targetUUID = event.getEntity().getUUID();
         if (PROCESSING_ENTITIES.get().contains(targetUUID)) {
             return;

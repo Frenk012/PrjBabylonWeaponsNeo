@@ -41,11 +41,11 @@ public class IronBattleWandItemRenderer extends GeoItemRenderer<IronBattleWandIt
     }
 
     @Override
-    public void actuallyRender(PoseStack matrixStackIn, IronBattleWandItem animatable, BakedGeoModel model, RenderType type, MultiBufferSource renderTypeBuffer, VertexConsumer vertexBuilder, boolean isRenderer, float partialTicks, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
+    public void actuallyRender(PoseStack matrixStackIn, IronBattleWandItem animatable, BakedGeoModel model, RenderType type, MultiBufferSource renderTypeBuffer, VertexConsumer vertexBuilder, boolean isRenderer, float partialTicks, int packedLightIn, int packedOverlayIn, int renderColor) {
         this.currentBuffer = renderTypeBuffer;
         this.renderType = type;
         this.animatable = animatable;
-        super.actuallyRender(matrixStackIn, animatable, model, type, renderTypeBuffer, vertexBuilder, isRenderer, partialTicks, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+        super.actuallyRender(matrixStackIn, animatable, model, type, renderTypeBuffer, vertexBuilder, isRenderer, partialTicks, packedLightIn, packedOverlayIn, renderColor);
         if (this.renderArms) {
             this.renderArms = false;
         }

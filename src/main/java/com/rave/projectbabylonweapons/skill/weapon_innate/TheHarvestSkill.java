@@ -4,15 +4,13 @@ import com.rave.projectbabylonweapons.gameasset.PBAnimations;
 import com.rave.projectbabylonweapons.init.PBModEffects;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
+import yesman.epicfight.api.event.EntityEventListener;
+import yesman.epicfight.api.event.EpicFightEventHooks;
 import yesman.epicfight.skill.SkillContainer;
 import yesman.epicfight.skill.weaponinnate.SimpleWeaponInnateSkill;
-import yesman.epicfight.world.entity.eventlistener.PlayerEventListener.EventType;
-
-import java.util.UUID;
 
 public class TheHarvestSkill extends SimpleWeaponInnateSkill {
 
-    private static final UUID DAMAGE_UUID = UUID.fromString("d3a1f2c4-9b7e-4a11-8c3d-1f2e3a4b5c6d");
     private static final int MARKED_DURATION_TICKS = 12 * 20;
 
     public TheHarvestSkill(SimpleWeaponInnateSkill.Builder builder) {
@@ -20,19 +18,18 @@ public class TheHarvestSkill extends SimpleWeaponInnateSkill {
     }
 
     @Override
-    public void onInitiate(SkillContainer container) {
-        super.onInitiate(container);
+    public void onInitiate(SkillContainer container, EntityEventListener eventListener) {
+        super.onInitiate(container, eventListener);
 
-        container.getExecutor().getEventListener().addEventListener(
-                EventType.DEAL_DAMAGE_EVENT_HURT,
-                DAMAGE_UUID,
+        eventListener.registerEvent(
+                EpicFightEventHooks.Entity.DELIVER_DAMAGE_POST,
                 (event) -> {
                     var eventAnim = event.getDamageSource().getAnimation();
                     if (eventAnim == null) {
                         return;
                     }
 
-                    if (!eventAnim.toString().equals(PBAnimations.THE_HARVEST.registryName().toString())) {
+                    if (eventAnim != PBAnimations.THE_HARVEST) {
                         return;
                     }
 
@@ -42,27 +39,27 @@ public class TheHarvestSkill extends SimpleWeaponInnateSkill {
                     }
 
                     // Lifesteal
-                    float healAmount = event.getAttackDamage() * 0.1f;
+                    float healAmount = event.getModifiedDamage() * 0.1f;
                     if (healAmount > 0) {
                         container.getExecutor().getOriginal().heal(healAmount);
                     }
 
-                    // MARKED 
+                    // MARKED
                     target.addEffect(new MobEffectInstance(
-                            PBModEffects.MARKED.get(),
+                            PBModEffects.MARKED,
                             MARKED_DURATION_TICKS,
                             0,
                             false,
                             true,
                             true
                     ));
-                }
+                },
+                this
         );
     }
 
     @Override
     public void onRemoved(SkillContainer container) {
-        container.getExecutor().getEventListener().removeListener(EventType.DEAL_DAMAGE_EVENT_HURT, DAMAGE_UUID);
         super.onRemoved(container);
     }
 }

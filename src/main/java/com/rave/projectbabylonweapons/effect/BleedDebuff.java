@@ -16,12 +16,12 @@ public class BleedDebuff extends MobEffect {
     }
 
     @Override
-    public boolean isDurationEffectTick(int duration, int amplifier) {
+    public boolean shouldApplyEffectTickThisTick(int duration, int amplifier) {
         return duration % 100 == 0;
     }
 
     @Override
-    public void applyEffectTick(LivingEntity entity, int amplifier) {
+    public boolean applyEffectTick(LivingEntity entity, int amplifier) {
         if (!entity.level().isClientSide && entity.level() instanceof ServerLevel serverLevel) {
             DamageSource source = new DamageSource(
                     serverLevel.registryAccess()
@@ -32,11 +32,12 @@ public class BleedDebuff extends MobEffect {
             if (sourceEntity == null) {
                 sourceEntity = entity;
             }
-            double spellPower = sourceEntity.getAttributeValue(AttributeRegistry.SPELL_POWER.get());
-            double bloodPower = sourceEntity.getAttributeValue(AttributeRegistry.BLOOD_SPELL_POWER.get());
+            double spellPower = sourceEntity.getAttributeValue(AttributeRegistry.SPELL_POWER);
+            double bloodPower = sourceEntity.getAttributeValue(AttributeRegistry.BLOOD_SPELL_POWER);
             float baseDamage = 1.0F * (amplifier + 1);
             float damage = (float)(baseDamage * spellPower * bloodPower);
             entity.hurt(source, damage);
         }
+        return true;
     }
 }

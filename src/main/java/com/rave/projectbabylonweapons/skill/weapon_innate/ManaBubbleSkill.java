@@ -11,7 +11,7 @@ import io.redspace.ironsspellbooks.util.ParticleHelper;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -20,13 +20,13 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import org.joml.Vector3f;
+import yesman.epicfight.api.event.EntityEventListener;
+import yesman.epicfight.api.event.EpicFightEventHooks;
+import yesman.epicfight.api.event.types.animation.AnimationEndEvent;
 import yesman.epicfight.client.input.EpicFightKeyMappings;
-import yesman.epicfight.skill.SkillBuilder;
 import yesman.epicfight.skill.SkillContainer;
 import yesman.epicfight.skill.weaponinnate.WeaponInnateSkill;
 import yesman.epicfight.world.capabilities.entitypatch.player.ServerPlayerPatch;
-import yesman.epicfight.world.entity.eventlistener.AnimationEndEvent;
-import yesman.epicfight.world.entity.eventlistener.PlayerEventListener.EventType;
 
 import java.util.UUID;
 
@@ -47,16 +47,15 @@ public class ManaBubbleSkill extends WeaponInnateSkill {
     private static final double GROUND_RING_Y_OFFSET = 0.08D;
     private static final double TORSO_RING_Y_MULTIPLIER = 0.62D;
 
-    public ManaBubbleSkill(SkillBuilder<? extends WeaponInnateSkill> builder) {
+    public ManaBubbleSkill(WeaponInnateSkill.Builder<?> builder) {
         super(builder);
     }
 
     @Override
-    public void onInitiate(SkillContainer container) {
-        super.onInitiate(container);
-        container.getExecutor().getEventListener().addEventListener(
-                EventType.ATTACK_PHASE_END_EVENT,
-                CONTACT_UUID,
+    public void onInitiate(SkillContainer container, EntityEventListener eventListener) {
+        super.onInitiate(container, eventListener);
+        eventListener.registerEvent(
+                EpicFightEventHooks.Animation.ATTACK_PHASE_END,
                 event -> {
                     if (container.getExecutor().isLogicalClient()) {
                         return;
@@ -70,8 +69,7 @@ public class ManaBubbleSkill extends WeaponInnateSkill {
                         return;
                     }
 
-                    ServerPlayerPatch playerPatch = event.getPlayerPatch();
-                    if (playerPatch == null) {
+                    if (!(event.getEntityPatch() instanceof ServerPlayerPatch playerPatch)) {
                         return;
                     }
 
@@ -89,24 +87,23 @@ public class ManaBubbleSkill extends WeaponInnateSkill {
                     if (container.isActivated()) {
                         container.deactivate();
                     }
-                }
+                },
+                this
         );
-        container.getExecutor().getEventListener().addEventListener(
-                EventType.ANIMATION_END_EVENT,
-                END_UUID,
-                event -> onAnimationEnd(container, event)
+        eventListener.registerEvent(
+                EpicFightEventHooks.Animation.END,
+                event -> onAnimationEnd(container, event),
+                this
         );
     }
 
     @Override
     public void onRemoved(SkillContainer container) {
-        container.getExecutor().getEventListener().removeListener(EventType.ATTACK_PHASE_END_EVENT, CONTACT_UUID);
-        container.getExecutor().getEventListener().removeListener(EventType.ANIMATION_END_EVENT, END_UUID);
         super.onRemoved(container);
     }
 
     @Override
-    public void executeOnServer(SkillContainer container, FriendlyByteBuf args) {
+    public void executeOnServer(SkillContainer container, CompoundTag args) {
         super.executeOnServer(container, args);
         container.activate();
         container.getExecutor().getOriginal().level().playSound(
@@ -124,19 +121,19 @@ public class ManaBubbleSkill extends WeaponInnateSkill {
     }
 
     @Override
-    public void executeOnClient(SkillContainer container, FriendlyByteBuf args) {
+    public void executeOnClient(SkillContainer container, CompoundTag args) {
         super.executeOnClient(container, args);
         container.activate();
     }
 
     @Override
-    public void cancelOnServer(SkillContainer container, FriendlyByteBuf args) {
+    public void cancelOnServer(SkillContainer container, CompoundTag args) {
         container.deactivate();
         super.cancelOnServer(container, args);
     }
 
     @Override
-    public void cancelOnClient(SkillContainer container, FriendlyByteBuf args) {
+    public void cancelOnClient(SkillContainer container, CompoundTag args) {
         container.deactivate();
         super.cancelOnClient(container, args);
     }

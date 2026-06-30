@@ -15,7 +15,7 @@ import software.bernie.geckolib.animation.AnimatableManager;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animatable.GeoItem;
 
-import net.minecraftforge.client.extensions.common.IClientItemExtensions;
+import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
@@ -34,14 +34,9 @@ public class NetheriteBattleScytheItem extends SwordItem implements GeoItem {
     public static final float ATTACK_SPEED_MOD = -3.0F;
 
     public NetheriteBattleScytheItem() {
-        super(
-                Tiers.DIAMOND,
-                ATTACK_DAMAGE_MOD,
-                ATTACK_SPEED_MOD,
-                new Item.Properties()
+        super(Tiers.DIAMOND, (new Item.Properties()
                         .durability(2600)
-                        .rarity(Rarity.COMMON)
-        );
+                        .rarity(Rarity.COMMON)).attributes(SwordItem.createAttributes(Tiers.DIAMOND, ATTACK_DAMAGE_MOD, ATTACK_SPEED_MOD)));
     }
 
     @Override
@@ -113,7 +108,7 @@ public class NetheriteBattleScytheItem extends SwordItem implements GeoItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Level level, List<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, net.minecraft.world.item.Item.TooltipContext level, List<Component> tooltip, TooltipFlag flag) {
         super.appendHoverText(stack, level, tooltip, flag);
         NetheriteBrimstonePassive.appendTooltip(tooltip);
     }

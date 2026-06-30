@@ -13,11 +13,11 @@ import java.util.List;
 public class NetheriteShovelItem extends ShovelItem {
 
     public NetheriteShovelItem(Properties props) {
-        super(Tiers.NETHERITE, 1.5F, -3.0F, props);
+        super(Tiers.NETHERITE, (props).attributes(ShovelItem.createAttributes(Tiers.NETHERITE, 1.5F, -3.0F)));
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Level level, List<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, net.minecraft.world.item.Item.TooltipContext level, List<Component> tooltip, TooltipFlag flag) {
         super.appendHoverText(stack, level, tooltip, flag);
         NetheriteBrimstonePassive.appendTooltip(tooltip);
     }

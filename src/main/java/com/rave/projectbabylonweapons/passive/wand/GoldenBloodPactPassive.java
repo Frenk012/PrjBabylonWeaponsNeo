@@ -13,21 +13,21 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.fml.common.EventBusSubscriber;
 
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Mod.EventBusSubscriber(modid = ProjectBabylonWeapons.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+@EventBusSubscriber(modid = ProjectBabylonWeapons.MODID, bus = EventBusSubscriber.Bus.GAME)
 public final class GoldenBloodPactPassive {
-    private static final UUID MAX_HEALTH_MODIFIER_ID = UUID.fromString("5afdf51c-92d3-4c50-a5ef-d927b3c83b53");
-    private static final UUID ATTACK_SPEED_MODIFIER_ID = UUID.fromString("84c4ee46-f7c7-4f56-95e7-174fcbf4e031");
+    private static final ResourceLocation MAX_HEALTH_MODIFIER_ID = ResourceLocation.fromNamespaceAndPath("project_babylon_weapons", "golden_blood_pact_health");
+    private static final ResourceLocation ATTACK_SPEED_MODIFIER_ID = ResourceLocation.fromNamespaceAndPath("project_babylon_weapons", "golden_blood_pact_speed");
     private static final Map<UUID, PactState> ACTIVE_STATES = new ConcurrentHashMap<>();
     private static final WeaponPassiveTooltipData TOOLTIP = new WeaponPassiveTooltipData(
             Component.translatable("tooltip.project_babylon_weapons.passive.wand_golden.name"),
@@ -71,18 +71,18 @@ public final class GoldenBloodPactPassive {
     }
 
     @SubscribeEvent
-    public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
-        if (event.phase != TickEvent.Phase.END || event.player.level().isClientSide) {
+    public static void onPlayerTick(PlayerTickEvent.Post event) {
+        if (event.getEntity().level().isClientSide) {
             return;
         }
 
-        PactState state = ACTIVE_STATES.get(event.player.getUUID());
+        PactState state = ACTIVE_STATES.get(event.getEntity().getUUID());
         if (state == null) {
             return;
         }
 
-        if (event.player.level().getGameTime() > state.expiresAt) {
-            clearState(event.player);
+        if (event.getEntity().level().getGameTime() > state.expiresAt) {
+            clearState(event.getEntity());
         }
     }
 
@@ -111,7 +111,7 @@ public final class GoldenBloodPactPassive {
         AttributeInstance maxHealth = attacker.getAttribute(Attributes.MAX_HEALTH);
         if (maxHealth != null) {
             maxHealth.removeModifier(MAX_HEALTH_MODIFIER_ID);
-            maxHealth.addTransientModifier(new AttributeModifier(MAX_HEALTH_MODIFIER_ID, "golden_blood_pact_health", -totalPercent, AttributeModifier.Operation.MULTIPLY_TOTAL));
+            maxHealth.addTransientModifier(new AttributeModifier(MAX_HEALTH_MODIFIER_ID, -totalPercent, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
             if (attacker.getHealth() > attacker.getMaxHealth()) {
                 attacker.setHealth(attacker.getMaxHealth());
             }
@@ -120,7 +120,7 @@ public final class GoldenBloodPactPassive {
         AttributeInstance attackSpeed = attacker.getAttribute(Attributes.ATTACK_SPEED);
         if (attackSpeed != null) {
             attackSpeed.removeModifier(ATTACK_SPEED_MODIFIER_ID);
-            attackSpeed.addTransientModifier(new AttributeModifier(ATTACK_SPEED_MODIFIER_ID, "golden_blood_pact_speed", totalPercent, AttributeModifier.Operation.MULTIPLY_TOTAL));
+            attackSpeed.addTransientModifier(new AttributeModifier(ATTACK_SPEED_MODIFIER_ID, totalPercent, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
         }
     }
 

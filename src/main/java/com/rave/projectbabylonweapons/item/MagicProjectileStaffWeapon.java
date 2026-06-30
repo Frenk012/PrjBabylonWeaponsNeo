@@ -13,7 +13,7 @@ import yesman.epicfight.api.animation.AnimationManager.AnimationAccessor;
 import yesman.epicfight.api.animation.types.AttackAnimation;
 import yesman.epicfight.world.capabilities.entitypatch.player.ServerPlayerPatch;
 import yesman.epicfight.world.damagesource.StunType;
-import yesman.epicfight.world.entity.eventlistener.AttackPhaseEndEvent;
+import yesman.epicfight.api.event.types.animation.AttackPhaseEndEvent;
 
 public interface MagicProjectileStaffWeapon extends MagicMeleeWeapon {
     BasicSpellProjectileEntity createMagicProjectile(Level level);

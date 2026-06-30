@@ -13,10 +13,10 @@ import net.minecraft.world.item.Tiers;
 public class DiamondShovelItem extends ShovelItem {
 
     public DiamondShovelItem(Properties props) {
-        super(Tiers.DIAMOND, 1.5F, -3.0F, props);
+        super(Tiers.DIAMOND, (props).attributes(ShovelItem.createAttributes(Tiers.DIAMOND, 1.5F, -3.0F)));
     }
     @Override
-    public void appendHoverText(ItemStack stack, Level level, List<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, net.minecraft.world.item.Item.TooltipContext level, List<Component> tooltip, TooltipFlag flag) {
         super.appendHoverText(stack, level, tooltip, flag);
         DiamondFangPassive.appendTooltip(tooltip);
     }

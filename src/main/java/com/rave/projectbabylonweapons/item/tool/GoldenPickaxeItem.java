@@ -13,11 +13,11 @@ import java.util.List;
 public class GoldenPickaxeItem extends PickaxeItem {
 
     public GoldenPickaxeItem(Properties props) {
-        super(PBToolTiers.GOLDEN_DURABLE, 1, -2.8F, props);
+        super(PBToolTiers.GOLDEN_DURABLE, (props).attributes(PickaxeItem.createAttributes(PBToolTiers.GOLDEN_DURABLE, 1, -2.8F)));
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Level level, List<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, net.minecraft.world.item.Item.TooltipContext level, List<Component> tooltip, TooltipFlag flag) {
         super.appendHoverText(stack, level, tooltip, flag);
         GoldenMagicPassive.appendTooltip(tooltip);
     }

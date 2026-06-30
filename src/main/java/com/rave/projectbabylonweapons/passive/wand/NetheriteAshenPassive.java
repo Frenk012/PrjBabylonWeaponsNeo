@@ -72,7 +72,7 @@ public final class NetheriteAshenPassive {
             }
 
             if (owner.getRandom().nextFloat() < profile.igniteProcChance()) {
-                victim.setSecondsOnFire(profile.igniteSeconds());
+                victim.igniteForSeconds(profile.igniteSeconds());
             }
         }
     }

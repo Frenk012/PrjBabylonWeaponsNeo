@@ -1,14 +1,14 @@
 package com.rave.projectbabylonweapons.skill.weapon_innate;
 
 import java.util.List;
-import java.util.UUID;
 
 import com.google.common.collect.Lists;
 
 import com.rave.projectbabylonweapons.gameasset.PBAnimations;
 import net.minecraft.ChatFormatting;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -17,40 +17,37 @@ import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
-import yesman.epicfight.skill.SkillBuilder;
+import yesman.epicfight.api.event.EntityEventListener;
+import yesman.epicfight.api.event.EpicFightEventHooks;
 import yesman.epicfight.skill.SkillContainer;
 import yesman.epicfight.skill.weaponinnate.WeaponInnateSkill;
 import yesman.epicfight.world.capabilities.entitypatch.player.PlayerPatch;
 import yesman.epicfight.world.capabilities.item.CapabilityItem;
-import yesman.epicfight.world.effect.EpicFightMobEffects;
-import yesman.epicfight.world.entity.ai.attribute.EpicFightAttributes;
-import yesman.epicfight.world.entity.eventlistener.PlayerEventListener.EventType;
+import yesman.epicfight.registry.entries.EpicFightMobEffects;
+import yesman.epicfight.registry.entries.EpicFightAttributes;
 
 public class BeastRoarSkill extends WeaponInnateSkill {
-    private static final UUID EVENT_UUID = UUID.fromString("aef3d0d6-76c7-4249-a0c9-75d90f60a1ed");
-    private static final UUID STAMINA_REGEN_UUID = UUID.fromString("b1f2d1b1-4cdd-4f90-8e1c-8ce3d04b1e29");
+    private static final ResourceLocation STAMINA_REGEN_ID = ResourceLocation.fromNamespaceAndPath("project_babylon_weapons", "beast_roar_stamina_regen");
     private static final int ROAR_BUFF_DURATION_TICKS = 38 * 20;
 
-    public BeastRoarSkill(SkillBuilder<? extends WeaponInnateSkill> builder) {
+    public BeastRoarSkill(WeaponInnateSkill.Builder<?> builder) {
         super(builder);
     }
 
     @Override
-    public void onInitiate(SkillContainer container) {
-        super.onInitiate(container);
-        container.getExecutor().getEventListener().addEventListener(EventType.MODIFY_ATTACK_SPEED_EVENT, EVENT_UUID, (event) -> {
+    public void onInitiate(SkillContainer container, EntityEventListener eventListener) {
+        super.onInitiate(container, eventListener);
+        eventListener.registerEvent(EpicFightEventHooks.Entity.MODIFY_ATTACK_SPEED, (event) -> {
             if (container.isActivated()) {
                 float attackSpeed = event.getAttackSpeed();
                 event.setAttackSpeed(attackSpeed * 1.18F);
             }
-        });
+        }, this);
     }
 
     @Override
     public void onRemoved(SkillContainer container) {
         super.onRemoved(container);
-        container.getExecutor().getEventListener().removeListener(EventType.MODIFY_ATTACK_SPEED_EVENT, EVENT_UUID);
-        container.getExecutor().getEventListener().removeListener(EventType.MOVEMENT_INPUT_EVENT, EVENT_UUID);
         if (!container.getExecutor().isLogicalClient()) {
             removeStaminaRegenModifier(container);
             removeStunImmunity(container);
@@ -58,7 +55,7 @@ public class BeastRoarSkill extends WeaponInnateSkill {
     }
 
     @Override
-    public void executeOnServer(SkillContainer container, FriendlyByteBuf args) {
+    public void executeOnServer(SkillContainer container, CompoundTag args) {
         if (this.isActivated(container)) {
             this.cancelOnServer(container, args);
         } else {
@@ -72,7 +69,7 @@ public class BeastRoarSkill extends WeaponInnateSkill {
     }
 
     @Override
-    public void cancelOnServer(SkillContainer container, FriendlyByteBuf args) {
+    public void cancelOnServer(SkillContainer container, CompoundTag args) {
         container.deactivate();
         super.cancelOnServer(container, args);
         container.getServerExecutor().modifyLivingMotionByCurrentItem(false);
@@ -81,13 +78,13 @@ public class BeastRoarSkill extends WeaponInnateSkill {
     }
 
     @Override
-    public void executeOnClient(SkillContainer container, FriendlyByteBuf args) {
+    public void executeOnClient(SkillContainer container, CompoundTag args) {
         super.executeOnClient(container, args);
         container.activate();
     }
 
     @Override
-    public void cancelOnClient(SkillContainer container, FriendlyByteBuf args) {
+    public void cancelOnClient(SkillContainer container, CompoundTag args) {
         super.cancelOnClient(container, args);
         container.deactivate();
     }
@@ -154,34 +151,33 @@ public class BeastRoarSkill extends WeaponInnateSkill {
 
     private void applyStaminaRegenModifier(SkillContainer container) {
         Player player = (Player) container.getExecutor().getOriginal();
-        AttributeInstance instance = player.getAttribute(EpicFightAttributes.STAMINA_REGEN.get());
-        if (instance == null || instance.getModifier(STAMINA_REGEN_UUID) != null) {
+        AttributeInstance instance = player.getAttribute(EpicFightAttributes.STAMINA_REGEN);
+        if (instance == null || instance.getModifier(STAMINA_REGEN_ID) != null) {
             return;
         }
         AttributeModifier modifier = new AttributeModifier(
-                STAMINA_REGEN_UUID,
-                "Beast Roar stamina regen",
+                STAMINA_REGEN_ID,
                 0.30D,
-                AttributeModifier.Operation.MULTIPLY_TOTAL
+                AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL
         );
         instance.addTransientModifier(modifier);
     }
 
     private void removeStaminaRegenModifier(SkillContainer container) {
         Player player = (Player) container.getExecutor().getOriginal();
-        AttributeInstance instance = player.getAttribute(EpicFightAttributes.STAMINA_REGEN.get());
+        AttributeInstance instance = player.getAttribute(EpicFightAttributes.STAMINA_REGEN);
         if (instance != null) {
-            instance.removeModifier(STAMINA_REGEN_UUID);
+            instance.removeModifier(STAMINA_REGEN_ID);
         }
     }
 
     private void applyStunImmunity(SkillContainer container) {
         Player player = (Player) container.getExecutor().getOriginal();
-        player.addEffect(new MobEffectInstance(EpicFightMobEffects.STUN_IMMUNITY.get(), ROAR_BUFF_DURATION_TICKS, 0, false, true, true));
+        player.addEffect(new MobEffectInstance(EpicFightMobEffects.STUN_IMMUNITY, ROAR_BUFF_DURATION_TICKS, 0, false, true, true));
     }
 
     private void removeStunImmunity(SkillContainer container) {
         Player player = (Player) container.getExecutor().getOriginal();
-        player.removeEffect(EpicFightMobEffects.STUN_IMMUNITY.get());
+        player.removeEffect(EpicFightMobEffects.STUN_IMMUNITY);
     }
 }
