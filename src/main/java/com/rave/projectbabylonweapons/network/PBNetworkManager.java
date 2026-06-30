@@ -1,85 +1,38 @@
 package com.rave.projectbabylonweapons.network;
 
 import com.rave.projectbabylonweapons.ProjectBabylonWeapons;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
-import net.minecraftforge.network.NetworkDirection;
-import net.minecraftforge.network.NetworkRegistry;
-import net.minecraftforge.network.PacketDistributor;
-import net.minecraftforge.network.simple.SimpleChannel;
+import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
-public class PBNetworkManager {
+public final class PBNetworkManager {
 
     private static final String PROTOCOL_VERSION = "1";
 
-    public static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
-            ResourceLocation.fromNamespaceAndPath(ProjectBabylonWeapons.MODID, "main"),
-            () -> PROTOCOL_VERSION,
-            PROTOCOL_VERSION::equals,
-            PROTOCOL_VERSION::equals
-    );
+    private PBNetworkManager() {}
 
-    private static int id = 0;
+    public static void register(RegisterPayloadHandlersEvent event) {
+        PayloadRegistrar registrar = event.registrar(ProjectBabylonWeapons.MODID).versioned(PROTOCOL_VERSION);
 
-    public static void register() {
-
-        CHANNEL.registerMessage(
-                id++,
-                CPPullOwnerToTarget.class,
-                CPPullOwnerToTarget::encode,
-                CPPullOwnerToTarget::new,
-                CPPullOwnerToTarget::handle,
-                java.util.Optional.of(NetworkDirection.PLAY_TO_SERVER)
-        );
-
-
-        CHANNEL.registerMessage(
-                id++,
-                CPPullTargetToOwner.class,
-                CPPullTargetToOwner::encode,
-                CPPullTargetToOwner::new,
-                CPPullTargetToOwner::handle,
-                java.util.Optional.of(NetworkDirection.PLAY_TO_SERVER)
-        );
-
-        CHANNEL.registerMessage(
-                id++,
-                SPFrozenVisualSync.class,
-                SPFrozenVisualSync::encode,
-                SPFrozenVisualSync::new,
-                SPFrozenVisualSync::handle,
-                java.util.Optional.of(NetworkDirection.PLAY_TO_CLIENT)
-        );
-
-        CHANNEL.registerMessage(
-                id++,
-                SPSickleActiveSync.class,
-                SPSickleActiveSync::encode,
-                SPSickleActiveSync::new,
-                SPSickleActiveSync::handle,
-                java.util.Optional.of(NetworkDirection.PLAY_TO_CLIENT)
-        );
-
-        CHANNEL.registerMessage(
-                id++,
-                SPPlayWeaponVisualEffect.class,
-                SPPlayWeaponVisualEffect::encode,
-                SPPlayWeaponVisualEffect::new,
-                SPPlayWeaponVisualEffect::handle,
-                java.util.Optional.of(NetworkDirection.PLAY_TO_CLIENT)
-        );
+        registrar.playToServer(CPPullOwnerToTarget.TYPE,      CPPullOwnerToTarget.STREAM_CODEC,      CPPullOwnerToTarget::handle);
+        registrar.playToServer(CPPullTargetToOwner.TYPE,      CPPullTargetToOwner.STREAM_CODEC,      CPPullTargetToOwner::handle);
+        registrar.playToClient(SPFrozenVisualSync.TYPE,       SPFrozenVisualSync.STREAM_CODEC,       SPFrozenVisualSync::handle);
+        registrar.playToClient(SPSickleActiveSync.TYPE,       SPSickleActiveSync.STREAM_CODEC,       SPSickleActiveSync::handle);
+        registrar.playToClient(SPPlayWeaponVisualEffect.TYPE, SPPlayWeaponVisualEffect.STREAM_CODEC, SPPlayWeaponVisualEffect::handle);
     }
 
-    public static void sendToServer(Object packet) {
-        CHANNEL.sendToServer(packet);
+    public static void sendToServer(CustomPacketPayload packet) {
+        PacketDistributor.sendToServer(packet);
     }
 
-    public static void sendToPlayer(ServerPlayer player, Object packet) {
-        CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), packet);
+    public static void sendToPlayer(ServerPlayer player, CustomPacketPayload packet) {
+        PacketDistributor.sendToPlayer(player, packet);
     }
 
-    public static void sendToTrackingAndSelf(Entity entity, Object packet) {
-        CHANNEL.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> entity), packet);
+    public static void sendToTrackingAndSelf(Entity entity, CustomPacketPayload packet) {
+        PacketDistributor.sendToPlayersTrackingEntityAndSelf(entity, packet);
     }
 }

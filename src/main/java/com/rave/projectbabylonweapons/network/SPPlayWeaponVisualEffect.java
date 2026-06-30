@@ -1,33 +1,32 @@
 package com.rave.projectbabylonweapons.network;
 
+import com.rave.projectbabylonweapons.ProjectBabylonWeapons;
 import com.rave.projectbabylonweapons.client.WeaponVisualEffectClientHelper;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.network.NetworkEvent;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-import java.util.function.Supplier;
+public record SPPlayWeaponVisualEffect(String effectId, int entityId) implements CustomPacketPayload {
 
-public class SPPlayWeaponVisualEffect {
-    private final String effectId;
-    private final int entityId;
+    public static final Type<SPPlayWeaponVisualEffect> TYPE =
+            new Type<>(ResourceLocation.fromNamespaceAndPath(ProjectBabylonWeapons.MODID, "play_weapon_visual_effect"));
 
-    public SPPlayWeaponVisualEffect(String effectId, int entityId) {
-        this.effectId = effectId;
-        this.entityId = entityId;
+    public static final StreamCodec<RegistryFriendlyByteBuf, SPPlayWeaponVisualEffect> STREAM_CODEC =
+            StreamCodec.composite(
+                    ByteBufCodecs.STRING_UTF8, SPPlayWeaponVisualEffect::effectId,
+                    ByteBufCodecs.VAR_INT,     SPPlayWeaponVisualEffect::entityId,
+                    SPPlayWeaponVisualEffect::new
+            );
+
+    @Override
+    public Type<SPPlayWeaponVisualEffect> type() {
+        return TYPE;
     }
 
-    public SPPlayWeaponVisualEffect(FriendlyByteBuf buf) {
-        this.effectId = buf.readUtf();
-        this.entityId = buf.readVarInt();
-    }
-
-    public void encode(FriendlyByteBuf buf) {
-        buf.writeUtf(this.effectId);
-        buf.writeVarInt(this.entityId);
-    }
-
-    public void handle(Supplier<NetworkEvent.Context> contextSupplier) {
-        NetworkEvent.Context context = contextSupplier.get();
-        context.enqueueWork(() -> WeaponVisualEffectClientHelper.play(this.effectId, this.entityId));
-        context.setPacketHandled(true);
+    public static void handle(SPPlayWeaponVisualEffect packet, IPayloadContext context) {
+        context.enqueueWork(() -> WeaponVisualEffectClientHelper.play(packet.effectId(), packet.entityId()));
     }
 }

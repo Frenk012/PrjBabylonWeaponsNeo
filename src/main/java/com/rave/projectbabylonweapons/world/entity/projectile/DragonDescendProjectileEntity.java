@@ -33,8 +33,8 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.network.NetworkHooks;
-import net.minecraftforge.network.PlayMessages;
+import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
+import net.minecraft.server.level.ServerEntity;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.AnimatableManager;
@@ -120,9 +120,6 @@ public class DragonDescendProjectileEntity extends Projectile implements GeoEnti
         this(PBModEntities.DRAGON_DESCEND_PROJECTILE.get(), level);
     }
 
-    public DragonDescendProjectileEntity(PlayMessages.SpawnEntity packet, Level level) {
-        this(PBModEntities.DRAGON_DESCEND_PROJECTILE.get(), level);
-    }
 
     public void configureProjectile(LivingEntity owner, ItemStack sourceWeapon, ResourceKey<DamageType> magicDamageType,
                                     float rawMagicDamage, float trailMagicDamage, float magicArmorNegation,
@@ -205,15 +202,15 @@ public class DragonDescendProjectileEntity extends Projectile implements GeoEnti
     }
 
     @Override
-    public Packet<ClientGamePacketListener> getAddEntityPacket() {
-        return NetworkHooks.getEntitySpawningPacket(this);
+    public Packet<ClientGamePacketListener> getAddEntityPacket(ServerEntity serverEntity) {
+        return new ClientboundAddEntityPacket(this, serverEntity);
     }
 
     @Override
-    protected void defineSynchedData() {
-        this.entityData.define(DATA_TRAIL_COLOR, DEFAULT_TRAIL_COLOR);
-        this.entityData.define(DATA_RENDER_SCALE, DEFAULT_RENDER_SCALE);
-        this.entityData.define(DATA_ANIMATION_MODE, AnimationMode.DIVE.ordinal());
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        builder.define(DATA_TRAIL_COLOR, DEFAULT_TRAIL_COLOR);
+        builder.define(DATA_RENDER_SCALE, DEFAULT_RENDER_SCALE);
+        builder.define(DATA_ANIMATION_MODE, AnimationMode.DIVE.ordinal());
     }
 
     @Override
@@ -306,7 +303,7 @@ public class DragonDescendProjectileEntity extends Projectile implements GeoEnti
         tag.putInt(TAG_ANIMATION_MODE, this.getAnimationMode().ordinal());
         tag.putLong(TAG_NEXT_ROAR_TICK, this.nextRoarGameTime);
         if (!this.sourceWeapon.isEmpty()) {
-            tag.put(TAG_SOURCE_WEAPON, this.sourceWeapon.save(new CompoundTag()));
+            tag.put(TAG_SOURCE_WEAPON, this.sourceWeapon.save(this.registryAccess()));
         }
     }
 
@@ -325,7 +322,7 @@ public class DragonDescendProjectileEntity extends Projectile implements GeoEnti
         this.setAnimationMode(AnimationMode.fromOrdinal(tag.getInt(TAG_ANIMATION_MODE)));
         this.nextRoarGameTime = tag.getLong(TAG_NEXT_ROAR_TICK);
         if (tag.contains(TAG_SOURCE_WEAPON)) {
-            this.sourceWeapon = ItemStack.of(tag.getCompound(TAG_SOURCE_WEAPON));
+            this.sourceWeapon = ItemStack.parse(this.registryAccess(), tag.getCompound(TAG_SOURCE_WEAPON)).orElse(ItemStack.EMPTY);
         }
     }
 

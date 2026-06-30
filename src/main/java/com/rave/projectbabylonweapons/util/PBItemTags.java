@@ -9,16 +9,16 @@ import net.minecraft.world.item.Item;
 public final class PBItemTags {
 
     public static final TagKey<Item> NETHERITE_TOOLS =
-            ItemTags.create(new ResourceLocation(ProjectBabylonWeapons.MODID, "netherite_tools"));
+            ItemTags.create(ResourceLocation.fromNamespaceAndPath(ProjectBabylonWeapons.MODID, "netherite_tools"));
 
     public static final TagKey<Item> ICE_TOOLS =
-            ItemTags.create(new ResourceLocation(ProjectBabylonWeapons.MODID, "ice_tools"));
+            ItemTags.create(ResourceLocation.fromNamespaceAndPath(ProjectBabylonWeapons.MODID, "ice_tools"));
 
     public static final TagKey<Item> GOLDEN_TOOLS =
-            ItemTags.create(new ResourceLocation(ProjectBabylonWeapons.MODID, "golden_tools"));
+            ItemTags.create(ResourceLocation.fromNamespaceAndPath(ProjectBabylonWeapons.MODID, "golden_tools"));
 
     public static final TagKey<Item> DIAMOND_TOOLS =
-            ItemTags.create(new ResourceLocation(ProjectBabylonWeapons.MODID, "diamond_tools"));
+            ItemTags.create(ResourceLocation.fromNamespaceAndPath(ProjectBabylonWeapons.MODID, "diamond_tools"));
 
     private PBItemTags() {
     }

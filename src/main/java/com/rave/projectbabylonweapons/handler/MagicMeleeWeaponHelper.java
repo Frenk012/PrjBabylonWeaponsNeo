@@ -2,6 +2,7 @@ package com.rave.projectbabylonweapons.handler;
 
 import com.rave.projectbabylonweapons.item.MagicMeleeWeapon;
 import net.minecraft.core.Holder;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.damagesource.DamageSource;
@@ -35,7 +36,7 @@ public final class MagicMeleeWeaponHelper {
         }
 
         double spellPower = Math.max(0.0D, attacker.getAttributeValue(AttributeRegistry.SPELL_POWER));
-        Holder<Attribute> schoolAttribute = magicWeapon.getSchoolSpellPowerAttribute();
+        Holder<Attribute> schoolAttribute = BuiltInRegistries.ATTRIBUTE.wrapAsHolder(magicWeapon.getSchoolSpellPowerAttribute());
         double schoolPower = Math.max(0.0D, attacker.getAttributeValue(schoolAttribute));
 
         return (float) (baseMagicDamage * attackContextMultiplier * spellPower * schoolPower * damageMultiplier);
@@ -56,7 +57,6 @@ public final class MagicMeleeWeaponHelper {
             magicSource.setBaseArmorNegation(originalEpicSource.getBaseArmorNegation());
             magicSource.setBaseImpact(originalEpicSource.getBaseImpact());
             magicSource.setStunType(originalEpicSource.getStunType());
-            magicSource.setBasicAttack(originalEpicSource.isBasicAttack());
             magicSource.setAnimation(originalEpicSource.getAnimation());
             magicSource.setInitialPosition(originalEpicSource.getInitialPosition());
             if (!originalEpicSource.getUsedItem().isEmpty()) {
@@ -81,7 +81,6 @@ public final class MagicMeleeWeaponHelper {
                 .setUsedItem(weaponStack)
                 .setBaseArmorNegation(Math.max(0.0F, armorNegation))
                 .setBaseImpact(Math.max(0.0F, impact))
-                .setBasicAttack(true)
                 .setInitialPosition(attacker.position());
 
         if (stunType != null) {

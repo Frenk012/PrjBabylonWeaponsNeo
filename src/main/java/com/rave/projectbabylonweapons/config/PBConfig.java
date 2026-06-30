@@ -1,14 +1,14 @@
 package com.rave.projectbabylonweapons.config;
 
-import net.minecraftforge.common.ForgeConfigSpec;
+import net.neoforged.neoforge.common.ModConfigSpec;
 
 public final class PBConfig {
 
-    public static final ForgeConfigSpec SPEC;
-    public static final ForgeConfigSpec.BooleanValue ENABLE_VANILLA_WEAPONS_TOOLS_RECIPES;
+    public static final ModConfigSpec SPEC;
+    public static final ModConfigSpec.BooleanValue ENABLE_VANILLA_WEAPONS_TOOLS_RECIPES;
 
     static {
-        ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
+        ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
 
         builder.push("recipes");
         ENABLE_VANILLA_WEAPONS_TOOLS_RECIPES = builder

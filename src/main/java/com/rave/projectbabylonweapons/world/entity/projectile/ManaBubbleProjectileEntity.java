@@ -33,8 +33,8 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.network.NetworkHooks;
-import net.minecraftforge.network.PlayMessages;
+import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
+import net.minecraft.server.level.ServerEntity;
 import org.joml.Vector3f;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
@@ -202,9 +202,6 @@ public class ManaBubbleProjectileEntity extends Projectile implements GeoEntity 
         this(PBModEntities.MANA_BUBBLE_PROJECTILE.get(), level);
     }
 
-    public ManaBubbleProjectileEntity(PlayMessages.SpawnEntity packet, Level level) {
-        this(PBModEntities.MANA_BUBBLE_PROJECTILE.get(), level);
-    }
 
     public void configureBubble(LivingEntity owner, ItemStack sourceWeapon, ResourceKey<DamageType> magicDamageType,
                                 float rawMagicDamage, float magicArmorNegation, float impact, StunType stunType,
@@ -225,15 +222,15 @@ public class ManaBubbleProjectileEntity extends Projectile implements GeoEntity 
     }
 
     @Override
-    public Packet<ClientGamePacketListener> getAddEntityPacket() {
-        return NetworkHooks.getEntitySpawningPacket(this);
+    public Packet<ClientGamePacketListener> getAddEntityPacket(ServerEntity serverEntity) {
+        return new ClientboundAddEntityPacket(this, serverEntity);
     }
 
     @Override
-    protected void defineSynchedData() {
-        this.entityData.define(DATA_TRAIL_COLOR, DEFAULT_TRAIL_COLOR);
-        this.entityData.define(DATA_RENDER_SCALE, DEFAULT_RENDER_SCALE);
-        this.entityData.define(DATA_VISUAL_PRESET, VisualPreset.BASIC.ordinal());
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        builder.define(DATA_TRAIL_COLOR, DEFAULT_TRAIL_COLOR);
+        builder.define(DATA_RENDER_SCALE, DEFAULT_RENDER_SCALE);
+        builder.define(DATA_VISUAL_PRESET, VisualPreset.BASIC.ordinal());
     }
 
     @Override
@@ -310,7 +307,7 @@ public class ManaBubbleProjectileEntity extends Projectile implements GeoEntity 
         tag.putFloat(TAG_DRAG_STRENGTH, this.dragStrength);
         tag.putInt(TAG_VISUAL_PRESET, this.getVisualPreset().ordinal());
         if (!this.sourceWeapon.isEmpty()) {
-            tag.put(TAG_SOURCE_WEAPON, this.sourceWeapon.save(new CompoundTag()));
+            tag.put(TAG_SOURCE_WEAPON, this.sourceWeapon.save(this.registryAccess()));
         }
     }
 
@@ -328,7 +325,7 @@ public class ManaBubbleProjectileEntity extends Projectile implements GeoEntity 
         this.dragStrength = tag.contains(TAG_DRAG_STRENGTH) ? Math.max(0.0F, tag.getFloat(TAG_DRAG_STRENGTH)) : 0.9F;
         this.setVisualPreset(VisualPreset.fromOrdinal(tag.getInt(TAG_VISUAL_PRESET)));
         if (tag.contains(TAG_SOURCE_WEAPON)) {
-            this.sourceWeapon = ItemStack.of(tag.getCompound(TAG_SOURCE_WEAPON));
+            this.sourceWeapon = ItemStack.parse(this.registryAccess(), tag.getCompound(TAG_SOURCE_WEAPON)).orElse(ItemStack.EMPTY);
         }
     }
 

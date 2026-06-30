@@ -212,10 +212,10 @@ public class BasicSpellProjectileTrailParticle extends TextureSheetParticle {
             float alphaFrom = Mth.clamp(from, 0.0F, 1.0F);
             float alphaTo = Mth.clamp(to, 0.0F, 1.0F);
 
-            vertexConsumer.vertex(pos1.x(), pos1.y(), pos1.z()).uv(from, 1.0F).color(this.rCol, this.gCol, this.bCol, this.alpha * alphaFrom * fading).uv2(light).endVertex();
-            vertexConsumer.vertex(pos2.x(), pos2.y(), pos2.z()).uv(from, 0.0F).color(this.rCol, this.gCol, this.bCol, this.alpha * alphaFrom * fading).uv2(light).endVertex();
-            vertexConsumer.vertex(pos3.x(), pos3.y(), pos3.z()).uv(to, 0.0F).color(this.rCol, this.gCol, this.bCol, this.alpha * alphaTo * fading).uv2(light).endVertex();
-            vertexConsumer.vertex(pos4.x(), pos4.y(), pos4.z()).uv(to, 1.0F).color(this.rCol, this.gCol, this.bCol, this.alpha * alphaTo * fading).uv2(light).endVertex();
+            vertexConsumer.addVertex(pos1.x(), pos1.y(), pos1.z()).setUv(from, 1.0F).setColor(this.rCol, this.gCol, this.bCol, this.alpha * alphaFrom * fading).setLight(light);
+            vertexConsumer.addVertex(pos2.x(), pos2.y(), pos2.z()).setUv(from, 0.0F).setColor(this.rCol, this.gCol, this.bCol, this.alpha * alphaFrom * fading).setLight(light);
+            vertexConsumer.addVertex(pos3.x(), pos3.y(), pos3.z()).setUv(to, 0.0F).setColor(this.rCol, this.gCol, this.bCol, this.alpha * alphaTo * fading).setLight(light);
+            vertexConsumer.addVertex(pos4.x(), pos4.y(), pos4.z()).setUv(to, 1.0F).setColor(this.rCol, this.gCol, this.bCol, this.alpha * alphaTo * fading).setLight(light);
 
             from += interval;
             to += interval;
@@ -223,8 +223,8 @@ public class BasicSpellProjectileTrailParticle extends TextureSheetParticle {
     }
 
     @Override
-    public boolean shouldCull() {
-        return false;
+    public net.minecraft.world.phys.AABB getRenderBoundingBox(float partialTicks) {
+        return net.minecraft.world.phys.AABB.INFINITE;
     }
 
     @Override

@@ -43,8 +43,10 @@ public class ProjectBabylonWeapons {
         modBus.addListener(this::commonSetup);
         modBus.addListener(this::addCreative);
         modBus.addListener(this::addPackFindersEvent);
-        modBus.addListener(PBSkills::buildSkillEvent);
         modBus.addListener(PBAnimations::registerAnimations);
+        modBus.addListener(PBNetworkManager::register);
+
+        PBSkills.REGISTRY.register(modBus);
 
         CreativeTabRegistry.TABS.register(modBus);
         PBModBlocks.register(modBus);
@@ -61,11 +63,6 @@ public class ProjectBabylonWeapons {
     private void commonSetup(FMLCommonSetupEvent event) {
         event.enqueueWork(() -> {
             LOGGER.info("Project Babylon common setup started");
-
-            PBNetworkManager.register();
-            LOGGER.info("Network packets registered");
-
-            LOGGER.info("Fear animations registered");
         });
     }
 

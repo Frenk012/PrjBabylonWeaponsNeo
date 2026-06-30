@@ -106,71 +106,63 @@ public class SickleChainRenderer extends EntityRenderer<SickleProjectileEntity> 
         Matrix4f matrix4f = pose.pose();
         Matrix3f matrix3f = pose.normal();
 
-        buffer.vertex(matrix4f, chainOffset, 0, 0)
-                .color(255, 255, 255, 255)
-                .uv(0f, chainLength)
-                .overlayCoords(setOverlay)
-                .uv2(packedLightIn)
-                .normal(matrix3f, 0.0F, 1.0F, 0.0F)
-                .endVertex();
+        buffer.addVertex(matrix4f, chainOffset, 0, 0)
+                .setColor(255, 255, 255, 255)
+                .setUv(0f, chainLength)
+                .setOverlay(setOverlay)
+                .setLight(packedLightIn)
+                .setNormal(pose, 0.0F, 1.0F, 0.0F);
 
-        buffer.vertex(matrix4f, chainWidth + chainOffset, 0, 0)
-                .color(255, 255, 255, 255)
-                .uv(chainWidth, chainLength)
-                .overlayCoords(setOverlay)
-                .uv2(packedLightIn)
-                .normal(matrix3f, 0.0F, 1.0F, 0.0F)
-                .endVertex();
+        buffer.addVertex(matrix4f, chainWidth + chainOffset, 0, 0)
+                .setColor(255, 255, 255, 255)
+                .setUv(chainWidth, chainLength)
+                .setOverlay(setOverlay)
+                .setLight(packedLightIn)
+                .setNormal(pose, 0.0F, 1.0F, 0.0F);
 
-        buffer.vertex(matrix4f, chainWidth + chainOffset, chainLength, 0)
-                .color(255, 255, 255, 255)
-                .uv(chainWidth, 0f)
-                .overlayCoords(setOverlay)
-                .uv2(packedLightIn)
-                .normal(matrix3f, 0.0F, 1.0F, 0.0F)
-                .endVertex();
+        buffer.addVertex(matrix4f, chainWidth + chainOffset, chainLength, 0)
+                .setColor(255, 255, 255, 255)
+                .setUv(chainWidth, 0f)
+                .setOverlay(setOverlay)
+                .setLight(packedLightIn)
+                .setNormal(pose, 0.0F, 1.0F, 0.0F);
 
-        buffer.vertex(matrix4f, chainOffset, chainLength, 0)
-                .color(255, 255, 255, 255)
-                .uv(0f, 0f)
-                .overlayCoords(setOverlay)
-                .uv2(packedLightIn)
-                .normal(matrix3f, 0.0F, 1.0F, 0.0F)
-                .endVertex();
+        buffer.addVertex(matrix4f, chainOffset, chainLength, 0)
+                .setColor(255, 255, 255, 255)
+                .setUv(0f, 0f)
+                .setOverlay(setOverlay)
+                .setLight(packedLightIn)
+                .setNormal(pose, 0.0F, 1.0F, 0.0F);
 
         float pixelSkip = 4F / 32F;
 
-        buffer.vertex(matrix4f, 0, pixelSkip, chainOffset)
-                .color(255, 255, 255, 255)
-                .uv(chainWidth, chainLength + pixelSkip)
-                .overlayCoords(setOverlay)
-                .uv2(packedLightIn)
-                .normal(matrix3f, 0.0F, 1.0F, 0.0F)
-                .endVertex();
+        buffer.addVertex(matrix4f, 0, pixelSkip, chainOffset)
+                .setColor(255, 255, 255, 255)
+                .setUv(chainWidth, chainLength + pixelSkip)
+                .setOverlay(setOverlay)
+                .setLight(packedLightIn)
+                .setNormal(pose, 0.0F, 1.0F, 0.0F);
 
-        buffer.vertex(matrix4f, 0, pixelSkip, chainWidth + chainOffset)
-                .color(255, 255, 255, 255)
-                .uv(chainWidth * 2, chainLength + pixelSkip)
-                .overlayCoords(setOverlay)
-                .uv2(packedLightIn)
-                .normal(matrix3f, 0.0F, 1.0F, 0.0F)
-                .endVertex();
+        buffer.addVertex(matrix4f, 0, pixelSkip, chainWidth + chainOffset)
+                .setColor(255, 255, 255, 255)
+                .setUv(chainWidth * 2, chainLength + pixelSkip)
+                .setOverlay(setOverlay)
+                .setLight(packedLightIn)
+                .setNormal(pose, 0.0F, 1.0F, 0.0F);
 
-        buffer.vertex(matrix4f, 0, chainLength + pixelSkip, chainWidth + chainOffset)
-                .color(255, 255, 255, 255)
-                .uv(chainWidth * 2, pixelSkip)
-                .overlayCoords(setOverlay)
-                .uv2(packedLightIn)
-                .normal(matrix3f, 0.0F, 1.0F, 0.0F)
-                .endVertex();
+        buffer.addVertex(matrix4f, 0, chainLength + pixelSkip, chainWidth + chainOffset)
+                .setColor(255, 255, 255, 255)
+                .setUv(chainWidth * 2, pixelSkip)
+                .setOverlay(setOverlay)
+                .setLight(packedLightIn)
+                .setNormal(pose, 0.0F, 1.0F, 0.0F);
 
-        buffer.vertex(matrix4f, 0, chainLength + pixelSkip, chainOffset)
-                .color(255, 255, 255, 255)
-                .uv(chainWidth, pixelSkip)
-                .overlayCoords(setOverlay)
-                .uv2(packedLightIn)
-                .normal(matrix3f, 0.0F, 1.0F, 0.0F)
-                .endVertex();
+        buffer.addVertex(matrix4f, 0, chainLength + pixelSkip, chainOffset)
+                .setColor(255, 255, 255, 255)
+                .setUv(chainWidth, pixelSkip)
+                .setOverlay(setOverlay)
+                .setLight(packedLightIn)
+                .setNormal(pose, 0.0F, 1.0F, 0.0F);
 
         poseStack.popPose();
     }

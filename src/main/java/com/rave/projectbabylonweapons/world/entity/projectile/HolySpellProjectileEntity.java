@@ -8,7 +8,6 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.network.PlayMessages;
 import software.bernie.geckolib.animation.AnimatableManager;
 import software.bernie.geckolib.animation.AnimationController;
 import software.bernie.geckolib.animation.RawAnimation;
@@ -23,10 +22,6 @@ public class HolySpellProjectileEntity extends BasicSpellProjectileEntity {
     }
 
     public HolySpellProjectileEntity(Level level) {
-        this(PBModEntities.HOLY_SPELL_PROJECTILE.get(), level);
-    }
-
-    public HolySpellProjectileEntity(PlayMessages.SpawnEntity packet, Level level) {
         this(PBModEntities.HOLY_SPELL_PROJECTILE.get(), level);
     }
 

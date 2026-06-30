@@ -1,34 +1,35 @@
 package com.rave.projectbabylonweapons.network;
 
+import com.rave.projectbabylonweapons.ProjectBabylonWeapons;
 import com.rave.projectbabylonweapons.skill.weapon_innate.SickleThrowSkill;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.network.NetworkEvent;
+import net.minecraft.core.UUIDUtil;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import java.util.UUID;
-import java.util.function.Supplier;
 
-public class SPSickleActiveSync {
-    private final UUID playerId;
-    private final int entityId;
+public record SPSickleActiveSync(UUID playerId, int entityId) implements CustomPacketPayload {
 
-    public SPSickleActiveSync(UUID playerId, int entityId) {
-        this.playerId = playerId;
-        this.entityId = entityId;
+    public static final Type<SPSickleActiveSync> TYPE =
+            new Type<>(ResourceLocation.fromNamespaceAndPath(ProjectBabylonWeapons.MODID, "sickle_active_sync"));
+
+    public static final StreamCodec<RegistryFriendlyByteBuf, SPSickleActiveSync> STREAM_CODEC =
+            StreamCodec.composite(
+                    UUIDUtil.STREAM_CODEC, SPSickleActiveSync::playerId,
+                    ByteBufCodecs.INT,     SPSickleActiveSync::entityId,
+                    SPSickleActiveSync::new
+            );
+
+    @Override
+    public Type<SPSickleActiveSync> type() {
+        return TYPE;
     }
 
-    public SPSickleActiveSync(FriendlyByteBuf buf) {
-        this.playerId = buf.readUUID();
-        this.entityId = buf.readInt();
-    }
-
-    public void encode(FriendlyByteBuf buf) {
-        buf.writeUUID(playerId);
-        buf.writeInt(entityId);
-    }
-
-    public void handle(Supplier<NetworkEvent.Context> contextSupplier) {
-        NetworkEvent.Context context = contextSupplier.get();
-        context.enqueueWork(() -> SickleThrowSkill.setClientActiveProjectile(playerId, entityId));
-        context.setPacketHandled(true);
+    public static void handle(SPSickleActiveSync packet, IPayloadContext context) {
+        context.enqueueWork(() -> SickleThrowSkill.setClientActiveProjectile(packet.playerId(), packet.entityId()));
     }
 }

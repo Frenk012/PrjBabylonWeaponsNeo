@@ -1,6 +1,7 @@
 
 package com.rave.projectbabylonweapons.block.renderer;
 
+import com.mojang.serialization.MapCodec;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.block.state.StateDefinition;
@@ -26,6 +27,12 @@ import java.util.Collections;
 
 public class FrozenDebuffIceBlock extends BaseEntityBlock implements EntityBlock {
     public static final IntegerProperty ANIMATION = IntegerProperty.create("animation", 0, (int) 1);
+    public static final MapCodec<FrozenDebuffIceBlock> CODEC = simpleCodec(p -> new FrozenDebuffIceBlock());
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
+    }
 
     public FrozenDebuffIceBlock() {
         super(BlockBehaviour.Properties.of()

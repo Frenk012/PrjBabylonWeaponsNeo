@@ -16,15 +16,15 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
-import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
-import net.minecraftforge.client.event.RenderLevelStageEvent;
+import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
+import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.fml.common.EventBusSubscriber;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Mod.EventBusSubscriber(modid = ProjectBabylonWeapons.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
+@EventBusSubscriber(modid = ProjectBabylonWeapons.MODID, bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
 public class FrozenEffectRenderHandler {
     private static final float MODEL_SCALE = 2.0F;
     private static final double Y_OFFSET = -1.0D;
@@ -60,7 +60,7 @@ public class FrozenEffectRenderHandler {
         double camX = event.getCamera().getPosition().x;
         double camY = event.getCamera().getPosition().y;
         double camZ = event.getCamera().getPosition().z;
-        float partialTick = event.getPartialTick();
+        float partialTick = event.getPartialTick().getGameTimeDeltaPartialTick(false);
         boolean renderedAny = false;
 
         for (Entity rawEntity : level.entitiesForRendering()) {
@@ -68,7 +68,7 @@ public class FrozenEffectRenderHandler {
                 continue;
             }
 
-            boolean hasFrozen = entity.hasEffect(PBModEffects.FROZEN.get());
+            boolean hasFrozen = entity.hasEffect(PBModEffects.FROZEN);
             boolean syncedFrozen = CLIENT_FROZEN_ENTITY_SYNC_UNTIL_MS.getOrDefault(entity.getId(), 0L) > now;
             boolean shouldRenderFrozen = hasFrozen || syncedFrozen;
             boolean isAlive = entity.isAlive();

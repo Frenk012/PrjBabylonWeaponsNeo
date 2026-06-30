@@ -19,9 +19,9 @@ public class GlacierIceSpikeRenderer extends GeoEntityRenderer<GlacierIceSpikeEn
     @Override
     public void actuallyRender(PoseStack poseStack, GlacierIceSpikeEntity animatable, BakedGeoModel model, @Nullable net.minecraft.client.renderer.RenderType renderType,
                                MultiBufferSource bufferSource, @Nullable VertexConsumer buffer, boolean isReRender, float partialTick,
-                               int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
+                               int packedLight, int packedOverlay, int renderColor) {
         float scale = animatable.getSpikeScale();
         poseStack.scale(scale, scale, scale);
-        super.actuallyRender(poseStack, animatable, model, renderType, bufferSource, buffer, isReRender, partialTick, packedLight, packedOverlay, red, green, blue, alpha);
+        super.actuallyRender(poseStack, animatable, model, renderType, bufferSource, buffer, isReRender, partialTick, packedLight, packedOverlay, renderColor);
     }
 }
