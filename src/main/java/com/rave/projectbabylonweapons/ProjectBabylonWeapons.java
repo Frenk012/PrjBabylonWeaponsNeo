@@ -57,7 +57,6 @@ public class ProjectBabylonWeapons {
         PBModEntities.ENTITIES.register(modBus);
 
         gameBus.addListener(this::addReloadListeners);
-        gameBus.register(this);
     }
 
     private void commonSetup(FMLCommonSetupEvent event) {
