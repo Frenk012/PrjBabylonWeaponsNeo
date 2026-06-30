@@ -3,7 +3,7 @@ package com.rave.projectbabylonweapons.gameasset;
 import com.rave.projectbabylonweapons.ProjectBabylonWeapons;
 
 import net.minecraft.world.InteractionHand;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 import yesman.epicfight.api.animation.AnimationManager;
 import yesman.epicfight.api.animation.property.AnimationEvent;
 import yesman.epicfight.api.animation.property.AnimationProperty;

@@ -3,7 +3,7 @@ package com.rave.projectbabylonweapons.init;
 import software.bernie.geckolib.animatable.GeoItem;
 
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 import net.minecraftforge.event.TickEvent;
 
 import net.minecraft.world.item.ItemStack;

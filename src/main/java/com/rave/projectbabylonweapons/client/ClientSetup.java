@@ -7,10 +7,10 @@ import com.rave.projectbabylonweapons.network.CPPullOwnerToTarget;
 import com.rave.projectbabylonweapons.network.CPPullTargetToOwner;
 import com.rave.projectbabylonweapons.skill.weapon_innate.SickleThrowSkill;
 import net.minecraft.client.Minecraft;
-import net.minecraftforge.api.distmarker.Dist;
+import net.neoforged.api.distmarker.Dist;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(modid = ProjectBabylonWeapons.MODID, value = Dist.CLIENT)

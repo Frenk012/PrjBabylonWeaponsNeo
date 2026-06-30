@@ -21,10 +21,10 @@ import com.rave.projectbabylonweapons.client.renderer.TectonicFallingBlockRender
 import com.rave.projectbabylonweapons.init.PBModBlocks;
 import com.rave.projectbabylonweapons.init.PBModEntities;
 import com.rave.projectbabylonweapons.init.PBModParticles;
-import net.minecraftforge.api.distmarker.Dist;
+import net.neoforged.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 

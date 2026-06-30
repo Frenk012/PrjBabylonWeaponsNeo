@@ -4,7 +4,7 @@ import java.util.Set;
 
 
 import com.rave.projectbabylonweapons.skill.weapon_innate.*;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 

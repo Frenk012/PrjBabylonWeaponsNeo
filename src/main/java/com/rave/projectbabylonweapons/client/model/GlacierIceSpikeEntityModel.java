@@ -4,7 +4,7 @@ import com.rave.projectbabylonweapons.ProjectBabylonWeapons;
 import com.rave.projectbabylonweapons.world.entity.effect.GlacierIceSpikeEntity;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
-import software.bernie.geckolib.core.animation.AnimationState;
+import software.bernie.geckolib.animation.AnimationState;
 import software.bernie.geckolib.model.GeoModel;
 
 public class GlacierIceSpikeEntityModel extends GeoModel<GlacierIceSpikeEntity> {
