@@ -109,11 +109,10 @@ dependencies {
             'cdmoveset-*.jar'
     ])
 
-    // Project Babylon Materials: the locally-built NeoForge sibling mod jar.
+    // Project Babylon Materials: the locally-built NeoForge sibling mod jar (compile only).
+    // At dev runtime it is supplied from run/mods (like the other integration mods), so it is
+    // NOT added to localRuntime here — doing so would load Materials twice (duplicate mod id).
     compileOnly files("${materials_project_dir}/build/libs/project_babylon_materials-${materials_version}.jar")
-
-    // Dev runtime: load the parent Materials mod so dependent registrations resolve in dev runs.
-    localRuntime files("${materials_project_dir}/build/libs/project_babylon_materials-${materials_version}.jar")
 }
 
 // Expand mod metadata placeholders (${mod_id}, ${neo_version_range}, ...) in the toml + pack.mcmeta.
