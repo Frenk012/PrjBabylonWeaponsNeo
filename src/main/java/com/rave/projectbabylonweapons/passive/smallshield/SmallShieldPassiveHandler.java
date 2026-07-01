@@ -8,6 +8,8 @@ import com.rave.projectbabylonweapons.world.entity.effect.DragonFuryChargeEntity
 import io.redspace.ironsspellbooks.registries.MobEffectRegistry;
 import net.corruptdog.cdm.gameasset.CDSkills;
 import net.corruptdog.cdm.gameasset.CorruptAnimations;
+import net.minecraft.core.Holder;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.DamageTypeTags;
@@ -21,12 +23,17 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import yesman.epicfight.api.animation.AnimationPlayer;
 import yesman.epicfight.api.asset.AssetAccessor;
+import yesman.epicfight.api.event.EpicFightEventHooks;
+import yesman.epicfight.api.event.IdentifierProvider;
+import yesman.epicfight.api.event.types.entity.DealDamageEvent;
+import yesman.epicfight.api.event.types.entity.TakeDamageEvent;
+import yesman.epicfight.api.event.types.player.SkillCastEvent;
 import yesman.epicfight.api.utils.AttackResult;
 import yesman.epicfight.api.utils.math.ValueModifier;
 import yesman.epicfight.skill.SkillContainer;
@@ -34,10 +41,6 @@ import yesman.epicfight.skill.SkillSlots;
 import yesman.epicfight.world.capabilities.EpicFightCapabilities;
 import yesman.epicfight.world.capabilities.entitypatch.player.PlayerPatch;
 import yesman.epicfight.world.capabilities.entitypatch.player.ServerPlayerPatch;
-import yesman.epicfight.world.entity.eventlistener.DealDamageEvent;
-import yesman.epicfight.world.entity.eventlistener.PlayerEventListener;
-import yesman.epicfight.world.entity.eventlistener.SkillCastEvent;
-import yesman.epicfight.world.entity.eventlistener.TakeDamageEvent;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -46,11 +49,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-@Mod.EventBusSubscriber(modid = ProjectBabylonWeapons.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+@EventBusSubscriber(modid = ProjectBabylonWeapons.MODID, bus = EventBusSubscriber.Bus.GAME)
 public final class SmallShieldPassiveHandler {
-    private static final UUID SKILL_CAST_LISTENER = UUID.fromString("47c90cdd-8827-40fb-b57d-1cd1e11c3d6c");
-    private static final UUID TAKE_DAMAGE_LISTENER = UUID.fromString("c20d0e2c-1c4d-4954-b6ba-3ec0dc3466d7");
-    private static final UUID DEAL_DAMAGE_LISTENER = UUID.fromString("af17c47d-37bb-43ab-b5c7-b7e90bf34cc5");
+    private static final IdentifierProvider SKILL_CAST_LISTENER = IdentifierProvider.constant(
+            ResourceLocation.fromNamespaceAndPath(ProjectBabylonWeapons.MODID, "smallshield_skill_cast"));
+    private static final IdentifierProvider TAKE_DAMAGE_LISTENER = IdentifierProvider.constant(
+            ResourceLocation.fromNamespaceAndPath(ProjectBabylonWeapons.MODID, "smallshield_take_damage"));
+    private static final IdentifierProvider DEAL_DAMAGE_LISTENER = IdentifierProvider.constant(
+            ResourceLocation.fromNamespaceAndPath(ProjectBabylonWeapons.MODID, "smallshield_deal_damage"));
     private static final double LAUNCH_TARGET_HEIGHT = 1.05D;
     private static final float SHIELD_BASH_PARRY_WINDOW_SECONDS = 0.2F;
 
@@ -62,12 +68,12 @@ public final class SmallShieldPassiveHandler {
     }
 
     @SubscribeEvent
-    public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
-        if (event.phase != TickEvent.Phase.START || event.player.level().isClientSide) {
+    public static void onPlayerTick(PlayerTickEvent.Pre event) {
+        if (event.getEntity().level().isClientSide) {
             return;
         }
 
-        Player player = event.player;
+        Player player = event.getEntity();
         PlayerPatch<?> playerPatch = EpicFightCapabilities.getEntityPatch(player, PlayerPatch.class);
         if (playerPatch == null) {
             return;
@@ -75,9 +81,12 @@ public final class SmallShieldPassiveHandler {
 
         UUID playerId = player.getUUID();
         if (REGISTERED_PLAYERS.putIfAbsent(playerId, Boolean.TRUE) == null) {
-            playerPatch.getEventListener().addEventListener(PlayerEventListener.EventType.SKILL_CAST_EVENT, SKILL_CAST_LISTENER, skillCastEvent -> onSkillCast(player, skillCastEvent));
-            playerPatch.getEventListener().addEventListener(PlayerEventListener.EventType.TAKE_DAMAGE_EVENT_ATTACK, TAKE_DAMAGE_LISTENER, takeDamageEvent -> onTakeDamageAttack(player, takeDamageEvent), 0);
-            playerPatch.getEventListener().addEventListener(PlayerEventListener.EventType.DEAL_DAMAGE_EVENT_HURT, DEAL_DAMAGE_LISTENER, dealDamageEvent -> onDealDamageHurt(player, dealDamageEvent));
+            playerPatch.getEventListener().registerContextAwareEvent(EpicFightEventHooks.Player.CAST_SKILL,
+                    (SkillCastEvent skillCastEvent, yesman.epicfight.api.event.EventContext context) -> onSkillCast(player, skillCastEvent), SKILL_CAST_LISTENER);
+            playerPatch.getEventListener().registerContextAwareEvent(EpicFightEventHooks.Entity.TAKE_DAMAGE_INCOME,
+                    (TakeDamageEvent.Income takeDamageEvent, yesman.epicfight.api.event.EventContext context) -> onTakeDamageAttack(player, takeDamageEvent), TAKE_DAMAGE_LISTENER);
+            playerPatch.getEventListener().registerEvent(EpicFightEventHooks.Entity.DELIVER_DAMAGE_PRE,
+                    (DealDamageEvent.Pre dealDamageEvent) -> onDealDamageHurt(player, dealDamageEvent), DEAL_DAMAGE_LISTENER);
         }
 
         tickTemporaryStates(player);
@@ -93,9 +102,9 @@ public final class SmallShieldPassiveHandler {
 
         PlayerPatch<?> playerPatch = EpicFightCapabilities.getEntityPatch(event.getEntity(), PlayerPatch.class);
         if (playerPatch != null) {
-            playerPatch.getEventListener().removeListener(PlayerEventListener.EventType.SKILL_CAST_EVENT, SKILL_CAST_LISTENER);
-            playerPatch.getEventListener().removeListener(PlayerEventListener.EventType.TAKE_DAMAGE_EVENT_ATTACK, TAKE_DAMAGE_LISTENER, 0);
-            playerPatch.getEventListener().removeListener(PlayerEventListener.EventType.DEAL_DAMAGE_EVENT_HURT, DEAL_DAMAGE_LISTENER);
+            playerPatch.getEventListener().removeListenersBelongTo(SKILL_CAST_LISTENER);
+            playerPatch.getEventListener().removeListenersBelongTo(TAKE_DAMAGE_LISTENER);
+            playerPatch.getEventListener().removeListenersBelongTo(DEAL_DAMAGE_LISTENER);
         }
     }
 
@@ -119,7 +128,7 @@ public final class SmallShieldPassiveHandler {
         }
     }
 
-    private static void onTakeDamageAttack(Player player, TakeDamageEvent.Attack event) {
+    private static void onTakeDamageAttack(Player player, TakeDamageEvent.Income event) {
         ItemStack shieldStack = getEquippedSmallShieldStack(player);
         if (shieldStack.isEmpty()) {
             return;
@@ -145,7 +154,7 @@ public final class SmallShieldPassiveHandler {
 
         GoldenSmallShieldBalance.Profile golden = GoldenSmallShieldBalance.resolve(shieldStack);
         if (golden != null) {
-            attacker.addEffect(new MobEffectInstance(PBMEffects.EXHAUSTED.get(), golden.exhaustedDurationTicks(), 0, false, true, true));
+            attacker.addEffect(new MobEffectInstance(PBMEffects.EXHAUSTED, golden.exhaustedDurationTicks(), 0, false, true, true));
         }
 
         EtherealSmallShieldBalance.Profile ethereal = EtherealSmallShieldBalance.resolve(shieldStack);
@@ -154,21 +163,21 @@ public final class SmallShieldPassiveHandler {
             if (removedBuffs > 0) {
                 float restoreAmount = ethereal.weaponChargeRestorePerBuff() * removedBuffs;
                 float absorptionAmount = player.getMaxHealth() * ethereal.absorptionPercentPerBuff() * removedBuffs;
-                restoreWeaponInnateCharge(event.getPlayerPatch(), restoreAmount);
+                restoreWeaponInnateCharge((ServerPlayerPatch) event.getEntityPatch(), restoreAmount);
                 grantTemporaryAbsorption(player, absorptionAmount, ethereal.absorptionDurationTicks());
             }
         }
 
         IceSmallShieldBalance.Profile ice = IceSmallShieldBalance.resolve(shieldStack);
         if (ice != null) {
-            attacker.addEffect(new MobEffectInstance(PBMEffects.FROZEN.get(), ice.frozenDurationTicks(), 0, false, true, true));
-            attacker.addEffect(new MobEffectInstance(MobEffectRegistry.CHILLED.get(), ice.chillDurationTicks(), 0, false, true, true));
+            attacker.addEffect(new MobEffectInstance(PBMEffects.FROZEN, ice.frozenDurationTicks(), 0, false, true, true));
+            attacker.addEffect(new MobEffectInstance(MobEffectRegistry.CHILLED, ice.chillDurationTicks(), 0, false, true, true));
         }
 
         NetheriteSmallShieldBalance.Profile netherite = NetheriteSmallShieldBalance.resolve(shieldStack);
         if (netherite != null) {
-            attacker.setSecondsOnFire(netherite.fireDurationSeconds());
-            attacker.addEffect(new MobEffectInstance(PBMEffects.BRIMSTONE_FLAMES.get(), netherite.brimstoneDurationTicks(), 0, false, true, true));
+            attacker.igniteForSeconds(netherite.fireDurationSeconds());
+            attacker.addEffect(new MobEffectInstance(PBMEffects.BRIMSTONE_FLAMES, netherite.brimstoneDurationTicks(), 0, false, true, true));
         }
 
         DragonsteelSmallShieldBalance.Profile dragonsteel = DragonsteelSmallShieldBalance.resolve(shieldStack);
@@ -178,7 +187,7 @@ public final class SmallShieldPassiveHandler {
         }
     }
 
-    private static void onDealDamageHurt(Player player, DealDamageEvent.Hurt event) {
+    private static void onDealDamageHurt(Player player, DealDamageEvent.Pre event) {
         if (player.level().isClientSide || event.getTarget() == null || !event.getTarget().isAlive() || event.getTarget().isAlliedTo(player)) {
             return;
         }
@@ -186,7 +195,7 @@ public final class SmallShieldPassiveHandler {
         applyDragonFuryIfPresent(player, event);
     }
 
-    private static void applyDragonFuryIfPresent(Player player, DealDamageEvent.Hurt event) {
+    private static void applyDragonFuryIfPresent(Player player, DealDamageEvent.Pre event) {
         DragonsteelSmallShieldBalance.Profile profile = DragonsteelSmallShieldBalance.resolve(getEquippedSmallShieldStack(player));
         if (profile == null) {
             DRAGON_FURY_CHARGES.remove(player.getUUID());
@@ -241,8 +250,8 @@ public final class SmallShieldPassiveHandler {
         }
     }
 
-    private static boolean isShieldBashParry(TakeDamageEvent.Attack event) {
-        ServerPlayerPatch playerPatch = event.getPlayerPatch();
+    private static boolean isShieldBashParry(TakeDamageEvent.Income event) {
+        ServerPlayerPatch playerPatch = (ServerPlayerPatch) event.getEntityPatch();
         AnimationPlayer animationPlayer = playerPatch.getAnimator().getPlayerFor(null);
         if (animationPlayer == null || animationPlayer.getRealAnimation() == null) {
             return false;
@@ -260,17 +269,17 @@ public final class SmallShieldPassiveHandler {
         return isFrontBlockableSource(playerPatch, event.getDamageSource());
     }
 
-    private static boolean isShieldBashAnimation(DealDamageEvent.Hurt event) {
+    private static boolean isShieldBashAnimation(DealDamageEvent.Pre event) {
         var animation = event.getDamageSource().getAnimation();
         return animation != null && animation.toString().equals(CorruptAnimations.SHILED_SLASH.registryName().toString());
     }
 
-    private static boolean isVanillaShieldBlock(Player player, TakeDamageEvent.Attack event) {
+    private static boolean isVanillaShieldBlock(Player player, TakeDamageEvent.Income event) {
         if (!player.isBlocking()) {
             return false;
         }
 
-        return isFrontBlockableSource(event.getPlayerPatch(), event.getDamageSource());
+        return isFrontBlockableSource((ServerPlayerPatch) event.getEntityPatch(), event.getDamageSource());
     }
 
     private static boolean isFrontBlockableSource(ServerPlayerPatch playerPatch, DamageSource damageSource) {
@@ -454,9 +463,9 @@ public final class SmallShieldPassiveHandler {
     }
 
     private static int removeBeneficialEffects(LivingEntity target) {
-        List<MobEffect> removableEffects = new ArrayList<>();
+        List<Holder<MobEffect>> removableEffects = new ArrayList<>();
         for (MobEffectInstance effectInstance : target.getActiveEffects()) {
-            if (effectInstance.getEffect().isBeneficial()) {
+            if (effectInstance.getEffect().value().isBeneficial()) {
                 removableEffects.add(effectInstance.getEffect());
             }
         }

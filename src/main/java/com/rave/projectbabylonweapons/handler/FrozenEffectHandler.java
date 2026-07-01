@@ -12,14 +12,16 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.event.entity.living.LivingEvent;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.event.entity.living.LivingDamageEvent;
-import net.minecraftforge.event.entity.living.MobEffectEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.neoforge.event.tick.EntityTickEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
+import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import com.rave.projectbabylonweapons.ProjectBabylonWeapons;
 import yesman.epicfight.api.animation.Animator;
 import yesman.epicfight.world.capabilities.EpicFightCapabilities;
 import yesman.epicfight.world.capabilities.entitypatch.LivingEntityPatch;
@@ -29,10 +31,10 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE)
+@EventBusSubscriber(bus = EventBusSubscriber.Bus.GAME)
 public class FrozenEffectHandler {
 
-    private static final UUID FROZEN_MOVEMENT_UUID = UUID.fromString("a1b2c3d4-e5f6-7890-abcd-ef1234567890");
+    private static final ResourceLocation FROZEN_MOVEMENT_ID = ResourceLocation.fromNamespaceAndPath(ProjectBabylonWeapons.MODID, "frozen_movement");
     private static final int VISUAL_SYNC_HEARTBEAT_TICKS = 20;
     private static final int FROZEN_SNOWFLAKE_COUNT = 36;
     private static final int FROZEN_SNOW_DUST_COUNT = 20;
@@ -65,10 +67,12 @@ public class FrozenEffectHandler {
     }
 
     @SubscribeEvent
-    public static void onLivingUpdate(LivingEvent.LivingTickEvent event) {
-        LivingEntity entity = event.getEntity();
+    public static void onLivingUpdate(EntityTickEvent.Pre event) {
+        if (!(event.getEntity() instanceof LivingEntity entity)) {
+            return;
+        }
         UUID entityId = entity.getUUID();
-        boolean hasFrozen = entity.hasEffect(PBMEffects.FROZEN.get());
+        boolean hasFrozen = entity.hasEffect(PBMEffects.FROZEN);
 
         if (!entity.level().isClientSide) {
             boolean syncedFrozen = SYNCED_FROZEN_VISUALS.contains(entityId);
@@ -131,12 +135,11 @@ public class FrozenEffectHandler {
 
             if (!entity.level().isClientSide) {
                 AttributeInstance moveSpeed = entity.getAttribute(Attributes.MOVEMENT_SPEED);
-                if (moveSpeed != null && moveSpeed.getModifier(FROZEN_MOVEMENT_UUID) == null) {
+                if (moveSpeed != null && moveSpeed.getModifier(FROZEN_MOVEMENT_ID) == null) {
                     moveSpeed.addTransientModifier(new AttributeModifier(
-                            FROZEN_MOVEMENT_UUID,
-                            "frozen_movement",
+                            FROZEN_MOVEMENT_ID,
                             -1.0,
-                            AttributeModifier.Operation.MULTIPLY_TOTAL
+                            AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL
                     ));
                 }
 
@@ -161,7 +164,7 @@ public class FrozenEffectHandler {
             if (!entity.level().isClientSide) {
                 AttributeInstance moveSpeed = entity.getAttribute(Attributes.MOVEMENT_SPEED);
                 if (moveSpeed != null) {
-                    moveSpeed.removeModifier(FROZEN_MOVEMENT_UUID);
+                    moveSpeed.removeModifier(FROZEN_MOVEMENT_ID);
                 }
 
                 if (entity instanceof Mob mob) {
@@ -175,7 +178,7 @@ public class FrozenEffectHandler {
 
     @SubscribeEvent
     public static void onEffectRemoved(MobEffectEvent.Remove event) {
-        if (event.getEffect() == PBMEffects.FROZEN.get()) {
+        if (event.getEffect() == PBMEffects.FROZEN) {
             if (!event.getEntity().level().isClientSide) {
                 PBNetworkManager.sendToTrackingAndSelf(event.getEntity(), new SPFrozenVisualSync(event.getEntity().getId(), false));
                 SYNCED_FROZEN_VISUALS.remove(event.getEntity().getUUID());
@@ -196,20 +199,20 @@ public class FrozenEffectHandler {
     }
 
     @SubscribeEvent
-    public static void onLivingDamage(LivingDamageEvent event) {
+    public static void onLivingDamage(LivingDamageEvent.Pre event) {
         LivingEntity entity = event.getEntity();
-        if (entity.level().isClientSide || !entity.hasEffect(PBMEffects.FROZEN.get())) {
+        if (entity.level().isClientSide || !entity.hasEffect(PBMEffects.FROZEN)) {
             return;
         }
 
-        if (event.getAmount() < entity.getHealth()) {
+        if (event.getNewDamage() < entity.getHealth()) {
             return;
         }
 
         PBNetworkManager.sendToTrackingAndSelf(entity, new SPFrozenVisualSync(entity.getId(), false));
         SYNCED_FROZEN_VISUALS.remove(entity.getUUID());
         HIGH_HP_DURATION_ADJUSTED.remove(entity.getUUID());
-        entity.removeEffect(PBMEffects.FROZEN.get());
+        entity.removeEffect(PBMEffects.FROZEN);
         clearFrozenState(entity);
     }
 
@@ -217,7 +220,7 @@ public class FrozenEffectHandler {
 
     @SubscribeEvent
     public static void onEffectAdded(MobEffectEvent.Added event) {
-        if (event.getEffectInstance().getEffect() == PBMEffects.FROZEN.get()) {
+        if (event.getEffectInstance().getEffect() == PBMEffects.FROZEN) {
             LivingEntity entity = event.getEntity();
 
             if (!entity.level().isClientSide) {
@@ -254,7 +257,7 @@ public class FrozenEffectHandler {
             return;
         }
 
-        if (living.hasEffect(PBMEffects.FROZEN.get())) {
+        if (living.hasEffect(PBMEffects.FROZEN)) {
             PBNetworkManager.sendToPlayer(player, new SPFrozenVisualSync(living.getId(), true));
             SYNCED_FROZEN_VISUALS.add(living.getUUID());
         }
@@ -277,7 +280,7 @@ public class FrozenEffectHandler {
             return;
         }
 
-        if (player.hasEffect(PBMEffects.FROZEN.get())) {
+        if (player.hasEffect(PBMEffects.FROZEN)) {
             PBNetworkManager.sendToPlayer(player, new SPFrozenVisualSync(player.getId(), true));
             SYNCED_FROZEN_VISUALS.add(player.getUUID());
         }
@@ -299,7 +302,7 @@ public class FrozenEffectHandler {
         if (!entity.level().isClientSide) {
             AttributeInstance moveSpeed = entity.getAttribute(Attributes.MOVEMENT_SPEED);
             if (moveSpeed != null) {
-                moveSpeed.removeModifier(FROZEN_MOVEMENT_UUID);
+                moveSpeed.removeModifier(FROZEN_MOVEMENT_ID);
             }
 
             if (entity instanceof Mob mob) {
@@ -344,7 +347,7 @@ public class FrozenEffectHandler {
             return false;
         }
 
-        MobEffectInstance current = entity.getEffect(PBMEffects.FROZEN.get());
+        MobEffectInstance current = entity.getEffect(PBMEffects.FROZEN);
         if (current == null) {
             return false;
         }
@@ -355,8 +358,8 @@ public class FrozenEffectHandler {
             return false;
         }
 
-        entity.removeEffect(PBMEffects.FROZEN.get());
-        entity.addEffect(new MobEffectInstance(PBMEffects.FROZEN.get(), adjustedDuration));
+        entity.removeEffect(PBMEffects.FROZEN);
+        entity.addEffect(new MobEffectInstance(PBMEffects.FROZEN, adjustedDuration));
         HIGH_HP_DURATION_ADJUSTED.add(entityId);
         return true;
     }

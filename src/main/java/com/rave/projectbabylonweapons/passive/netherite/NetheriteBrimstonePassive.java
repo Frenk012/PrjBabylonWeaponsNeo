@@ -20,16 +20,16 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.event.entity.living.LivingHurtEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-@Mod.EventBusSubscriber(modid = ProjectBabylonWeapons.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+@EventBusSubscriber(modid = ProjectBabylonWeapons.MODID, bus = EventBusSubscriber.Bus.GAME)
 public final class NetheriteBrimstonePassive {
     private static final ThreadLocal<Set<UUID>> PROCESSING_ENTITIES = ThreadLocal.withInitial(HashSet::new);
     private static final ThreadLocal<Boolean> PROCESSING_BRIMSTONE_BLAST = ThreadLocal.withInitial(() -> false);
@@ -49,7 +49,7 @@ public final class NetheriteBrimstonePassive {
     }
 
     @SubscribeEvent
-    public static void onLivingHurt(LivingHurtEvent event) {
+    public static void onLivingHurt(LivingIncomingDamageEvent event) {
         if (event.isCanceled() || event.getAmount() <= 0.0F) {
             return;
         }
@@ -78,7 +78,7 @@ public final class NetheriteBrimstonePassive {
             return;
         }
 
-        if (target.hasEffect(PBMEffects.BRIMSTONE_FIRE.get())) {
+        if (target.hasEffect(PBMEffects.BRIMSTONE_FIRE)) {
             if (rollChance(attacker, profile.brimstoneBlastProcChance())) {
                 triggerBrimstoneBlast(attacker, target, event.getSource(), profile);
                 clearBrimstoneEffects(target);
@@ -86,10 +86,10 @@ public final class NetheriteBrimstonePassive {
             return;
         }
 
-        if (target.hasEffect(PBMEffects.BRIMSTONE_FLAMES.get())) {
+        if (target.hasEffect(PBMEffects.BRIMSTONE_FLAMES)) {
             if (rollChance(attacker, profile.brimstoneFireProcChance())) {
                 target.addEffect(new MobEffectInstance(
-                        PBMEffects.BRIMSTONE_FIRE.get(),
+                        PBMEffects.BRIMSTONE_FIRE,
                         profile.brimstoneFireDurationTicks()
                 ));
             }
@@ -99,7 +99,7 @@ public final class NetheriteBrimstonePassive {
         if (target.isOnFire()) {
             if (rollChance(attacker, profile.brimstoneFlamesProcChance())) {
                 target.addEffect(new MobEffectInstance(
-                        PBMEffects.BRIMSTONE_FLAMES.get(),
+                        PBMEffects.BRIMSTONE_FLAMES,
                         profile.brimstoneFlamesDurationTicks()
                 ));
             }
@@ -107,7 +107,7 @@ public final class NetheriteBrimstonePassive {
         }
 
         if (rollChance(attacker, profile.igniteProcChance())) {
-            target.setSecondsOnFire(8);
+            target.igniteForSeconds(8);
         }
     }
 
@@ -166,8 +166,8 @@ public final class NetheriteBrimstonePassive {
     }
 
     private static void clearBrimstoneEffects(LivingEntity target) {
-        target.removeEffect(PBMEffects.BRIMSTONE_FIRE.get());
-        target.removeEffect(PBMEffects.BRIMSTONE_FLAMES.get());
+        target.removeEffect(PBMEffects.BRIMSTONE_FIRE);
+        target.removeEffect(PBMEffects.BRIMSTONE_FLAMES);
     }
 
     private static boolean rollChance(LivingEntity attacker, float chance) {

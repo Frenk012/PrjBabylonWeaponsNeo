@@ -129,8 +129,7 @@ public class FearHandler {
 
     @SubscribeEvent
     public static void onLivingTick(EntityTickEvent.Pre event) {
-        if (!(event.getEntity() instanceof LivingEntity)) return;
-        LivingEntity entity = event.getEntity();
+        if (!(event.getEntity() instanceof LivingEntity entity)) return;
         if (!(entity instanceof Player player) || !isMobilityRestricted(player)) {
             return;
         }
@@ -155,7 +154,7 @@ public class FearHandler {
             return;
         }
 
-        Player player = event.player;
+        Player player = event.getEntity();
         if (!isSickleLocked(player)) {
             return;
         }

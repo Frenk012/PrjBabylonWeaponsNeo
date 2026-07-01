@@ -7,6 +7,7 @@ import com.rave.projectbabylonweapons.world.entity.effect.GlacierIceSpikeEntity;
 import com.rave.projectbabylonweapons.world.entity.effect.TectonicFallingBlockEntity;
 import io.redspace.ironsspellbooks.registries.MobEffectRegistry;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
@@ -22,9 +23,9 @@ import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,7 +36,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-@Mod.EventBusSubscriber(modid = ProjectBabylonWeapons.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+@EventBusSubscriber(modid = ProjectBabylonWeapons.MODID, bus = EventBusSubscriber.Bus.GAME)
 public final class BastionPassiveHandler {
     private static final double AREA_RADIUS = 8.0D;
     private static final double AREA_VERTICAL = 3.0D;
@@ -67,7 +68,7 @@ public final class BastionPassiveHandler {
 
         BastionCurseBalance.Profile curse = BastionCurseBalance.resolve(shieldStack);
         if (curse != null) {
-            applyEnemiesEffect(caster, new MobEffectInstance(PBMEffects.FEAR_DEBUFF.get(), curse.fearDurationTicks(), 0, false, true, true));
+            applyEnemiesEffect(caster, new MobEffectInstance(PBMEffects.FEAR_DEBUFF, curse.fearDurationTicks(), 0, false, true, true));
             return;
         }
 
@@ -80,13 +81,13 @@ public final class BastionPassiveHandler {
 
         BastionWarSignalBalance.Profile warSignal = BastionWarSignalBalance.resolve(shieldStack);
         if (warSignal != null) {
-            applyAlliedPlayersEffect(caster, new MobEffectInstance(PBMEffects.ASH_MEMORY.get(), warSignal.ashMemoryDurationTicks(), 0, false, true, true));
+            applyAlliedPlayersEffect(caster, new MobEffectInstance(PBMEffects.ASH_MEMORY, warSignal.ashMemoryDurationTicks(), 0, false, true, true));
             return;
         }
 
         BastionHeavensGiftBalance.Profile heavensGift = BastionHeavensGiftBalance.resolve(shieldStack);
         if (heavensGift != null) {
-            applyAlliedPlayersEffect(caster, new MobEffectInstance(PBMEffects.HOLY_SIGIL.get(), heavensGift.holySigilDurationTicks(), 0, false, true, true));
+            applyAlliedPlayersEffect(caster, new MobEffectInstance(PBMEffects.HOLY_SIGIL, heavensGift.holySigilDurationTicks(), 0, false, true, true));
             return;
         }
 
@@ -97,11 +98,7 @@ public final class BastionPassiveHandler {
     }
 
     @SubscribeEvent
-    public static void onServerTick(TickEvent.ServerTickEvent event) {
-        if (event.phase != TickEvent.Phase.END) {
-            return;
-        }
-
+    public static void onServerTick(ServerTickEvent.Post event) {
         tickPendingPermafrostSpikeBursts();
         tickFrostAuras();
         tickRuleAuras();
@@ -145,9 +142,9 @@ public final class BastionPassiveHandler {
             }
 
             state.nextRefreshGameTime = state.level.getGameTime() + state.profile.refreshIntervalTicks();
-            MobEffect chilledEffect = MobEffectRegistry.CHILLED.get();
+            Holder<MobEffect> chilledEffect = MobEffectRegistry.CHILLED;
             MobEffectInstance chilled = new MobEffectInstance(chilledEffect, state.profile.chillDurationTicks(), 0, false, true, true);
-            MobEffectInstance magicalResistance = new MobEffectInstance(PBMEffects.MAGICAL_RESISTANCE.get(), state.profile.magicalResistanceDurationTicks(), 0, false, true, true);
+            MobEffectInstance magicalResistance = new MobEffectInstance(PBMEffects.MAGICAL_RESISTANCE, state.profile.magicalResistanceDurationTicks(), 0, false, true, true);
             for (LivingEntity target : getNearbyEnemies(caster, state.profile.radiusBlocks(), AREA_VERTICAL)) {
                 target.addEffect(new MobEffectInstance(chilled));
             }
@@ -177,8 +174,8 @@ public final class BastionPassiveHandler {
             }
 
             state.nextRefreshGameTime = state.level.getGameTime() + state.profile.refreshIntervalTicks();
-            MobEffectInstance provoke = new MobEffectInstance(PBMEffects.PROVOKE_DEBUFF.get(), state.profile.provokeDurationTicks(), 0, false, true, true);
-            MobEffectInstance critResistance = new MobEffectInstance(PBMEffects.CRIT_RESISTANCE.get(), state.profile.critResistanceDurationTicks(), 0, false, true, true);
+            MobEffectInstance provoke = new MobEffectInstance(PBMEffects.PROVOKE_DEBUFF, state.profile.provokeDurationTicks(), 0, false, true, true);
+            MobEffectInstance critResistance = new MobEffectInstance(PBMEffects.CRIT_RESISTANCE, state.profile.critResistanceDurationTicks(), 0, false, true, true);
             for (LivingEntity target : getNearbyEnemies(caster, state.profile.radiusBlocks(), AREA_VERTICAL)) {
                 target.setLastHurtByMob(caster);
                 target.addEffect(new MobEffectInstance(provoke));

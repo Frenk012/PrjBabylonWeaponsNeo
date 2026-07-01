@@ -111,14 +111,13 @@ public class TectonicSkill extends SimpleWeaponInnateSkill {
 
     @Override
     public void onRemoved(SkillContainer container) {
-        container.getExecutor().getEventListener().removeListener(EventType.ANIMATION_BEGIN_EVENT, TECTONIC_BEGIN_UUID);
         PENDING_CASTS.remove(container.getExecutor().getOriginal().getUUID());
         super.onRemoved(container);
     }
 
     @SubscribeEvent
-    public static void onServerTick(TickEvent.ServerTickEvent event) {
-        if (event.phase != TickEvent.Phase.END || ACTIVE_WAVES.isEmpty()) {
+    public static void onServerTick(ServerTickEvent.Post event) {
+        if (ACTIVE_WAVES.isEmpty()) {
             return;
         }
 
@@ -231,7 +230,7 @@ public class TectonicSkill extends SimpleWeaponInnateSkill {
 
             target.setDeltaMovement(push.x, KNOCKUP_VELOCITY, push.z);
             target.hurtMarked = true;
-            target.addEffect(new MobEffectInstance(PBMEffects.CONCUSSED.get(), CONCUSSED_DURATION_TICKS, 0, false, true, true));
+            target.addEffect(new MobEffectInstance(PBMEffects.CONCUSSED, CONCUSSED_DURATION_TICKS, 0, false, true, true));
             waveState.hitTargets.add(target.getUUID());
         }
 

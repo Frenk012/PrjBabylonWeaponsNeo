@@ -17,6 +17,7 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import yesman.epicfight.api.event.EntityEventListener;
 import yesman.epicfight.api.event.EpicFightEventHooks;
+import yesman.epicfight.api.event.types.animation.AnimationEndEvent;
 import yesman.epicfight.client.input.EpicFightKeyMappings;
 import yesman.epicfight.skill.SkillContainer;
 import yesman.epicfight.skill.weaponinnate.WeaponInnateSkill;
@@ -69,12 +70,13 @@ public class ManaBubbleSkill extends WeaponInnateSkill {
                     if (container.isActivated()) {
                         container.deactivate();
                     }
-                }
+                },
+                this
         );
-        container.getExecutor().getEventListener().addEventListener(
-                EventType.ANIMATION_END_EVENT,
-                END_UUID,
-                event -> onAnimationEnd(container, event)
+        eventListener.registerEvent(
+                EpicFightEventHooks.Animation.END,
+                event -> onAnimationEnd(container, event),
+                this
         );
     }
 
@@ -125,6 +127,16 @@ public class ManaBubbleSkill extends WeaponInnateSkill {
             PBAnimations.MANA_BUBBLE.get().phases[0].addProperties(this.properties.get(0).entrySet());
         }
         return this;
+    }
+
+    private static void onAnimationEnd(SkillContainer container, AnimationEndEvent event) {
+        if (event.getAnimation() != PBAnimations.MANA_BUBBLE) {
+            return;
+        }
+
+        if (container.isActivated()) {
+            container.deactivate();
+        }
     }
 
     private static void spawnManaBubble(ServerPlayerPatch playerPatch, ItemStack weaponStack) {
