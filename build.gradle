@@ -103,7 +103,10 @@ dependencies {
             // Iron's Spells API references these in method signatures, so they must be on the
             // compile classpath even though the weapons mod does not import them directly.
             'curios-*.jar',
-            'irons-spellbooks-lib-*.jar', 'irons_spellbooks_lib-*.jar', 'CuriosApi-*.jar'
+            'irons-spellbooks-lib-*.jar', 'irons_spellbooks_lib-*.jar', 'CuriosApi-*.jar',
+            // CDM / cdmoveset (Epic Fight "resurrection fork" addon) — the updated mod integrates
+            // net.corruptdog.cdm (CorruptAnimations / CDSkills) for the new Bastion/smallshield presets.
+            'cdmoveset-*.jar'
     ])
 
     // Project Babylon Materials: the locally-built NeoForge sibling mod jar.

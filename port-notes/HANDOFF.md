@@ -93,3 +93,29 @@ SEMANTIC (11 renderer files): `actuallyRender(...)` override — replace trailin
 4. Port networking, then events/handlers, then EF capabilities/presets, then EF skills, then client/render, block entities, projectiles, effects, config.
 5. Compile-fix loop until BUILD SUCCESSFUL. Then `./gradlew build`.
 6. Port data resources (recipes/loot/tags/lang/sounds) per Material's "Restructure data resources" commit (loot_tables→loot_table folder rename etc.).
+
+---
+# WAVE 2 — porting the `main` 1.20.1 delta (in progress, 2026-07-01)
+
+The Forge `main` branch was updated with fixes + features. We imported that delta and are porting it.
+
+## What was done
+- `git diff 4dd541c main` = the new changes. Imported main's Forge code for all changed files into the working tree (commit "WIP: import main 1.20.1 delta ... pre-port"), then 5 cluster agents ported them. **3 agents were cut off by a session limit** — port is INCOMPLETE and does NOT compile yet. All partial work committed ("WIP: partial NeoForge port of main delta").
+- New content: shield family (item/shield/**, Bastion+Small), SternSlamSkill, PBLongswordStyles, new entities (DiamondShard, DragonFuryCharge), bastion/smallshield passives.
+- Effects were DELETED from weapons (moved to the Materials parent mod) — weapons now uses `com.rave.projectbabylonmaterials.init.PBMEffects`.
+- Added `cdmoveset-*.jar` to the compile fileTree in build.gradle.
+
+## BLOCKERS
+1. **Materials effects missing (NEEDS USER / materials update).** Weapons `main` uses ~16 effects from `com.rave.projectbabylonmaterials.init.PBMEffects`: BLEED_DEBUFF, FROZEN, FEAR_DEBUFF, MARKED, CONCUSSED, CHAINED, BRIMSTONE_FIRE, BRIMSTONE_FLAMES, CRIT_RESISTANCE, PHYSICAL_RESISTANCE, MAGICAL_RESISTANCE, ASH_MEMORY, HOLY_SIGIL, WEAPON_CHIP, EXHAUSTED, PROVOKE_DEBUFF. The ported Materials mod (../PrjBabilonMaterialPort, jar project_babylon_materials-1.1.15.jar) `PBMEffects` defines ONLY `UNSTABLE`. These effects exist in NEITHER materials branch. → The Materials 1.21.1 mod must be updated with these effects and rebuilt (`gradlew build`) so weapons can compile/run. Some effect classes (BleedDebuff, FrozenDebuff, FearDebuff, Marked, Concussed, BrimstoneFlames, BrokenArmor, ImpactBreak, MagicBrokenArmor) exist as ALREADY-PORTED NeoForge code in weapons git history (commit d6633b5, before the delta deleted them) and can be moved into materials; the rest (CRIT/PHYSICAL/MAGICAL_RESISTANCE, ASH_MEMORY, HOLY_SIGIL, WEAPON_CHIP, EXHAUSTED, PROVOKE_DEBUFF) are new and need their source.
+   NOTE: cdmoveset jar does NOT contain these effects (checked).
+2. **net.corruptdog.cdm — RESOLVED.** cdmoveset-2.0-neoforge1.21.1.jar (curse.maven:epic-fight-resurrection-fork-1514242:7927181) in run/mods provides net.corruptdog.cdm (CorruptAnimations, CDSkills). Added to build.gradle compile fileTree.
+
+## USER NOTE
+- `main` (1.20.1) got ANOTHER latest commit after the delta was imported — RE-DIFF `4dd541c..main` (or the new HEAD) to catch anything additional to port.
+- Weapons must run alongside the user's Materials port (../PrjBabilonMaterialPort build) — its jar is on compileOnly + localRuntime.
+
+## NEXT STEPS (fresh session)
+1. Verify ProjectBabylonWeapons.java + PBWeaponCapabilityPresets.java still have the runtime fixes (mod-bus ctor, PBSkills.REGISTRY.register, PBNetworkManager listener, PBWeaponCapabilityPresets.register() via EpicFightEventHooks.Registry.WEAPON_CAPABILITY_PRESET, addPackFinders "resourcepacks/projectbabylonpack", NO gameBus.register(this)) — the init agent was cut off mid-work.
+2. Resolve blocker 1 (materials effects).
+3. `./gradlew compileJava` and finish porting the remaining delta errors (skill/passive/handler/client/network were the cut-off clusters).
+4. Then: runtime test (was working before the delta), and the still-pending data-resource migration (recipes/loot/lang layout, GeckoLib idle animations, EF animation format).
