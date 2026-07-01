@@ -28,7 +28,6 @@ public class HolySpellProjectileEntity extends BasicSpellProjectileEntity {
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(new AnimationController<>(this, "loop_controller", 0, state -> {
-            state.getController().setAnimation(HOLY_LOOP_ANIMATION);
             return PlayState.CONTINUE;
         }));
     }
