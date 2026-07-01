@@ -8,8 +8,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.network.PlayMessages;
-import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.animation.AnimatableManager;
 
 public class EnderSpellProjectileEntity extends BasicSpellProjectileEntity {
     private static final int IMPACT_PORTAL_COUNT = 28;
@@ -20,10 +19,6 @@ public class EnderSpellProjectileEntity extends BasicSpellProjectileEntity {
     }
 
     public EnderSpellProjectileEntity(Level level) {
-        this(PBModEntities.ENDER_SPELL_PROJECTILE.get(), level);
-    }
-
-    public EnderSpellProjectileEntity(PlayMessages.SpawnEntity packet, Level level) {
         this(PBModEntities.ENDER_SPELL_PROJECTILE.get(), level);
     }
 

@@ -4,40 +4,37 @@ import com.rave.projectbabylonmaterials.init.PBMEffects;
 import com.rave.projectbabylonweapons.gameasset.PBAnimations;
 import com.rave.projectbabylonweapons.passive.bastion.BastionPassiveHandler;
 import net.minecraft.client.KeyMapping;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import yesman.epicfight.api.event.EntityEventListener;
+import yesman.epicfight.api.event.EpicFightEventHooks;
 import yesman.epicfight.client.input.EpicFightKeyMappings;
-import yesman.epicfight.skill.SkillBuilder;
 import yesman.epicfight.skill.SkillContainer;
 import yesman.epicfight.skill.weaponinnate.WeaponInnateSkill;
 import yesman.epicfight.world.capabilities.entitypatch.player.ServerPlayerPatch;
-import yesman.epicfight.world.entity.eventlistener.PlayerEventListener.EventType;
 
 import java.util.List;
-import java.util.UUID;
 
 public class SternSlamSkill extends WeaponInnateSkill {
-    private static final UUID CONTACT_UUID = UUID.fromString("f6b71011-2d0c-4c2c-b5f2-b9e1f2ff3fc2");
     private static final int BUFF_DURATION_TICKS = 20 * 20;
     private static final double BUFF_RADIUS = 8.0D;
     private static final double BUFF_VERTICAL = 3.0D;
 
-    public SternSlamSkill(SkillBuilder<? extends WeaponInnateSkill> builder) {
+    public SternSlamSkill(WeaponInnateSkill.Builder<?> builder) {
         super(builder);
     }
 
     @Override
-    public void onInitiate(SkillContainer container) {
-        super.onInitiate(container);
-        container.getExecutor().getEventListener().addEventListener(
-                EventType.ATTACK_PHASE_END_EVENT,
-                CONTACT_UUID,
+    public void onInitiate(SkillContainer container, EntityEventListener eventListener) {
+        super.onInitiate(container, eventListener);
+        eventListener.registerEvent(
+                EpicFightEventHooks.Animation.ATTACK_PHASE_END,
                 event -> {
                     if (container.getExecutor().isLogicalClient()) {
                         return;
@@ -47,26 +44,25 @@ public class SternSlamSkill extends WeaponInnateSkill {
                         return;
                     }
 
-                    ServerPlayerPatch playerPatch = event.getPlayerPatch();
-                    if (playerPatch == null) {
+                    if (!(event.getEntityPatch() instanceof ServerPlayerPatch playerPatch)) {
                         return;
                     }
 
                     LivingEntity caster = playerPatch.getOriginal();
                     applyPhysicalResistanceBuff(caster);
                     BastionPassiveHandler.handleSternSlamContact(caster, caster.getOffhandItem());
-                }
+                },
+                this
         );
     }
 
     @Override
     public void onRemoved(SkillContainer container) {
-        container.getExecutor().getEventListener().removeListener(EventType.ATTACK_PHASE_END_EVENT, CONTACT_UUID);
         super.onRemoved(container);
     }
 
     @Override
-    public void executeOnServer(SkillContainer container, FriendlyByteBuf args) {
+    public void executeOnServer(SkillContainer container, CompoundTag args) {
         if (this.isActivated(container)) {
             return;
         }
@@ -78,7 +74,7 @@ public class SternSlamSkill extends WeaponInnateSkill {
     }
 
     @Override
-    public void executeOnClient(SkillContainer container, FriendlyByteBuf args) {
+    public void executeOnClient(SkillContainer container, CompoundTag args) {
         super.executeOnClient(container, args);
         if (!this.isActivated(container)) {
             container.activate();
@@ -86,14 +82,14 @@ public class SternSlamSkill extends WeaponInnateSkill {
     }
 
     @Override
-    public void cancelOnServer(SkillContainer container, FriendlyByteBuf args) {
+    public void cancelOnServer(SkillContainer container, CompoundTag args) {
         container.deactivate();
         super.cancelOnServer(container, args);
         container.getServerExecutor().modifyLivingMotionByCurrentItem(false);
     }
 
     @Override
-    public void cancelOnClient(SkillContainer container, FriendlyByteBuf args) {
+    public void cancelOnClient(SkillContainer container, CompoundTag args) {
         container.deactivate();
         super.cancelOnClient(container, args);
     }
@@ -111,7 +107,7 @@ public class SternSlamSkill extends WeaponInnateSkill {
             return;
         }
 
-        MobEffectInstance buff = new MobEffectInstance(PBMEffects.PHYSICAL_RESISTANCE.get(), BUFF_DURATION_TICKS, 0, false, true, true);
+        MobEffectInstance buff = new MobEffectInstance(PBMEffects.PHYSICAL_RESISTANCE, BUFF_DURATION_TICKS, 0, false, true, true);
         caster.addEffect(new MobEffectInstance(buff));
 
         if (!(caster instanceof ServerPlayer serverPlayer)) {

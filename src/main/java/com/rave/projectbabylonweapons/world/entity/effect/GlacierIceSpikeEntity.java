@@ -13,11 +13,11 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.network.NetworkHooks;
-import net.minecraftforge.network.PlayMessages;
+import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
+import net.minecraft.server.level.ServerEntity;
 import software.bernie.geckolib.animatable.GeoEntity;
-import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.animation.AnimatableManager;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 public class GlacierIceSpikeEntity extends Entity implements GeoEntity {
@@ -45,10 +45,6 @@ public class GlacierIceSpikeEntity extends Entity implements GeoEntity {
     }
 
     public GlacierIceSpikeEntity(Level level) {
-        this(PBModEntities.GLACIER_ICE_SPIKE.get(), level);
-    }
-
-    public GlacierIceSpikeEntity(PlayMessages.SpawnEntity packet, Level level) {
         this(PBModEntities.GLACIER_ICE_SPIKE.get(), level);
     }
 
@@ -133,11 +129,11 @@ public class GlacierIceSpikeEntity extends Entity implements GeoEntity {
     }
 
     @Override
-    protected void defineSynchedData() {
-        this.entityData.define(DATA_WAIT_TIME, 0);
-        this.entityData.define(DATA_RISE_HEIGHT, 1.4F);
-        this.entityData.define(DATA_SPIKE_SCALE, 1.0F);
-        this.entityData.define(DATA_MIRRORED, false);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        builder.define(DATA_WAIT_TIME, 0);
+        builder.define(DATA_RISE_HEIGHT, 1.4F);
+        builder.define(DATA_SPIKE_SCALE, 1.0F);
+        builder.define(DATA_MIRRORED, false);
     }
 
     @Override
@@ -157,8 +153,8 @@ public class GlacierIceSpikeEntity extends Entity implements GeoEntity {
     }
 
     @Override
-    public Packet<ClientGamePacketListener> getAddEntityPacket() {
-        return NetworkHooks.getEntitySpawningPacket(this);
+    public Packet<ClientGamePacketListener> getAddEntityPacket(ServerEntity serverEntity) {
+        return new ClientboundAddEntityPacket(this, serverEntity);
     }
 
     @Override

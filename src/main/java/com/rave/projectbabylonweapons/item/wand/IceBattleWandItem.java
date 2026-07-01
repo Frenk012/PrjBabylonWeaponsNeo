@@ -22,17 +22,17 @@ import net.minecraft.world.item.SwordItem;
 import net.minecraft.world.item.Tiers;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.client.extensions.common.IClientItemExtensions;
+import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 import software.bernie.geckolib.animatable.GeoItem;
-import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.core.animation.AnimatableManager;
-import software.bernie.geckolib.core.animation.AnimationController;
-import software.bernie.geckolib.core.animation.AnimationState;
-import software.bernie.geckolib.core.animation.RawAnimation;
-import software.bernie.geckolib.core.object.PlayState;
+import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.animation.AnimatableManager;
+import software.bernie.geckolib.animation.AnimationController;
+import software.bernie.geckolib.animation.AnimationState;
+import software.bernie.geckolib.animation.RawAnimation;
+import software.bernie.geckolib.animation.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 import yesman.epicfight.world.capabilities.entitypatch.player.ServerPlayerPatch;
-import yesman.epicfight.world.entity.eventlistener.AttackPhaseEndEvent;
+import yesman.epicfight.api.event.types.animation.AttackPhaseEndEvent;
 
 import java.util.function.Consumer;
 
@@ -48,11 +48,10 @@ public class IceBattleWandItem extends SwordItem implements GeoItem, MagicProjec
     public IceBattleWandItem() {
         super(
                 Tiers.DIAMOND,
-                ATTACK_DAMAGE_MOD,
-                ATTACK_SPEED_MOD,
                 new Item.Properties()
                         .durability(2600)
                         .rarity(Rarity.COMMON)
+                        .attributes(SwordItem.createAttributes(Tiers.DIAMOND, ATTACK_DAMAGE_MOD, ATTACK_SPEED_MOD))
         );
     }
 
@@ -73,7 +72,7 @@ public class IceBattleWandItem extends SwordItem implements GeoItem, MagicProjec
 
     @Override
     public float getSchoolResistMultiplier(LivingEntity target) {
-        return Math.max(0.0F, 1.0F + (float) target.getAttributeValue(AttributeRegistry.ICE_MAGIC_RESIST.get()));
+        return Math.max(0.0F, 1.0F + (float) target.getAttributeValue(AttributeRegistry.ICE_MAGIC_RESIST));
     }
 
     @Override

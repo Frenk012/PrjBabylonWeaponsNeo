@@ -31,15 +31,15 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.network.NetworkHooks;
-import net.minecraftforge.network.PlayMessages;
+import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
+import net.minecraft.server.level.ServerEntity;
 import org.joml.Vector3f;
 import software.bernie.geckolib.animatable.GeoEntity;
-import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.core.animation.AnimatableManager;
-import software.bernie.geckolib.core.animation.AnimationController;
-import software.bernie.geckolib.core.animation.RawAnimation;
-import software.bernie.geckolib.core.object.PlayState;
+import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.animation.AnimatableManager;
+import software.bernie.geckolib.animation.AnimationController;
+import software.bernie.geckolib.animation.RawAnimation;
+import software.bernie.geckolib.animation.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 import yesman.epicfight.world.damagesource.StunType;
 
@@ -90,10 +90,6 @@ public class BasicSpellProjectileEntity extends Projectile implements GeoEntity 
     }
 
     public BasicSpellProjectileEntity(Level level) {
-        this(PBModEntities.BASIC_SPELL_PROJECTILE.get(), level);
-    }
-
-    public BasicSpellProjectileEntity(PlayMessages.SpawnEntity packet, Level level) {
         this(PBModEntities.BASIC_SPELL_PROJECTILE.get(), level);
     }
 
@@ -184,14 +180,14 @@ public class BasicSpellProjectileEntity extends Projectile implements GeoEntity 
     }
 
     @Override
-    public Packet<ClientGamePacketListener> getAddEntityPacket() {
-        return NetworkHooks.getEntitySpawningPacket(this);
+    public Packet<ClientGamePacketListener> getAddEntityPacket(ServerEntity serverEntity) {
+        return new ClientboundAddEntityPacket(this, serverEntity);
     }
 
     @Override
-    protected void defineSynchedData() {
-        this.entityData.define(DATA_TRAIL_COLOR, DEFAULT_TRAIL_COLOR);
-        this.entityData.define(DATA_VISUAL_SCALE, 1.0F);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        builder.define(DATA_TRAIL_COLOR, DEFAULT_TRAIL_COLOR);
+        builder.define(DATA_VISUAL_SCALE, 1.0F);
     }
 
     @Override
@@ -306,7 +302,7 @@ public class BasicSpellProjectileEntity extends Projectile implements GeoEntity 
         tag.putBoolean(TAG_BASIC_WAND_ATTACK, this.basicWandAttack);
         tag.putBoolean(TAG_HOMING_ENABLED, this.homingEnabled);
         if (!this.sourceWeapon.isEmpty()) {
-            tag.put(TAG_SOURCE_WEAPON, this.sourceWeapon.save(new CompoundTag()));
+            tag.put(TAG_SOURCE_WEAPON, this.sourceWeapon.save(this.registryAccess()));
         }
     }
 
@@ -330,7 +326,7 @@ public class BasicSpellProjectileEntity extends Projectile implements GeoEntity 
             this.setTrailColor(tag.getInt(TAG_TRAIL_COLOR));
         }
         if (tag.contains(TAG_SOURCE_WEAPON)) {
-            this.sourceWeapon = ItemStack.of(tag.getCompound(TAG_SOURCE_WEAPON));
+            this.sourceWeapon = ItemStack.parse(this.registryAccess(), tag.getCompound(TAG_SOURCE_WEAPON)).orElse(ItemStack.EMPTY);
         }
     }
 

@@ -14,29 +14,24 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.TieredItem;
 import net.minecraft.world.item.Tiers;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
 import yesman.epicfight.api.animation.AnimationManager;
 import yesman.epicfight.api.animation.LivingMotions;
-import yesman.epicfight.api.forgeevent.WeaponCapabilityPresetRegistryEvent;
+import yesman.epicfight.api.event.EpicFightEventHooks;
+import yesman.epicfight.api.event.types.registry.WeaponCapabilityPresetRegistryEvent;
 import yesman.epicfight.gameasset.Animations;
-import yesman.epicfight.gameasset.EpicFightSkills;
-import yesman.epicfight.gameasset.EpicFightSounds;
+import yesman.epicfight.registry.entries.EpicFightSkills;
+import yesman.epicfight.registry.entries.EpicFightSounds;
 import yesman.epicfight.main.EpicFightMod;
-import yesman.epicfight.particle.EpicFightParticles;
+import yesman.epicfight.registry.entries.EpicFightParticles;
 import yesman.epicfight.skill.SkillSlots;
 import yesman.epicfight.world.capabilities.EpicFightCapabilities;
 import yesman.epicfight.world.capabilities.entitypatch.player.PlayerPatch;
 import yesman.epicfight.world.capabilities.item.CapabilityItem;
 import yesman.epicfight.world.capabilities.item.WeaponCapability;
 
-@Mod.EventBusSubscriber(
-        modid = "project_babylon_weapons",
-        bus = Mod.EventBusSubscriber.Bus.MOD
-)
 public class PBWeaponCapabilityPresets {
 
-    public static final Function<Item, CapabilityItem.Builder> SICKLE = (item) -> {
+    public static final Function<Item, CapabilityItem.Builder<?>> SICKLE = (item) -> {
         WeaponCapability.Builder builder = WeaponCapability.builder()
                 .category(PBWeaponCategories.PB_SICKLE)
                 .styleProvider((playerpatch) -> {
@@ -83,8 +78,8 @@ public class PBWeaponCapabilityPresets {
                 .newStyleCombo(CapabilityItem.Styles.MOUNT, new AnimationManager.AnimationAccessor[]{
                         Animations.SWORD_MOUNT_ATTACK
                 })
-                .innateSkill(CapabilityItem.Styles.ONE_HAND, (itemstack) -> PBSkills.SICKLE_THROW)
-                .innateSkill(CapabilityItem.Styles.TWO_HAND, (itemstack) -> PBSkills.THE_HARVEST)
+                .innateSkill(CapabilityItem.Styles.ONE_HAND, (itemstack) -> PBSkills.SICKLE_THROW.get())
+                .innateSkill(CapabilityItem.Styles.TWO_HAND, (itemstack) -> PBSkills.THE_HARVEST.get())
                 .livingMotionModifier(CapabilityItem.Styles.ONE_HAND, LivingMotions.IDLE, PBAnimations.SICKLE_IDLE)
                 .livingMotionModifier(CapabilityItem.Styles.ONE_HAND, LivingMotions.KNEEL, PBAnimations.SICKLE_HOLD)
                 .livingMotionModifier(CapabilityItem.Styles.ONE_HAND, LivingMotions.WALK, PBAnimations.SICKLE_WALK)
@@ -109,7 +104,7 @@ public class PBWeaponCapabilityPresets {
         return builder;
     };
 
-    public static final Function<Item, CapabilityItem.Builder> ARCLIGHT = (item) -> {
+    public static final Function<Item, CapabilityItem.Builder<?>> ARCLIGHT = (item) -> {
         WeaponCapability.Builder builder = WeaponCapability.builder()
                 .category(PBWeaponCategories.ARCLIGHT)
                 .styleProvider((playerpatch) -> CapabilityItem.Styles.TWO_HAND)
@@ -144,7 +139,7 @@ public class PBWeaponCapabilityPresets {
                 .newStyleCombo(CapabilityItem.Styles.MOUNT, new AnimationManager.AnimationAccessor[]{
                         Animations.SWORD_MOUNT_ATTACK
                 })
-                .innateSkill(CapabilityItem.Styles.TWO_HAND, (itemstack) -> PBSkills.THE_HARVEST)
+                .innateSkill(CapabilityItem.Styles.TWO_HAND, (itemstack) -> PBSkills.THE_HARVEST.get())
                 .livingMotionModifier(CapabilityItem.Styles.TWO_HAND, LivingMotions.IDLE, PBAnimations.ARCLIGHT_IDLE)
                 .livingMotionModifier(CapabilityItem.Styles.TWO_HAND, LivingMotions.KNEEL, Animations.BIPED_KNEEL)
                 .livingMotionModifier(CapabilityItem.Styles.TWO_HAND, LivingMotions.WALK, PBAnimations.ARCLIGHT_WALK)
@@ -158,7 +153,7 @@ public class PBWeaponCapabilityPresets {
         return builder;
     };
 
-    public static final Function<Item, CapabilityItem.Builder> PB_WAND = (item) -> {
+    public static final Function<Item, CapabilityItem.Builder<?>> PB_WAND = (item) -> {
         WeaponCapability.Builder builder = WeaponCapability.builder()
                 .category(PBWeaponCategories.PB_WAND)
                 .styleProvider((playerpatch) -> CapabilityItem.Styles.TWO_HAND)
@@ -193,7 +188,7 @@ public class PBWeaponCapabilityPresets {
                 .newStyleCombo(CapabilityItem.Styles.MOUNT, new AnimationManager.AnimationAccessor[]{
                         Animations.SWORD_MOUNT_ATTACK
                 })
-                .innateSkill(CapabilityItem.Styles.TWO_HAND, (itemstack) -> PBSkills.MANA_BUBBLE)
+                .innateSkill(CapabilityItem.Styles.TWO_HAND, (itemstack) -> PBSkills.MANA_BUBBLE.get())
                 .livingMotionModifier(CapabilityItem.Styles.TWO_HAND, LivingMotions.IDLE, PBAnimations.WAND_IDLE)
                 .livingMotionModifier(CapabilityItem.Styles.TWO_HAND, LivingMotions.KNEEL, Animations.BIPED_KNEEL)
                 .livingMotionModifier(CapabilityItem.Styles.TWO_HAND, LivingMotions.WALK, PBAnimations.WAND_WALK)
@@ -207,7 +202,7 @@ public class PBWeaponCapabilityPresets {
         return builder;
     };
 
-    public static final Function<Item, CapabilityItem.Builder> PB_LONGSWORD = (item) -> {
+    public static final Function<Item, CapabilityItem.Builder<?>> PB_LONGSWORD = (item) -> {
         WeaponCapability.Builder builder = WeaponCapability.builder()
                 .category(CapabilityItem.WeaponCategories.LONGSWORD)
                 .styleProvider((playerpatch) -> {
@@ -228,8 +223,8 @@ public class PBWeaponCapabilityPresets {
                 .newStyleCombo(PBLongswordStyles.BASTION, CorruptAnimations.SWORD_ONEHAND_AUTO1, CorruptAnimations.SWORD_ONEHAND_AUTO2, CorruptAnimations.SWORD_ONEHAND_AUTO3, CorruptAnimations.SWORD_ONEHAND_AUTO4, CorruptAnimations.SWORD_ONEHAND_DASH, Animations.SWORD_AIR_SLASH)
                 .innateSkill(CapabilityItem.Styles.ONE_HAND, (itemstack) -> CDSkills.SHILEDSLASH)
                 .innateSkill(CapabilityItem.Styles.TWO_HAND, (itemstack) -> CDSkills.GUARDPARRY)
-                .innateSkill(CapabilityItem.Styles.OCHS, (itemstack) -> EpicFightSkills.LIECHTENAUER)
-                .innateSkill(PBLongswordStyles.BASTION, (itemstack) -> PBSkills.STERN_SLAM)
+                .innateSkill(CapabilityItem.Styles.OCHS, (itemstack) -> EpicFightSkills.LIECHTENAUER.get())
+                .innateSkill(PBLongswordStyles.BASTION, (itemstack) -> PBSkills.STERN_SLAM.get())
                 .livingMotionModifier(CapabilityItem.Styles.COMMON, LivingMotions.IDLE, PBAnimations.BASTION_IDLE)
                 .livingMotionModifier(CapabilityItem.Styles.COMMON, LivingMotions.WALK, Animations.BIPED_WALK_LONGSWORD)
                 .livingMotionModifier(CapabilityItem.Styles.COMMON, LivingMotions.CHASE, Animations.BIPED_WALK_LONGSWORD)
@@ -260,7 +255,10 @@ public class PBWeaponCapabilityPresets {
         return builder;
     };
 
-    @SubscribeEvent
+    public static void register() {
+        EpicFightEventHooks.Registry.WEAPON_CAPABILITY_PRESET.registerEvent(PBWeaponCapabilityPresets::registerWeaponPresets);
+    }
+
     public static void registerWeaponPresets(WeaponCapabilityPresetRegistryEvent event) {
         event.getTypeEntry().put(
                 ResourceLocation.fromNamespaceAndPath("project_babylon_weapons", "pb_sickle"),

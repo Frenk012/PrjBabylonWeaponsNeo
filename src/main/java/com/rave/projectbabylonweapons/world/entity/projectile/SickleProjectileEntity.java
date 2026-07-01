@@ -33,8 +33,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.network.PlayMessages;
-import net.minecraftforge.network.NetworkHooks;
+import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
+import net.minecraft.server.level.ServerEntity;
 import java.util.UUID;
 
 import yesman.epicfight.world.damagesource.EpicFightDamageSource;
@@ -71,21 +71,17 @@ public class SickleProjectileEntity extends ThrowableItemProjectile implements P
         // Position is set via shootFromRotation in skill logic
     }
 
-    public SickleProjectileEntity(PlayMessages.SpawnEntity packet, Level level) {
-        this(PBModEntities.SICKLE_PROJECTILE.get(), level);
+    @Override
+    public Packet<ClientGamePacketListener> getAddEntityPacket(ServerEntity serverEntity) {
+        return new ClientboundAddEntityPacket(this, serverEntity);
     }
 
     @Override
-    public Packet<ClientGamePacketListener> getAddEntityPacket() {
-        return NetworkHooks.getEntitySpawningPacket(this);
-    }
-
-    @Override
-    protected void defineSynchedData() {
-        super.defineSynchedData();
-        this.entityData.define(DATA_ITEM_STACK, ItemStack.EMPTY);
-        this.entityData.define(DATA_TETHERED, false);
-        this.entityData.define(DATA_OWNER_ID, -1);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(DATA_ITEM_STACK, ItemStack.EMPTY);
+        builder.define(DATA_TETHERED, false);
+        builder.define(DATA_OWNER_ID, -1);
     }
 
     @Override
@@ -268,9 +264,9 @@ public class SickleProjectileEntity extends ThrowableItemProjectile implements P
         target.hurt(epicSource, SickleThrowSkill.PROJECTILE_DAMAGE);
 
         // Apply effects
-        target.addEffect(new MobEffectInstance(PBMEffects.MARKED.get(), SickleThrowSkill.TETHER_DURATION_TICKS, 0, false, true, true));
+        target.addEffect(new MobEffectInstance(PBMEffects.MARKED, SickleThrowSkill.TETHER_DURATION_TICKS, 0, false, true, true));
         target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, SickleThrowSkill.TETHER_DURATION_TICKS, 0, false, true, true)); // Slow effect during tether
-        target.addEffect(new MobEffectInstance(PBMEffects.CHAINED.get(), SickleThrowSkill.TETHER_DURATION_TICKS, 0, false, true, true));
+        target.addEffect(new MobEffectInstance(PBMEffects.CHAINED, SickleThrowSkill.TETHER_DURATION_TICKS, 0, false, true, true));
 
         // Activate tether
         this.tetherTarget = target;
@@ -376,8 +372,8 @@ public class SickleProjectileEntity extends ThrowableItemProjectile implements P
     }
 
     @Override
-    protected float getGravity() {
-        return 0.0f; // No gravity
+    protected double getDefaultGravity() {
+        return 0.0; // No gravity
     }
 
     private void startReturning() {
@@ -390,7 +386,7 @@ public class SickleProjectileEntity extends ThrowableItemProjectile implements P
 
     private static void clearChainedEffect(@Nullable LivingEntity target) {
         if (target != null) {
-            target.removeEffect(PBMEffects.CHAINED.get());
+            target.removeEffect(PBMEffects.CHAINED);
         }
     }
 

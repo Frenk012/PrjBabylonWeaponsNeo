@@ -9,22 +9,22 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.tick.ServerTickEvent;
+import yesman.epicfight.api.event.EntityEventListener;
+import yesman.epicfight.api.event.EpicFightEventHooks;
 import yesman.epicfight.skill.SkillContainer;
 import yesman.epicfight.skill.weaponinnate.SimpleWeaponInnateSkill;
-import yesman.epicfight.world.entity.eventlistener.PlayerEventListener.EventType;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 
-@Mod.EventBusSubscriber(modid = ProjectBabylonWeapons.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+@EventBusSubscriber(modid = ProjectBabylonWeapons.MODID)
 public class UppercutSkill extends SimpleWeaponInnateSkill {
 
-    private static final UUID DAMAGE_UUID = UUID.fromString("d3a1f2c4-9b7e-4a11-8c3d-1f2e3a4b5c6d");
     private static final int FEAR_DURATION_TICKS = 3 * 20;
     private static final float KNOCKUP_VELOCITY = 0.70F;
     private static final int KNOCKUP_DELAY_TICKS = 1;
@@ -48,19 +48,13 @@ public class UppercutSkill extends SimpleWeaponInnateSkill {
     }
 
     @Override
-    public void onInitiate(SkillContainer container) {
-        super.onInitiate(container);
+    public void onInitiate(SkillContainer container, EntityEventListener eventListener) {
+        super.onInitiate(container, eventListener);
 
-        container.getExecutor().getEventListener().addEventListener(
-                EventType.DEAL_DAMAGE_EVENT_HURT,
-                DAMAGE_UUID,
+        eventListener.registerEvent(
+                EpicFightEventHooks.Entity.DELIVER_DAMAGE_POST,
                 (event) -> {
-                    var eventAnim = event.getDamageSource().getAnimation();
-                    if (eventAnim == null) {
-                        return;
-                    }
-
-                    if (!eventAnim.toString().equals(PBAnimations.UPPERCUT.registryName().toString())) {
+                    if (event.getDamageSource().getAnimation() != PBAnimations.UPPERCUT) {
                         return;
                     }
 
@@ -70,7 +64,8 @@ public class UppercutSkill extends SimpleWeaponInnateSkill {
                     }
 
                     queueKnockupAndFear(target);
-                }
+                },
+                this
         );
     }
 
@@ -84,8 +79,8 @@ public class UppercutSkill extends SimpleWeaponInnateSkill {
     }
 
     @SubscribeEvent
-    public static void onServerTick(TickEvent.ServerTickEvent event) {
-        if (event.phase != TickEvent.Phase.END || PENDING_KNOCKUPS.isEmpty()) {
+    public static void onServerTick(ServerTickEvent.Post event) {
+        if (PENDING_KNOCKUPS.isEmpty()) {
             return;
         }
 
@@ -125,7 +120,7 @@ public class UppercutSkill extends SimpleWeaponInnateSkill {
         target.hurtMarked = true;
 
         target.addEffect(new MobEffectInstance(
-                PBMEffects.FEAR_DEBUFF.get(),
+                PBMEffects.FEAR_DEBUFF,
                 FEAR_DURATION_TICKS,
                 0,
                 false,
@@ -136,8 +131,6 @@ public class UppercutSkill extends SimpleWeaponInnateSkill {
 
     @Override
     public void onRemoved(SkillContainer container) {
-        container.getExecutor().getEventListener().removeListener(EventType.DEAL_DAMAGE_EVENT_HURT, DAMAGE_UUID);
         super.onRemoved(container);
     }
 }
-

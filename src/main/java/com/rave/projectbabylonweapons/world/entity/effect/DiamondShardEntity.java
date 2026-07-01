@@ -23,11 +23,12 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.network.NetworkHooks;
+import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
+import net.minecraft.server.level.ServerEntity;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.animatable.GeoEntity;
-import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.animation.AnimatableManager;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.Optional;
@@ -131,12 +132,12 @@ public class DiamondShardEntity extends Entity implements GeoEntity {
     }
 
     @Override
-    protected void defineSynchedData() {
-        this.entityData.define(DATA_OWNER_UUID, Optional.empty());
-        this.entityData.define(DATA_ORBIT_SLOT, 0);
-        this.entityData.define(DATA_ORBIT_TOTAL, 1);
-        this.entityData.define(DATA_LAUNCHED, false);
-        this.entityData.define(DATA_DAMAGE, 0.0F);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        builder.define(DATA_OWNER_UUID, Optional.empty());
+        builder.define(DATA_ORBIT_SLOT, 0);
+        builder.define(DATA_ORBIT_TOTAL, 1);
+        builder.define(DATA_LAUNCHED, false);
+        builder.define(DATA_DAMAGE, 0.0F);
     }
 
     @Override
@@ -168,8 +169,8 @@ public class DiamondShardEntity extends Entity implements GeoEntity {
     }
 
     @Override
-    public Packet<ClientGamePacketListener> getAddEntityPacket() {
-        return NetworkHooks.getEntitySpawningPacket(this);
+    public Packet<ClientGamePacketListener> getAddEntityPacket(ServerEntity serverEntity) {
+        return new ClientboundAddEntityPacket(this, serverEntity);
     }
 
     @Override
@@ -278,7 +279,7 @@ public class DiamondShardEntity extends Entity implements GeoEntity {
         } finally {
             target.invulnerableTime = originalInvulnerableTime;
         }
-        target.addEffect(new MobEffectInstance(PBMEffects.WEAPON_CHIP.get(), this.weaponChipDurationTicks, 0, false, true, true));
+        target.addEffect(new MobEffectInstance(PBMEffects.WEAPON_CHIP, this.weaponChipDurationTicks, 0, false, true, true));
         this.discardWithEffects();
     }
 

@@ -8,42 +8,36 @@ import com.rave.projectbabylonweapons.item.MagicProjectileStaffWeapon;
 import com.rave.projectbabylonweapons.world.entity.projectile.ManaBubbleProjectileEntity;
 import io.redspace.ironsspellbooks.registries.SoundRegistry;
 import net.minecraft.client.KeyMapping;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import yesman.epicfight.api.event.EntityEventListener;
+import yesman.epicfight.api.event.EpicFightEventHooks;
 import yesman.epicfight.client.input.EpicFightKeyMappings;
-import yesman.epicfight.skill.SkillBuilder;
 import yesman.epicfight.skill.SkillContainer;
 import yesman.epicfight.skill.weaponinnate.WeaponInnateSkill;
 import yesman.epicfight.world.capabilities.entitypatch.player.ServerPlayerPatch;
-import yesman.epicfight.world.entity.eventlistener.AnimationEndEvent;
-import yesman.epicfight.world.entity.eventlistener.PlayerEventListener.EventType;
-
-import java.util.UUID;
 
 public class ManaBubbleSkill extends WeaponInnateSkill {
-    private static final UUID CONTACT_UUID = UUID.fromString("efec2a91-5997-4ca1-9f2a-8ef9f1de7b93");
-    private static final UUID END_UUID = UUID.fromString("79f1297d-10f0-4e5a-bfdb-83d6d8adf4d9");
     private static final float DAMAGE_MULTIPLIER = 3.0F;
     private static final float SPEED_MULTIPLIER = 0.15F;
     private static final float RENDER_SCALE = 7.0F;
     private static final float DRAG_STRENGTH = 0.82F;
     private static final int MIN_LIFETIME = 40;
 
-    public ManaBubbleSkill(SkillBuilder<? extends WeaponInnateSkill> builder) {
+    public ManaBubbleSkill(WeaponInnateSkill.Builder<?> builder) {
         super(builder);
     }
 
     @Override
-    public void onInitiate(SkillContainer container) {
-        super.onInitiate(container);
-        container.getExecutor().getEventListener().addEventListener(
-                EventType.ATTACK_PHASE_END_EVENT,
-                CONTACT_UUID,
+    public void onInitiate(SkillContainer container, EntityEventListener eventListener) {
+        super.onInitiate(container, eventListener);
+        eventListener.registerEvent(
+                EpicFightEventHooks.Animation.ATTACK_PHASE_END,
                 event -> {
                     if (container.getExecutor().isLogicalClient()) {
                         return;
@@ -57,8 +51,7 @@ public class ManaBubbleSkill extends WeaponInnateSkill {
                         return;
                     }
 
-                    ServerPlayerPatch playerPatch = event.getPlayerPatch();
-                    if (playerPatch == null) {
+                    if (!(event.getEntityPatch() instanceof ServerPlayerPatch playerPatch)) {
                         return;
                     }
 
@@ -87,13 +80,11 @@ public class ManaBubbleSkill extends WeaponInnateSkill {
 
     @Override
     public void onRemoved(SkillContainer container) {
-        container.getExecutor().getEventListener().removeListener(EventType.ATTACK_PHASE_END_EVENT, CONTACT_UUID);
-        container.getExecutor().getEventListener().removeListener(EventType.ANIMATION_END_EVENT, END_UUID);
         super.onRemoved(container);
     }
 
     @Override
-    public void executeOnServer(SkillContainer container, FriendlyByteBuf args) {
+    public void executeOnServer(SkillContainer container, CompoundTag args) {
         super.executeOnServer(container, args);
         container.activate();
         container.getExecutor().getOriginal().level().playSound(
@@ -111,19 +102,19 @@ public class ManaBubbleSkill extends WeaponInnateSkill {
     }
 
     @Override
-    public void executeOnClient(SkillContainer container, FriendlyByteBuf args) {
+    public void executeOnClient(SkillContainer container, CompoundTag args) {
         super.executeOnClient(container, args);
         container.activate();
     }
 
     @Override
-    public void cancelOnServer(SkillContainer container, FriendlyByteBuf args) {
+    public void cancelOnServer(SkillContainer container, CompoundTag args) {
         container.deactivate();
         super.cancelOnServer(container, args);
     }
 
     @Override
-    public void cancelOnClient(SkillContainer container, FriendlyByteBuf args) {
+    public void cancelOnClient(SkillContainer container, CompoundTag args) {
         container.deactivate();
         super.cancelOnClient(container, args);
     }
@@ -134,16 +125,6 @@ public class ManaBubbleSkill extends WeaponInnateSkill {
             PBAnimations.MANA_BUBBLE.get().phases[0].addProperties(this.properties.get(0).entrySet());
         }
         return this;
-    }
-
-    private static void onAnimationEnd(SkillContainer container, AnimationEndEvent event) {
-        if (event.getAnimation() != PBAnimations.MANA_BUBBLE.get()) {
-            return;
-        }
-
-        if (container.isActivated()) {
-            container.deactivate();
-        }
     }
 
     private static void spawnManaBubble(ServerPlayerPatch playerPatch, ItemStack weaponStack) {
