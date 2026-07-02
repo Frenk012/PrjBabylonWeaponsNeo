@@ -119,3 +119,18 @@ The Forge `main` branch was updated with fixes + features. We imported that delt
 2. Resolve blocker 1 (materials effects).
 3. `./gradlew compileJava` and finish porting the remaining delta errors (skill/passive/handler/client/network were the cut-off clusters).
 4. Then: runtime test (was working before the delta), and the still-pending data-resource migration (recipes/loot/lang layout, GeckoLib idle animations, EF animation format).
+
+---
+# WAVE 2 COMPLETE (2026-07-01): main delta ported, builds, resources synced
+
+- Weapons + Materials both compile & build. main delta (shields, stern_slam, entities, effect-move) fully ported.
+- Materials mod updated: PBMEffects now has all 21 effects + PBMPhotonEffectHelper Bastion auras (committed in ../PrjBabilonMaterialPort neo_1.21.1). Fresh jar copied to weapons run/mods.
+- cdmoveset (net.corruptdog.cdm) added to compile classpath.
+- FIXED a big gap: the resource delta import missed 394 files (git pathspec). Restored all resources present on main but missing from the branch (animations, shield textures/models). Java verified complete (HEAD == main).
+- EF animation clips migrated to 21.x format: clip JSONs must be `{"animation":[...]}` only (old bundled vertices/armature/constructor removed). 115 clips converted. Non-clip EF files (trail_effects, layer/masks/priority, multilayer) left as-is.
+- Materials Photon FX runtime is a no-op stub on neo_1.21.1 (ALL effects, not just bastion) → particle visuals won't render until that shared stub is implemented (non-fatal).
+
+## Still possibly pending (runtime polish)
+- EF datapack animations (data/epicfight/...) with "No constructor information" (~non-fatal earlier) may need a `constructor` field for 21.x.
+- GeckoLib idle-animation lookups, recipe/loot/lang 1.21.1 layout — verify at runtime.
+- Runtime: retest weapon use after the missing-clip fix.
