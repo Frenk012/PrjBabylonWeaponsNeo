@@ -35,7 +35,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-@EventBusSubscriber(modid = ProjectBabylonWeapons.MODID, bus = EventBusSubscriber.Bus.GAME)
 public class SickleThrowSkill extends WeaponInnateSkill implements ChargeableSkill {
     private static final net.minecraft.resources.ResourceLocation CHARGING_SLOW_ID = net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(ProjectBabylonWeapons.MODID, "sickle_throw_charging_slow");
     private static final double CHARGING_SLOW_MULTIPLIER = -0.7D;
@@ -307,7 +306,6 @@ public class SickleThrowSkill extends WeaponInnateSkill implements ChargeableSki
         return null;
     }
 
-    @SubscribeEvent
     public static void onPlayerTick(PlayerTickEvent.Post event) {
         if (!(event.getEntity() instanceof ServerPlayer serverPlayer)) {
             return;
@@ -319,7 +317,6 @@ public class SickleThrowSkill extends WeaponInnateSkill implements ChargeableSki
         }
     }
 
-    @SubscribeEvent
     public static void onPlayerLogout(PlayerEvent.PlayerLoggedOutEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer serverPlayer)) {
             return;
@@ -333,7 +330,6 @@ public class SickleThrowSkill extends WeaponInnateSkill implements ChargeableSki
         }
     }
 
-    @SubscribeEvent
     public static void onPlayerDeath(LivingDeathEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer serverPlayer)) {
             return;

@@ -54,6 +54,20 @@ public class ProjectBabylonWeapons {
         PBWeaponCapabilityPresets.register();
 
         NeoForge.EVENT_BUS.addListener(this::addReloadListeners);
+
+        // Skill event handlers registered via addListener instead of @EventBusSubscriber:
+        // the bus's annotation scan reflects over the whole class hierarchy (checkSupertypes ->
+        // getDeclaredMethods), and Epic Fight's Skill superclasses declare client-only methods
+        // (GuiGraphics in signatures), which crashes class-loading on a dedicated server.
+        NeoForge.EVENT_BUS.addListener(com.rave.projectbabylonweapons.skill.weapon_innate.GlacierSkill::onServerTick);
+        NeoForge.EVENT_BUS.addListener(com.rave.projectbabylonweapons.skill.weapon_innate.TectonicSkill::onServerTick);
+        NeoForge.EVENT_BUS.addListener(com.rave.projectbabylonweapons.skill.weapon_innate.UppercutSkill::onServerTick);
+        NeoForge.EVENT_BUS.addListener(com.rave.projectbabylonweapons.skill.weapon_innate.RebirthSkill::onLivingAttack);
+        NeoForge.EVENT_BUS.addListener(com.rave.projectbabylonweapons.skill.weapon_innate.RebirthSkill::onLivingHurt);
+        NeoForge.EVENT_BUS.addListener(com.rave.projectbabylonweapons.skill.weapon_innate.RebirthSkill::onLivingTick);
+        NeoForge.EVENT_BUS.addListener(com.rave.projectbabylonweapons.skill.weapon_innate.SickleThrowSkill::onPlayerTick);
+        NeoForge.EVENT_BUS.addListener(com.rave.projectbabylonweapons.skill.weapon_innate.SickleThrowSkill::onPlayerLogout);
+        NeoForge.EVENT_BUS.addListener(com.rave.projectbabylonweapons.skill.weapon_innate.SickleThrowSkill::onPlayerDeath);
     }
 
     private void commonSetup(FMLCommonSetupEvent event) {

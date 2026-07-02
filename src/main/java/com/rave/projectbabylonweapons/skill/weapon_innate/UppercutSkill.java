@@ -22,7 +22,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 
-@EventBusSubscriber(modid = ProjectBabylonWeapons.MODID)
 public class UppercutSkill extends SimpleWeaponInnateSkill {
 
     private static final int FEAR_DURATION_TICKS = 3 * 20;
@@ -78,7 +77,6 @@ public class UppercutSkill extends SimpleWeaponInnateSkill {
         PENDING_KNOCKUPS.put(target.getUUID(), new PendingKnockup(serverLevel.dimension(), applyAt));
     }
 
-    @SubscribeEvent
     public static void onServerTick(ServerTickEvent.Post event) {
         if (PENDING_KNOCKUPS.isEmpty()) {
             return;

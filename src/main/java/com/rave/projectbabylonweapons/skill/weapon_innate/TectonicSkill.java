@@ -33,7 +33,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-@EventBusSubscriber(modid = ProjectBabylonWeapons.MODID)
 public class TectonicSkill extends SimpleWeaponInnateSkill {
 
     private static final UUID TECTONIC_BEGIN_UUID = UUID.fromString("f306ba6f-4842-455e-b9ec-2ca8c6f79e5d");
@@ -115,7 +114,6 @@ public class TectonicSkill extends SimpleWeaponInnateSkill {
         super.onRemoved(container);
     }
 
-    @SubscribeEvent
     public static void onServerTick(ServerTickEvent.Post event) {
         if (ACTIVE_WAVES.isEmpty()) {
             return;

@@ -46,7 +46,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-@EventBusSubscriber(modid = com.rave.projectbabylonweapons.ProjectBabylonWeapons.MODID)
 public class GlacierSkill extends SimpleWeaponInnateSkill {
     private static final int CHILL_DURATION_TICKS = 15 * 20;
     private static final int FROZEN_DURATION_TICKS = 4 * 20;
@@ -181,7 +180,6 @@ public class GlacierSkill extends SimpleWeaponInnateSkill {
         WeaponVisualEffectHelper.stopGlacierCast(container.getExecutor().getOriginal());
         super.onRemoved(container);
     }
-    @SubscribeEvent
     public static void onServerTick(ServerTickEvent.Post event) {
         if (ACTIVE_CASTS.isEmpty()) {
             return;

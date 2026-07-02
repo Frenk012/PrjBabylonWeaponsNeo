@@ -27,7 +27,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-@EventBusSubscriber(modid = ProjectBabylonWeapons.MODID, bus = EventBusSubscriber.Bus.GAME)
 public class RebirthSkill extends WeaponInnateSkill {
     private static final Set<UUID> ACTIVE_REBIRTH = ConcurrentHashMap.newKeySet();
 
@@ -146,7 +145,6 @@ public class RebirthSkill extends WeaponInnateSkill {
         return true;
     }
 
-    @SubscribeEvent
     public static void onLivingAttack(LivingIncomingDamageEvent event) {
         LivingEntity entity = event.getEntity();
         if (entity.level().isClientSide() || event.isCanceled()) {
@@ -164,7 +162,6 @@ public class RebirthSkill extends WeaponInnateSkill {
         event.setCanceled(true);
     }
 
-    @SubscribeEvent
     public static void onLivingHurt(LivingDamageEvent.Pre event) {
         LivingEntity entity = event.getEntity();
         if (entity.level().isClientSide()) {
@@ -182,7 +179,6 @@ public class RebirthSkill extends WeaponInnateSkill {
         event.setNewDamage(0.0F);
     }
 
-    @SubscribeEvent
     public static void onLivingTick(EntityTickEvent.Post event) {
         if (!(event.getEntity() instanceof LivingEntity entity)) {
             return;
